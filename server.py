@@ -38,8 +38,6 @@ def add_poll_to_db():
     poll_type = int(request.form.get('poll_type'))
     is_results_visible = bool(request.form.get('is_results_visible'))
     email = request.form.get('email')
-    responses = request.form.get('responses')
-
     # print title, prompt, poll_type, is_results_visible, email, responses
 
     # get or create User
@@ -56,6 +54,9 @@ def add_poll_to_db():
         # print user
 
     # create Poll
+
+    # generate access code
+    # generate short code
     admin_code = uuid4().hex
     short_code = ShortUUID().random(length=8)
 
@@ -75,21 +76,25 @@ def add_poll_to_db():
     admin = PollAdmin(poll_id=poll.poll_id, user_id=user.user_id, created_at=datetime.now())
     db.session.add(admin)
     db.session.commit()
-    print admin
+    # print admin
 
+    # send poll creation email to user
 
     # if not open-ended, create Response objects
+    if poll.poll_type.name != "open-ended":
+        responses = request.form.get('responses')
+        responses = responses.split('\n')
+        # print responses
 
-    # generate access code
-    # generate short code
+        for response in responses:
+            response = Response(poll_id=poll.poll_id, user_id=user.user_id, text=response.strip(),
+                order=responses.index(response), created_at=datetime.now())
+            db.session.add(response)
+        db.session.commit()
 
-    # grab timestamp for created_at
-
-    # add to database
+        # print poll.responses
 
     return render_template('add-poll.html')
-
-
 
 
 

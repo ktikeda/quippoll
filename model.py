@@ -106,7 +106,7 @@ class Response(db.Model):
     users = db.relationship('User', secondary='tallys', backref='responses')  # returns of list of all users who have selected the response
 
     def __repr__(self):
-        return "<Response id={} poll_id={} text={}>".format(self.response_id, self.poll_id, self.poll_type_id, self.text)
+        return "<Response id={} poll_id={} text={}>".format(self.response_id, self.poll_id, self.text)
 
 
 class Tally(db.Model):
