@@ -128,6 +128,7 @@ class AdminRole(db.Model):
 
     role_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     name = db.Column(db.String(20), nullable=False)
+    description = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
 
@@ -142,7 +143,7 @@ class PollAdmin(db.Model):
 
     admin_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     poll_id = db.Column(db.Integer, db.ForeignKey('polls.poll_id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False, default=1)
     role_id = db.Column(db.Integer, db.ForeignKey('admin_roles.role_id'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
