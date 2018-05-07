@@ -63,7 +63,7 @@ class User(db.Model):
     lname = db.Column(db.String(20), nullable=True)
     email = db.Column(db.String(100), nullable=True)
     password = db.Column(db.String(20), nullable=True)
-    session_id = db.Column(db.String(20), nullable=True)
+    session_id = db.Column(db.String(32), nullable=True)
     twitter = db.Column(db.String(20), nullable=True)
     phone = db.Column(db.String(20), nullable=True)
     created_at = db.Column(db.DateTime, nullable=False)
@@ -75,6 +75,17 @@ class User(db.Model):
     def __repr__(self):
         return "<User id={}>".format(self.user_id)
 
+
+    # Adpated from https://www.programcreek.com/python/example/293/uuid.uuid4
+    def add_session_id(self):
+        """Adds session_id if value is None on user"""
+        if not self.session_id:
+            from uuid import uuid4
+            sid = uuid4().hex
+
+            self.session_id = sid
+
+        return self.session_id
 
 class Response(db.Model):
     """Response model. Records all response data (preset options or open-ended responses) across polls."""

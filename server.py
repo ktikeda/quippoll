@@ -38,14 +38,23 @@ def add_poll_to_db():
     email = request.form.get('email')
     responses = request.form.get('responses')
 
-    print title, prompt, poll_type, is_results_visible, email, responses
+    # print title, prompt, poll_type, is_results_visible, email, responses
 
-    return render_template('add-poll.html')
-
-    # create User
-    # generate session_id and add to User
+    if session.get('id'):
+        sid = session.get('id')
+        user = User.query.filter(User.session_id == sid).one()
+        # print user
+    else:
+        # create User and generate session_id
+        user = User(email=email, created_at=datetime.now())
+        user.add_session_id()
+        session['id'] = user.session_id
+        db.session.add(user)
+        db.session.commit()
+        # print user
 
     # create PollAdmin
+
 
     # if not open-ended, create Response objects
 
@@ -55,6 +64,8 @@ def add_poll_to_db():
     # grab timestamp for created_at
 
     # add to database
+
+    return render_template('add-poll.html')
 
 
 
