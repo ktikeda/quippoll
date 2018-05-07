@@ -69,9 +69,13 @@ def add_poll_to_db():
 
     db.session.add(poll)
     db.session.commit()
-
+    # print poll
 
     # create PollAdmin
+    admin = PollAdmin(poll_id=poll.poll_id, user_id=user.user_id, created_at=datetime.now())
+    db.session.add(admin)
+    db.session.commit()
+    print admin
 
 
     # if not open-ended, create Response objects

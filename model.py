@@ -149,13 +149,13 @@ class PollAdmin(db.Model):
 
     admin_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     poll_id = db.Column(db.Integer, db.ForeignKey('polls.poll_id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False, default=1)
-    role_id = db.Column(db.Integer, db.ForeignKey('admin_roles.role_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('admin_roles.role_id'), nullable=False, default=1)
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
-        return "<PollAdmin id={} poll_id={} user_id{}>".format(self.admin_id, self.poll_id, self.user_id)
+        return "<PollAdmin id={} poll_id={} user_id={}>".format(self.admin_id, self.poll_id, self.user_id)
 
 
 def connect_to_db(app):
