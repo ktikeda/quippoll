@@ -16,7 +16,7 @@ def create_poll_types():
     open_ended = PollType(name='open-ended', collect_response=True, 
         collect_tally=False, multi_select=False, created_at=datetime.now())
 
-    db.session.add_all(multi_choice, select_all, open_ended)
+    db.session.add_all([multi_choice, select_all, open_ended])
     db.session.commit()
 
 
@@ -28,7 +28,7 @@ def create_admin_roles():
     editor = AdminRole(name='editor', created_at=datetime.now(), description='User can edit all poll text, but cannot change settings.')
     moderator = AdminRole(name='moderator', created_at=datetime.now(), description='User can moderator responses.')
 
-    db.session.add_all(creator, super_admin, editor, moderator)
+    db.session.add_all([creator, super_admin, editor, moderator])
     db.session.commit()
 
 

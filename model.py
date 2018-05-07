@@ -1,9 +1,4 @@
-# from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
-# app = Flask(__name__)
-
-# DB_URI = "postgresql:///quippoll"
 
 db = SQLAlchemy()
 
@@ -152,13 +147,13 @@ class PollAdmin(db.Model):
         return "<PollAdmin id={} poll_id={} user_id{}>".format(self.admin_id, self.poll_id, self.user_id)
 
 
-def init_app():
-    # So that we can use Flask-SQLAlchemy, we'll make a Flask app.
-    from flask import Flask
-    app = Flask(__name__)
+# def init_app():
+#     # So that we can use Flask-SQLAlchemy, we'll make a Flask app.
+#     from flask import Flask
+#     app = Flask(__name__)
 
-    connect_to_db(app)
-    print "Connected to DB."
+#     connect_to_db(app)
+#     print "Connected to DB."
 
 
 def connect_to_db(app):
@@ -176,4 +171,6 @@ if __name__ == "__main__":
     # As a convenience, if we run this module interactively, it will leave
     # you in a state of being able to work with the database directly.
 
-    init_app()
+    from server import app
+    connect_to_db(app)
+    print "Connected to DB."
