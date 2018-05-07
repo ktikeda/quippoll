@@ -1,0 +1,133 @@
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+
+class PollType(db.Model):
+    """Poll type model. Attributes generate multiple-choice, select-all, open-ended polls."""
+
+    __tablename__ = 'poll_types'
+
+    poll_type_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = db.Column(db.String(20), nullable=False)
+    collect_response = db.Column(db.Boolean, nullable=False)
+    collect_tally = db.Column(db.Boolean, nullable=False)
+    multi_select = db.Column(db.Boolean, nullable=False)
+    tally_value_min = db.Column(db.Integer, nullable=False, default=1)
+    tally_value_max = db.Column(db.Integer, nullable=False, default=1)
+    created_at = db.Column(db.DateTime, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return "<Poll Type id={} name={}>".format(self.poll_type_id, self.name)
+
+
+class Poll(db.Model):
+    """Poll model."""
+
+    __tablename__ = 'polls'
+
+    poll_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    poll_type_id = db.Column(db.Integer, db.ForeignKey('poll_types.poll_type_id'), nullable=False)
+    title = db.Column(db.String(128), nullable=False)
+    prompt = db.Column(db.String(128), nullable=False)
+    short_code = db.Column(db.String(5), nullable=False)
+    admin_code = db.Column(db.String(20), nullable=False)
+    is_results_hidden = db.Column(db.Boolean, nullable=False, default=False)
+    is_open = db.Column(db.Boolean, nullable=False, default=True)
+    is_moderated = db.Column(db.Boolean, nullable=False, default=False)
+    is_unique_response = db.Column(db.Boolean, nullable=False, default=True)
+    reponse_max = db.Column(db.Integer, nullable=True)
+    tally_max = db.Column(db.Integer, nullable=True)
+    open_at = db.Column(db.DateTime, nullable=True)
+    close_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return "<Poll id={} poll_type_id={} title={}>".format(self.poll_id, self.poll_type_id, self.title)
+
+
+class User(db.Model):
+    """User model."""
+
+    __tablename__ = 'users'
+
+    user_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    fname = db.Column(db.String(20), nullable=True)
+    lname = db.Column(db.String(20), nullable=True)
+    email = db.Column(db.String(100), nullable=True)
+    password = db.Column(db.String(20), nullable=True)
+    session_id = db.Column(db.String(20), nullable=True)
+    twitter = db.Column(db.String(20), nullable=True)
+    phone = db.Column(db.String(20), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return "<User id={}>".format(self.user_id)
+
+
+class Response(db.Model):
+    """Response model. Records all response data (preset options or open-ended responses) across polls."""
+
+    __tablename__ = 'responses'
+
+    response_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    poll_id = db.Column(db.Integer, db.ForeignKey('polls.poll_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    text = db.Column(db.String(256), nullable=False)
+    order = db.Column(db.Integer, nullable=False)
+    is_hidden = db.Column(db.Boolean, nullable=False, default=False)  # Only use if Poll.is_moderated = True
+    created_at = db.Column(db.DateTime, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return "<Response id={} poll_id={} text={}>".format(self.response_id, self.poll_id, self.poll_type_id, self.text)
+
+
+class Tally(db.Model):
+    """Tally model. Records value input when user selects a response."""
+
+    __tablename__ = 'tallys'
+
+    tally_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    response_id = db.Column(db.Integer, db.ForeignKey('responses.response_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    value = db.Column(db.Integer, nullable=False, default=1)
+    created_at = db.Column(db.DateTime, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return "<Tally id={}>".format(self.tally_id)
+
+
+class AdminRole(db.Model):
+    """Model for admin roles."""
+
+    __tablename__ = 'admin_roles'
+
+    role_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    name = db.Column(db.String(20), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return "<AdminRole id={} name={}>".format(self.role_id, self.name)
+
+
+class PollAdmin(db.Model):
+    """Model for poll admins."""
+
+    __tablename__ = 'poll_admins'
+
+    admin_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    poll_id = db.Column(db.Integer, db.ForeignKey('polls.poll_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('admin_roles.role_id'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
+    updated_at = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return "<PollAdmin id={} poll_id={} user_id{}>".format(self.admin_id, self.poll_id, self.user_id)
+
