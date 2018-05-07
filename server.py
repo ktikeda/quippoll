@@ -19,6 +19,13 @@ def index():
     return render_template('homepage.html')
 
 
+@app.route('/add-poll')
+def add_poll():
+    """Add poll form."""
+
+    return render_template('add-poll.html')
+
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Poll{% endblock %}
+
+{% block content %}
+<h1>Add Poll</h1>
+
+<form action="/add-poll" method="POST">
+    Title: <input type="text" name="title"><br>
+    Prompt: <input type="text" name="prompt"><br>
+    Poll Type:
+    <select name="poll_type"> 
+      <option value="1">Multiple Choice</option>
+      <option value="2">Select All</option>
+      <option value="3">Open-Ended</option>
+    </select><br>
+    Show Results: 
+        <input type="radio" name="is_results_visible" value="True" checked> Yes
+        <input type="radio" name="is_results_visible" value="False"> No<br>
+    <!-- To do for open-ended polls: Add js logic for is_unique_responses, is_moderated response_max -->
+    <!-- Implement tally max -->
+    <!-- Implement poll scheduling with open_at and close_at -->
+    <input type="submit" value="Submit">
+    <!-- To do for multiple choice and select-all polls: Need js to add responses -->
+</form>
+{% endblock %}
