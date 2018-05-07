@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from uuid import uuid4
 
 db = SQLAlchemy()
 
@@ -33,8 +34,8 @@ class Poll(db.Model):
     poll_type_id = db.Column(db.Integer, db.ForeignKey('poll_types.poll_type_id'), nullable=False)
     title = db.Column(db.String(128), nullable=False)
     prompt = db.Column(db.String(128), nullable=False)
-    short_code = db.Column(db.String(5), nullable=False)
-    admin_code = db.Column(db.String(20), nullable=False)
+    short_code = db.Column(db.String(32), nullable=False)
+    admin_code = db.Column(db.String(32), nullable=False)
     is_results_visible = db.Column(db.Boolean, nullable=False, default=True)
     is_open = db.Column(db.Boolean, nullable=False, default=True)  # this might be denormalizing data with open_at
     is_moderated = db.Column(db.Boolean, nullable=False, default=False)
@@ -80,7 +81,6 @@ class User(db.Model):
     def add_session_id(self):
         """Adds session_id if value is None on user"""
         if not self.session_id:
-            from uuid import uuid4
             sid = uuid4().hex
 
             self.session_id = sid
