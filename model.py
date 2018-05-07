@@ -1,4 +1,9 @@
+# from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+
+# app = Flask(__name__)
+
+# DB_URI = "postgresql:///quippoll"
 
 db = SQLAlchemy()
 
@@ -17,6 +22,8 @@ class PollType(db.Model):
     tally_value_max = db.Column(db.Integer, nullable=False, default=1)
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
+
+    polls = db.relationship('Poll')  # returns a list of all polls with poll type
 
     def __repr__(self):
         return "<Poll Type id={} name={}>".format(self.poll_type_id, self.name)
@@ -44,6 +51,9 @@ class Poll(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
 
+    responses = db.relationship('Response')  # returns a list of Response objects
+    poll_type = db.relationship('PollType')  # returns PollType object
+
     def __repr__(self):
         return "<Poll id={} poll_type_id={} title={}>".format(self.poll_id, self.poll_type_id, self.title)
 
@@ -64,6 +74,9 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
 
+    polls = db.relationship('Poll', secondary='poll_admins', backref='admins') # returns a list of polls administered by user
+
+
     def __repr__(self):
         return "<User id={}>".format(self.user_id)
 
@@ -82,6 +95,10 @@ class Response(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
 
+    poll = db.relationship('Poll')  # returns Poll object
+    tallys = db.relationship('Tally')  # returns list of Tally objects
+    users = db.relationship('User', secondary='tallys', backref='responses')  # returns of list of all users who have selected the response
+
     def __repr__(self):
         return "<Response id={} poll_id={} text={}>".format(self.response_id, self.poll_id, self.poll_type_id, self.text)
 
@@ -97,6 +114,8 @@ class Tally(db.Model):
     value = db.Column(db.Integer, nullable=False, default=1)
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
+
+    response = db.relationship('Response')  # returns Response object
 
     def __repr__(self):
         return "<Tally id={}>".format(self.tally_id)
@@ -131,3 +150,29 @@ class PollAdmin(db.Model):
     def __repr__(self):
         return "<PollAdmin id={} poll_id={} user_id{}>".format(self.admin_id, self.poll_id, self.user_id)
 
+
+def init_app():
+    # So that we can use Flask-SQLAlchemy, we'll make a Flask app.
+    from flask import Flask
+    app = Flask(__name__)
+
+    connect_to_db(app)
+    print "Connected to DB."
+
+
+def connect_to_db(app):
+    """Connect the database to our Flask app."""
+
+    # Configure to use our PstgreSQL database
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///quippoll'
+    app.config['SQLALCHEMY_ECHO'] = False
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.app = app
+    db.init_app(app)
+
+
+if __name__ == "__main__":
+    # As a convenience, if we run this module interactively, it will leave
+    # you in a state of being able to work with the database directly.
+
+    init_app()
