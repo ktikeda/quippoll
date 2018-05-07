@@ -17,10 +17,14 @@
     Show Results: 
         <input type="radio" name="is_results_visible" value="True" checked> Yes
         <input type="radio" name="is_results_visible" value="False"> No<br>
+    Email: <input type="text" name="email"><br>
+    <!-- To do for multiple choice and select-all polls: Need js to add responses -->
+    Response Options:<br>
+        <textarea name="responses"></textarea><br>
     <!-- To do for open-ended polls: Add js logic for is_unique_responses, is_moderated response_max -->
     <!-- Implement tally max -->
     <!-- Implement poll scheduling with open_at and close_at -->
     <input type="submit" value="Submit">
-    <!-- To do for multiple choice and select-all polls: Need js to add responses -->
+    
 </form>
 {% endblock %}

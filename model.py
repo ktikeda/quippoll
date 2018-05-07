@@ -36,7 +36,7 @@ class Poll(db.Model):
     short_code = db.Column(db.String(5), nullable=False)
     admin_code = db.Column(db.String(20), nullable=False)
     is_results_visible = db.Column(db.Boolean, nullable=False, default=True)
-    is_open = db.Column(db.Boolean, nullable=False, default=True)
+    is_open = db.Column(db.Boolean, nullable=False, default=True)  # this might be denormalizing data with open_at
     is_moderated = db.Column(db.Boolean, nullable=False, default=False)
     is_unique_response = db.Column(db.Boolean, nullable=False, default=True)
     reponse_max = db.Column(db.Integer, nullable=True)
@@ -69,7 +69,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
 
-    polls = db.relationship('Poll', secondary='poll_admins', backref='admins') # returns a list of polls administered by user
+    polls = db.relationship('Poll', secondary='poll_admins', backref='admins')  # returns a list of polls administered by user
 
 
     def __repr__(self):

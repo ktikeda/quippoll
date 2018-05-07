@@ -2,6 +2,7 @@ from flask import Flask, redirect, request, render_template, session
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_sqlalchemy import SQLAlchemy
 from jinja2 import StrictUndefined
+from datetime import datetime
 
 from model import connect_to_db, db
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
@@ -24,6 +25,38 @@ def add_poll():
     """Add poll form."""
 
     return render_template('add-poll.html')
+
+@app.route('/add-poll', methods=["POST"])
+def add_poll_to_db():
+    """Adds poll form data to database"""
+
+    # get data from form
+    title = request.form.get('title')
+    prompt = request.form.get('prompt')
+    poll_type = int(request.form.get('poll_type'))
+    is_results_visible = bool(request.form.get('is_results_visible'))
+    email = request.form.get('email')
+    responses = request.form.get('responses')
+
+    print title, prompt, poll_type, is_results_visible, email, responses
+
+    return render_template('add-poll.html')
+
+    # create User
+    # generate session_id and add to User
+
+    # create PollAdmin
+
+    # if not open-ended, create Response objects
+
+    # generate access code
+    # generate short code
+
+    # grab timestamp for created_at
+
+    # add to database
+
+
 
 
 
