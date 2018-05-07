@@ -35,7 +35,7 @@ class Poll(db.Model):
     prompt = db.Column(db.String(128), nullable=False)
     short_code = db.Column(db.String(5), nullable=False)
     admin_code = db.Column(db.String(20), nullable=False)
-    is_results_hidden = db.Column(db.Boolean, nullable=False, default=False)
+    is_results_visible = db.Column(db.Boolean, nullable=False, default=True)
     is_open = db.Column(db.Boolean, nullable=False, default=True)
     is_moderated = db.Column(db.Boolean, nullable=False, default=False)
     is_unique_response = db.Column(db.Boolean, nullable=False, default=True)
@@ -86,7 +86,7 @@ class Response(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     text = db.Column(db.String(256), nullable=False)
     order = db.Column(db.Integer, nullable=False)
-    is_hidden = db.Column(db.Boolean, nullable=False, default=False)  # Only use if Poll.is_moderated = True
+    is_visible = db.Column(db.Boolean, nullable=False, default=True)  # Only use if Poll.is_moderated = True
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
 
@@ -145,15 +145,6 @@ class PollAdmin(db.Model):
 
     def __repr__(self):
         return "<PollAdmin id={} poll_id={} user_id{}>".format(self.admin_id, self.poll_id, self.user_id)
-
-
-# def init_app():
-#     # So that we can use Flask-SQLAlchemy, we'll make a Flask app.
-#     from flask import Flask
-#     app = Flask(__name__)
-
-#     connect_to_db(app)
-#     print "Connected to DB."
 
 
 def connect_to_db(app):

@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from jinja2 import StrictUndefined
 
 from model import connect_to_db, db
-
+from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
 
 app = Flask(__name__)
@@ -12,6 +12,13 @@ app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
 app.secret_key = "secret"
+
+@app.route('/')
+def index():
+    """Homepage."""
+    return render_template('homepage.html')
+
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
