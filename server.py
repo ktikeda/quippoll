@@ -106,6 +106,39 @@ def add_tally (short_code):
     return render_template('add-tally.html', poll=poll)
 
 
+@app.route('/<short_code>', methods=["POST"])
+def add_tally_to_db (short_code):
+    """Poll response submission display"""
+
+    poll = Poll.query.filter(Poll.short_code == short_code).one()
+
+    rid = int(request.form.get('response_id'))
+    print rid
+
+    response = Response.query.get(rid)
+    print response
+
+    # get or create User
+    if session.get('id'):
+        sid = session.get('id')
+        user = User.query.filter(User.session_id == sid).one()
+        # print user
+    else:
+        # create User and generate session_id
+        user = User(created_at=datetime.now(), session_id=uuid4().hex)
+        session['id'] = user.session_id
+        db.session.add(user)
+        db.session.commit()
+        # print user
+
+    tally = Tally(response_id=response.response_id, user_id=user.user_id, created_at=datetime.now())
+    db.session.add(tally)
+    db.session.commit()
+    print tally
+
+    return render_template('add-tally.html', poll=poll)
+
+
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension

@@ -5,11 +5,24 @@
 {% block content %}
 <h1>{{ poll.prompt }}</h1>
 
-<form action="/add-tally" method="POST">
+
     {% for response in poll.responses %}
-        <button type="button" name="response-option" value="{{ response.response_id }}">{{ response.text }}</button><br>
+        <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" value="{{ response.response_id }}">{{ response.text }}</button><br>
 
     {% endfor %}
     
-</form>
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+  "use strict";
+
+  function addTally(evt) {
+    let responseData = {'response_id' : $('.responseOption').val()};
+    $.post('/{{poll.short_code}}', responseData);
+    console.log(responseData)
+    }
+
+  $('.responseOption').on('click', addTally);
+</script>
 {% endblock %}
