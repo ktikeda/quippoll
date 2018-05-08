@@ -10,12 +10,13 @@
 
 </head>
 <body>
+    <strong>Quippoll</strong>
     <ul>
     {% for message in get_flashed_messages() %}
         <li>{{ message }}</li>
     {% endfor %}
     </ul>
-    <h1>Quippoll</h1>
+    
     {% block content %}CONTENT{% endblock %}
 
 

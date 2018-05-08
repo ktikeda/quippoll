@@ -1,4 +1,4 @@
-from flask import Flask, redirect, request, render_template, session
+from flask import Flask, redirect, request, render_template, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_sqlalchemy import SQLAlchemy
 from jinja2 import StrictUndefined
@@ -151,8 +151,12 @@ def add_user_input_to_db(short_code):
         # db.session.commit()
         # # print tally
 
-    route = '/' + poll.short_code + '/r'
-    # print route
+    if poll.is_results_visible:
+        flash('Your response has been recorded.')
+        route = '/' + poll.short_code + '/r'
+    else:
+        route = '/success'
+    
     return redirect(route)
 
 
