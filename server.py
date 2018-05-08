@@ -5,10 +5,10 @@ from jinja2 import StrictUndefined
 from datetime import datetime
 from uuid import uuid4
 from shortuuid import ShortUUID
+import json
 
 from model import connect_to_db, db
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
-from functions import get_poll_from_code
 
 
 app = Flask(__name__)
@@ -102,54 +102,76 @@ def add_poll_to_db():
 def add_tally(short_code):
     """Poll response submission display"""
 
-    poll = Poll.query.filter(Poll.short_code == short_code).one()
+    poll = Poll.get_from_code(short_code)
 
-    return render_template('add-tally.html', poll=poll)
+    if poll.poll_type.collect_response:
+        return render_template('add-response.html', poll=poll)
+    else:
+        return render_template('add-tally.html', poll=poll)
 
 
 @app.route('/<short_code>', methods=["POST"])
 def add_tally_to_db(short_code):
     """Poll response submission display"""
 
-    poll = Poll.query.filter(Poll.short_code == short_code).one()
+    poll = Poll.get_from_code(short_code)
 
-    rid = int(request.form.get('response_id'))
-    # print rid
-
-    response = Response.query.get(rid)
-    # print response
-
-    # get or create User
-    if session.get('id'):
-        sid = session.get('id')
-        user = User.query.filter(User.session_id == sid).one()
-        # print user
-    else:
-        # create User and generate session_id
-        user = User(created_at=datetime.now(), session_id=uuid4().hex)
-        session['id'] = user.session_id
-        db.session.add(user)
+    if poll.poll_type.collect_response:
+        text = request.form.get('response')
+        user = User.get_from_session(session)
+        print user
+        response = Response(poll_id=poll.poll_id, user_id=user.user_id, text=text,
+                            created_at=datetime.now(), order=1)
+        db.session.add(response)
         db.session.commit()
-        # print user
+        print response
+        return redirect('/success')
+    else:
 
-    tally = Tally(response_id=response.response_id, user_id=user.user_id, created_at=datetime.now())
-    db.session.add(tally)
-    db.session.commit()
-    # print tally
+        tallys = json.loads(request.form.get('tallys'))
+        print tallys
+
+        # response = Response.query.get(rid)
+        # # print response
+
+        # # get or create User
+        # if session.get('id'):
+        #     sid = session.get('id')
+        #     user = User.query.filter(User.session_id == sid).one()
+        #     # print user
+        # else:
+        #     # create User and generate session_id
+        #     user = User(created_at=datetime.now(), session_id=uuid4().hex)
+        #     session['id'] = user.session_id
+        #     db.session.add(user)
+        #     db.session.commit()
+        #     # print user
+
+        # tally = Tally(response_id=response.response_id, user_id=user.user_id, created_at=datetime.now())
+        # db.session.add(tally)
+        # db.session.commit()
+        # # print tally
 
     route = '/' + poll.short_code + '/r'
-    print route
+    # print route
     return redirect(route)
 
 
 @app.route('/<short_code>/r')
 def show_results(short_code):
     """Show poll results."""
-    poll = get_poll_from_code(short_code)
-
-    print "I'm in the results", poll
+    
+    poll = Poll.get_from_code(short_code)
+    # print poll
 
     return render_template('results.html', poll=poll)
+
+
+@app.route('/success')
+def success():
+    """Show success page."""
+
+    return render_template('success.html')
 
 
 if __name__ == "__main__":

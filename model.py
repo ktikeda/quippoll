@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from uuid import uuid4
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -53,6 +54,10 @@ class Poll(db.Model):
     def __repr__(self):
         return "<Poll id={} poll_type_id={} title={}>".format(self.poll_id, self.poll_type_id, self.title)
 
+    @staticmethod
+    def get_from_code(short_code):
+        return Poll.query.filter(Poll.short_code == short_code).one()
+
 
 class User(db.Model):
     """User model."""
@@ -76,16 +81,18 @@ class User(db.Model):
     def __repr__(self):
         return "<User id={}>".format(self.user_id)
 
+    @staticmethod
+    def get_from_session(session):
+        if session.get('id'):
+            sid = session.get('id')
+            user = User.query.filter(User.session_id == sid).one()
+        else:
+            user = User(created_at=datetime.now(), session_id=uuid4().hex)
+            session['id'] = user.session_id
+            db.session.add(user)
+            db.session.commit()
+        return user
 
-    # Adpated from https://www.programcreek.com/python/example/293/uuid.uuid4
-    def add_session_id(self):
-        """Adds session_id if value is None on user"""
-        if not self.session_id:
-            sid = uuid4().hex
-
-            self.session_id = sid
-
-        return self.session_id
 
 class Response(db.Model):
     """Response model. Records all response data (preset options or open-ended responses) across polls."""

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ poll.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ poll.prompt }}</h1>
+<form action="/{{ poll.short_code }}" method="POST">
+    <input type="textarea" id="response" name="response">
+    <input type="submit" value="submit">
+</form> 
+
+{% endblock %}
