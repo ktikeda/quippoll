@@ -9,7 +9,7 @@
     Title: <input type="text" name="title"><br>
     Prompt: <input type="text" name="prompt"><br>
     Poll Type:
-    <select name="poll_type"> 
+    <select name="poll_type" id="poll_type"> 
       <option value="1">Multiple Choice</option>
       <option value="2">Select All</option>
       <option value="3">Open-Ended</option>
@@ -19,12 +19,30 @@
         <input type="radio" name="is_results_visible" value="False"> No<br>
     Email: <input type="text" name="email"><br>
     <!-- To do for multiple choice and select-all polls: Need js to add responses -->
-    <label class="hidden">Response Options:</label><br>
-        <textarea name="responses" class="hidden"></textarea><br>
+    <div id="response_options" class="">
+    <label>Response Options:</label><br>
+        <textarea name="responses"></textarea><br>
+    </div>
     <!-- To do for open-ended polls: Add js logic for is_unique_responses, is_moderated response_max -->
     <!-- Implement tally max -->
     <!-- Implement poll scheduling with open_at and close_at -->
     <input type="submit" value="Submit">
     
 </form>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+  "use strict";
+  let poll_type
+  
+  $('#poll_type').on('change', function() {
+    poll_type = parseInt($('#poll_type option:selected').val());
+    console.log(poll_type);
+
+    if (poll_type === 3) {
+      $('#response_options').addClass('hidden');
+  }
+  });
+
+</script>
 {% endblock %}
