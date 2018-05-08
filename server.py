@@ -99,7 +99,7 @@ def add_poll_to_db():
 
 
 @app.route('/<short_code>')
-def add_tally(short_code):
+def add_user_input(short_code):
     """Poll response submission display"""
 
     poll = Poll.get_from_code(short_code)
@@ -111,7 +111,7 @@ def add_tally(short_code):
 
 
 @app.route('/<short_code>', methods=["POST"])
-def add_tally_to_db(short_code):
+def add_user_input_to_db(short_code):
     """Poll response submission display"""
 
     poll = Poll.get_from_code(short_code)
