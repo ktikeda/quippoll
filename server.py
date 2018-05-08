@@ -125,7 +125,6 @@ def add_user_input_to_db(short_code):
         db.session.add(response)
         db.session.commit()
         print response
-        return redirect('/success')
     else:
 
         tallys = json.loads(request.form.get('tallys'))
