@@ -94,6 +94,11 @@
     $('#tallys').attr("value", JSON.stringify(tallys));
   }
 
+  {% if poll.poll_type.multi_select %}
+  $('.responseOption').on('click', changeTally);
+  {% else %}
   $('.responseOption').on('click', selectTally);
+  {% endif %}
+
 </script>
 {% endblock %}
