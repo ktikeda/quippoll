@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ poll.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ poll.prompt }}</h1>
+
+<form action="/add-tally" method="POST">
+    {% for response in poll.responses %}
+        <button type="button" name="response-option" value="{{ response.response_id }}">{{ response.text }}</button><br>
+
+    {% endfor %}
+    
+</form>
+{% endblock %}

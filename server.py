@@ -94,8 +94,16 @@ def add_poll_to_db():
 
         # print poll.responses
 
-    return render_template('add-poll.html')
+    return redirect('/' + poll.short_code)
 
+
+@app.route('/<short_code>')
+def add_tally (short_code):
+    """Poll response submission display"""
+
+    poll = Poll.query.filter(Poll.short_code == short_code).one()
+
+    return render_template('add-tally.html', poll=poll)
 
 
 if __name__ == "__main__":
