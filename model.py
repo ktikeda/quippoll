@@ -50,11 +50,11 @@ class Poll(db.Model):
 
     responses = db.relationship('Response')  # returns a list of Response objects
     poll_type = db.relationship('PollType')  # returns PollType object
+    users_from_response = db.relationship('User', secondary='responses') #returns list of User objects who have created Response objects
 
     def __repr__(self):
         return "<Poll id={} poll_type_id={} title={}>".format(self.poll_id, self.poll_type_id, self.title)
 
-    
     def get_users_from_tally(self):
         responses = self.responses
         users = set()

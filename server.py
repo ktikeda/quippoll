@@ -106,14 +106,14 @@ def add_user_input(short_code):
     user = User.get_from_session(session)
 
     if poll.poll_type.collect_response:
-        return render_template('add-response.html', poll=poll)
+        if user not in poll.users_from_response:
+            return render_template('add-response.html', poll=poll)
     else:
-        if user in poll.get_users_from_tally():
-            route = '/' + poll.short_code + '/success'
-            return redirect(route)
-        else:
+        if user not in poll.get_users_from_tally():
             return render_template('add-tally.html', poll=poll)
 
+    route = '/' + poll.short_code + '/success'
+    return redirect(route)
 
 @app.route('/<short_code>', methods=["POST"])
 def add_user_input_to_db(short_code):
