@@ -115,41 +115,30 @@ def add_user_input_to_db(short_code):
     """Poll response submission display"""
 
     poll = Poll.get_from_code(short_code)
+    user = User.get_from_session(session)
 
     if poll.poll_type.collect_response:
         text = request.form.get('response')
-        user = User.get_from_session(session)
-        print user
+        
         response = Response(poll_id=poll.poll_id, user_id=user.user_id, text=text,
                             created_at=datetime.now(), order=1)
         db.session.add(response)
         db.session.commit()
         print response
+    
     else:
+        responses = json.loads(request.form.get('tallys'))
+        print "Responses:", responses
 
-        tallys = json.loads(request.form.get('tallys'))
-        print tallys
-
-        # response = Response.query.get(rid)
-        # # print response
-
-        # # get or create User
-        # if session.get('id'):
-        #     sid = session.get('id')
-        #     user = User.query.filter(User.session_id == sid).one()
-        #     # print user
-        # else:
-        #     # create User and generate session_id
-        #     user = User(created_at=datetime.now(), session_id=uuid4().hex)
-        #     session['id'] = user.session_id
-        #     db.session.add(user)
-        #     db.session.commit()
-        #     # print user
-
-        # tally = Tally(response_id=response.response_id, user_id=user.user_id, created_at=datetime.now())
-        # db.session.add(tally)
-        # db.session.commit()
-        # # print tally
+        for response_id, tally_num in responses.items():
+            response = Response.query.get(int(response_id))
+            print response
+            for tally in range(int(tally_num)):
+                tally = Tally(response_id=response.response_id, user_id=user.user_id, 
+                              created_at=datetime.now())
+                db.session.add(tally)
+                db.session.commit()
+                print tally
 
     if poll.is_results_visible:
         flash('Your response has been recorded.')

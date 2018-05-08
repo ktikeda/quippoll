@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>{{ poll.prompt }}</h1>
-<form action="/{{ poll.short_code }}" method="POST">
+<form name="poll_responses" action="/{{ poll.short_code }}" method="POST">
     
     {% for response in poll.responses %}
         <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" name={{ response.response_id }} value="{{ response.response_id }}">{{ response.text }}</button><br>
@@ -34,7 +34,7 @@
     console.log(tallys);
     console.log(JSON.stringify(tallys));
     $('#tallys').attr("value", JSON.stringify(tallys));
-    $(id).attr('disabled', true) /* to do: create toggle */
+    // $(id).attr('disabled', true) /* to do: create toggle */
   }
 
   $('.responseOption').on('click', addTally);
