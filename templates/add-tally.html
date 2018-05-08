@@ -9,20 +9,20 @@
     {% for response in poll.responses %}
         <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" value="{{ response.response_id }}">{{ response.text }}</button><br>
 
-    {% endfor %}
-    
-
+    {% endfor %}    
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
   "use strict";
 
   function addTally(evt) {
-    let responseData = {'response_id' : $('.responseOption').val()};
+    let id = '#' + evt.target.id;
+    console.log(id)
+    let responseData = {'response_id' : $(id).val()};
     $.post('/{{poll.short_code}}', responseData);
     console.log(responseData)
     }
 
-  $('.responseOption').on('click', addTally);
+  $('.responseOption').on('click', addTally, );
 </script>
 {% endblock %}
