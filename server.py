@@ -117,7 +117,7 @@ def add_user_input_to_db(short_code):
     poll = Poll.get_from_code(short_code)
     user = User.get_from_session(session)
 
-    if poll.poll_type.collect_response:
+    if poll.poll_type.collect_response:  # Add responses to db
         text = request.form.get('response')
         
         response = Response(poll_id=poll.poll_id, user_id=user.user_id, text=text,
@@ -126,11 +126,10 @@ def add_user_input_to_db(short_code):
         db.session.commit()
         print response
     
-    else:
-        responses = json.loads(request.form.get('tallys'))
-        print "Responses:", responses
+    else:  # Add tallys to db
+        tallys = json.loads(request.form.get('tallys'))
 
-        for response_id, tally_num in responses.items():
+        for response_id, tally_num in tallys.items():
             response = Response.query.get(int(response_id))
             print response
             for tally in range(int(tally_num)):
