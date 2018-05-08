@@ -7,7 +7,7 @@
 
 
     {% for response in poll.responses %}
-        {{ response.text }}: {{ len(response.tallys) }}<br>
+        {{ response.text }}: {{ response.value() }}<br>
 
     {% endfor %}
 {% endblock %}

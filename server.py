@@ -114,10 +114,10 @@ def add_tally_to_db(short_code):
     poll = Poll.query.filter(Poll.short_code == short_code).one()
 
     rid = int(request.form.get('response_id'))
-    print rid
+    # print rid
 
     response = Response.query.get(rid)
-    print response
+    # print response
 
     # get or create User
     if session.get('id'):
@@ -135,16 +135,22 @@ def add_tally_to_db(short_code):
     tally = Tally(response_id=response.response_id, user_id=user.user_id, created_at=datetime.now())
     db.session.add(tally)
     db.session.commit()
-    print tally
+    # print tally
 
-    return redirect('/' + poll.short_code + '/r')
+    route = '/' + poll.short_code + '/r'
+    print route
+    return redirect(route)
 
 
 @app.route('/<short_code>/r')
 def show_results(short_code):
+    """Show poll results."""
     poll = get_poll_from_code(short_code)
 
+    print "I'm in the results", poll
+
     return render_template('results.html', poll=poll)
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

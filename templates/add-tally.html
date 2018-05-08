@@ -4,25 +4,37 @@
 
 {% block content %}
 <h1>{{ poll.prompt }}</h1>
-
-
+<form action="/{{ poll.short_code }}" method="POST">
     {% for response in poll.responses %}
         <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" value="{{ response.response_id }}">{{ response.text }}</button><br>
 
-    {% endfor %}    
+    {% endfor %}
+    <input type="hidden" id="tallys" name="tallys" value="{}">
+    <input type="submit" value="submit">
+</form>  
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
   "use strict";
 
+  let tallys = {};
+
   function addTally(evt) {
     let id = '#' + evt.target.id;
-    console.log(id)
-    let responseData = {'response_id' : $(id).val()};
-    $.post('/{{poll.short_code}}', responseData);
-    console.log(responseData)
+    console.log(id);
+    let response_id = $(id).val();
+    
+    if (tallys[response_id]) {
+        tallys[response_id]++;
+    } else {
+        tallys[response_id] = 1;
     }
 
-  $('.responseOption').on('click', addTally, );
+    console.log(tallys);
+    console.log(JSON.stringify(tallys));
+    $('#tallys').attr("value", JSON.stringify(tallys));
+}
+
+  $('.responseOption').on('click', addTally);
 </script>
 {% endblock %}
