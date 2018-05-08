@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ poll.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ poll.prompt }}</h1>
+
+
+    {% for response in poll.responses %}
+        {{ response.text }}: {{ len(response.tallys) }}<br>
+
+    {% endfor %}
+{% endblock %}

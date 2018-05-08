@@ -8,6 +8,7 @@ from shortuuid import ShortUUID
 
 from model import connect_to_db, db
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
+from functions import get_poll_from_code
 
 
 app = Flask(__name__)
@@ -98,7 +99,7 @@ def add_poll_to_db():
 
 
 @app.route('/<short_code>')
-def add_tally (short_code):
+def add_tally(short_code):
     """Poll response submission display"""
 
     poll = Poll.query.filter(Poll.short_code == short_code).one()
@@ -107,7 +108,7 @@ def add_tally (short_code):
 
 
 @app.route('/<short_code>', methods=["POST"])
-def add_tally_to_db (short_code):
+def add_tally_to_db(short_code):
     """Poll response submission display"""
 
     poll = Poll.query.filter(Poll.short_code == short_code).one()
@@ -136,8 +137,14 @@ def add_tally_to_db (short_code):
     db.session.commit()
     print tally
 
-    return render_template('add-tally.html', poll=poll)
+    return redirect('/' + poll.short_code + '/r')
 
+
+@app.route('/<short_code>/r')
+def show_results(short_code):
+    poll = get_poll_from_code(short_code)
+
+    return render_template('results.html', poll=poll)
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

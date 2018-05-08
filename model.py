@@ -108,6 +108,12 @@ class Response(db.Model):
     def __repr__(self):
         return "<Response id={} poll_id={} text={}>".format(self.response_id, self.poll_id, self.text)
 
+    def value(self):
+        value = 0
+        for tally in self.tallys:
+            value += tally.value
+        return value
+
 
 class Tally(db.Model):
     """Tally model. Records value input when user selects a response."""
