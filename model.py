@@ -54,6 +54,17 @@ class Poll(db.Model):
     def __repr__(self):
         return "<Poll id={} poll_type_id={} title={}>".format(self.poll_id, self.poll_type_id, self.title)
 
+    
+    def get_users_from_tally(self):
+        responses = self.responses
+        users = set()
+
+        for response in responses:
+            r_users = set(response.users)
+            users = users | r_users
+
+        return list(users)
+
     @staticmethod
     def get_from_code(short_code):
         return Poll.query.filter(Poll.short_code == short_code).one()
@@ -75,7 +86,7 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
 
-    polls = db.relationship('Poll', secondary='poll_admins', backref='admins')  # returns a list of polls administered by user
+    admin_polls = db.relationship('Poll', secondary='poll_admins', backref='admins')  # returns a list of polls administered by user
 
 
     def __repr__(self):

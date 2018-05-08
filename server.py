@@ -103,11 +103,16 @@ def add_user_input(short_code):
     """Poll response submission display"""
 
     poll = Poll.get_from_code(short_code)
+    user = User.get_from_session(session)
 
     if poll.poll_type.collect_response:
         return render_template('add-response.html', poll=poll)
     else:
-        return render_template('add-tally.html', poll=poll)
+        if user in poll.get_users_from_tally():
+            route = '/' + poll.short_code + '/success'
+            return redirect(route)
+        else:
+            return render_template('add-tally.html', poll=poll)
 
 
 @app.route('/<short_code>', methods=["POST"])
@@ -139,12 +144,7 @@ def add_user_input_to_db(short_code):
                 db.session.commit()
                 print tally
 
-    if poll.is_results_visible:
-        flash('Your response has been recorded.')
-        route = '/' + poll.short_code + '/r'
-    else:
-        route = '/success'
-    
+    route = '/' + poll.short_code + '/success'
     return redirect(route)
 
 
@@ -158,11 +158,18 @@ def show_results(short_code):
     return render_template('results.html', poll=poll)
 
 
-@app.route('/success')
-def success():
+@app.route('/<short_code>/success')
+def success(short_code):
     """Show success page."""
+    
+    poll = Poll.get_from_code(short_code)
 
-    return render_template('success.html')
+    if poll.is_results_visible:
+        flash('Your response has been recorded.')
+        route = '/' + poll.short_code + '/r'
+        return redirect(route)
+    else:
+        return render_template('success.html')
 
 
 if __name__ == "__main__":
