@@ -1,3 +1,7 @@
+  "use strict";
+
+  let tallys = {};
+
   function addTally(evt) {
   // use for multiple tallys per button button 
     let button = $('#' + evt.target.id);

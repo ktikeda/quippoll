@@ -41,6 +41,7 @@ def add_poll_to_db():
     email = request.form.get('email')
     # print title, prompt, poll_type, is_results_visible, email, responses
 
+    # TODO: refactor into get_from_session
     # get or create User
     if session.get('id'):
         sid = session.get('id')
@@ -79,7 +80,7 @@ def add_poll_to_db():
     db.session.commit()
     # print admin
 
-    # send poll creation email to user
+    # TODO: send poll creation email to user
 
     # if not open-ended, create Response objects
     if poll.poll_type.name != "open-ended":
@@ -114,6 +115,7 @@ def add_user_input(short_code):
 
     route = '/' + poll.short_code + '/success'
     return redirect(route)
+
 
 @app.route('/<short_code>', methods=["POST"])
 def add_user_input_to_db(short_code):

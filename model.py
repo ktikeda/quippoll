@@ -93,7 +93,7 @@ class User(db.Model):
         return "<User id={}>".format(self.user_id)
 
     @staticmethod
-    def get_from_session(session):
+    def get_from_session(session): #TODO: look into *args
         if session.get('id'):
             sid = session.get('id')
             user = User.query.filter(User.session_id == sid).one()
