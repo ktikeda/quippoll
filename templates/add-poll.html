@@ -6,8 +6,8 @@
 <h1>Add Poll</h1>
 
 <form action="/add-poll" method="POST">
-    Title: <input type="text" name="title"><br>
-    Prompt: <input type="text" name="prompt"><br>
+    Title: <input type="text" name="title" required><br>
+    Prompt: <input type="text" name="prompt" required><br>
     Poll Type:
     <select name="poll_type" id="poll_type"> 
       <option value="1">Multiple Choice</option>
@@ -17,11 +17,11 @@
     Show Results: 
         <input type="radio" name="is_results_visible" value="True" checked> Yes
         <input type="radio" name="is_results_visible" value="False"> No<br>
-    Email: <input type="text" name="email"><br>
+    Email: <input type="text" name="email" required><br>
     <!-- TODO: for multiple choice and select-all polls: Need js to add responses -->
     <div id="response_options" class="">
     <label>Response Options:</label><br>
-        <textarea name="responses"></textarea><br>
+        <textarea name="responses" required></textarea><br>
     </div>
     <!-- TODO: for open-ended polls: Add js logic for is_unique_responses, is_moderated response_max -->
     <!-- TODO: Implement tally max -->

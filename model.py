@@ -1,6 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
+
+# Implementation of flask_login sourced from: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 from flask_login import UserMixin
+from server import login
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from uuid import uuid4
 from datetime import datetime
 from shortuuid import ShortUUID
@@ -142,7 +146,7 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return "<User id={}>".format(self.user_id)
 
-    # source: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
+    # source: miguelgrinberg.com
     def get_id(self):
         return self.user_id
 
@@ -183,6 +187,11 @@ class User(UserMixin, db.Model):
 
             else:
                 return None
+
+
+# @login.user_loader
+# def load_user(id):
+#     return User.query.get(int(id))
 
 
 class Response(db.Model):

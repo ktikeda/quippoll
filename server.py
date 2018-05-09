@@ -1,15 +1,15 @@
 from flask import Flask, redirect, request, render_template, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user, login_user
 import json
+
+app = Flask(__name__)
+login = LoginManager(app)
 
 from model import connect_to_db, db
 from model import Poll, User, Response, Tally, PollAdmin
 
-
-app = Flask(__name__)
-login = LoginManager(app)
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
@@ -19,7 +19,7 @@ app.secret_key = "secret"
 @app.route('/')
 def index():
     """Homepage."""
-    return render_template('homepage.html')
+    return render_template('index.html')
 
 
 @app.route('/add-poll')
@@ -97,6 +97,8 @@ def add_user_input_to_db(short_code):
     poll = Poll.get_from_code(short_code)
     user = User.get_from_session(session)
 
+    # TODO: Need to deal with assigning session_id to anon users
+
     # Add responses to db
     if poll.poll_type.collect_response:
         text = request.form.get('response')
@@ -144,6 +146,74 @@ def success(short_code):
         return redirect(route)
     else:
         return render_template('success.html')
+
+
+# Implementation of flask_login sourced from:
+# https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
+@app.route('/login')
+def show_login():
+    if current_user.is_authenticated:
+        return redirect('/')
+    else:
+        return render_template('login.html')
+
+
+@app.route('/login', methods=['POST'])
+def login_db():
+    # grab form data
+    email = request.form.get('email')
+    pw = request.form.get('password')
+
+    # query User
+    user = User.query.filter(User.email == email).first()
+
+    # validate user/password
+    if user is None or not user.check_password(pw):
+        flash('Invalid email or password')
+        return redirect('/login')
+
+    # login user
+    login_user(user)
+
+    flash('You are logged in.')
+    return redirect('/')
+
+
+@app.route('/register')
+def show_registration():
+    if current_user.is_authenticated:
+        return redirect('/')
+    else:
+        return render_template('register.html')
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    # grab form data
+    fname = request.form.get('fname')
+    lname = request.form.get('lname')
+    email = request.form.get('email')
+    pw = request.form.get('password')
+
+    # check if session_id present
+    user = User.get_from_session
+
+    if user:
+        user.fname = fname
+        user.lname = lname
+        user.email = email
+        user.set_password(pw)
+    else:
+        user = User(fname=fname,
+                    lname=lname,
+                    email=email)
+        user.set_password(pw)
+        db.session.add(user)
+
+    db.session.commit()
+
+    flash('Registration complete.')
+    return redirect('/login')
 
 
 if __name__ == "__main__":
