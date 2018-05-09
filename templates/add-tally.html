@@ -12,6 +12,7 @@
 
     {% endfor %}
     <input type="hidden" id="tallys" name="tallys" value="{}">
+    <input type="hidden" id="multi_select" name="multi_select" value="{{ poll.poll_type.multi_select }}">
     <input type="submit" value="submit">
 </form>  
 
@@ -19,13 +20,13 @@
 <script src="/static/addTally.js"></script>
 <script type="text/javascript">
 
+  let multiSelect = $('#multi_select').val();
 
-  // store jinja variable outside js in html
-  // {% if poll.poll_type.multi_select %}
-  $('.responseOption').on('click', changeTally);
-  // {% else %}
-  // $('.responseOption').on('click', selectTally);
-  // {% endif %}
+  if (multiSelect === 'true') {
+    $('.responseOption').on('click', changeTally);
+  } else {
+    $('.responseOption').on('click', selectTally);
+  }
 
 </script>
 {% endblock %}
