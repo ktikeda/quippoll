@@ -39,20 +39,14 @@ def add_poll_to_db():
     poll_type = int(request.form.get('poll_type'))
     is_results_visible = bool(request.form.get('is_results_visible'))
     email = request.form.get('email')
- 
+
+    # create and add objects to db
     user = User.get_from_session(session, email=email)
 
-    # create Poll
-    poll = Poll(poll_type_id=poll_type, title=title, prompt=prompt, 
-        is_results_visible=is_results_visible)
+    poll = Poll(poll_type_id=poll_type, title=title, prompt=prompt,
+                is_results_visible=is_results_visible)
 
-    db.session.add(poll)
-    db.session.commit()
-
-    # create PollAdmin
-    admin = PollAdmin(poll_id=poll.poll_id, user_id=user.user_id, created_at=datetime.now())
-    db.session.add(admin)
-    db.session.commit()
+    admin = PollAdmin(poll_id=poll.poll_id, user_id=user.user_id)
 
     # TODO: send poll creation email to user
 
@@ -62,12 +56,15 @@ def add_poll_to_db():
         responses = responses.split('\n')
 
         for response in responses:
-            response = Response(poll_id=poll.poll_id, user_id=user.user_id, text=response.strip(),
-                order=responses.index(response), created_at=datetime.now())
+            response = Response(poll_id=poll.poll_id,
+                                user_id=user.user_id,
+                                text=response.strip(),
+                                order=responses.index(response))
             db.session.add(response)
-        db.session.commit()
+        db.session.commit()  # only commit once all Responses are added
 
-    return redirect('/' + poll.short_code)
+    route = '/' + poll.short_code
+    return redirect(route)
 
 
 @app.route('/<short_code>')
@@ -79,11 +76,13 @@ def add_user_input(short_code):
 
     # TODO: make a direct query to db
     if poll.poll_type.collect_response:
-        if user not in poll.users_from_response:
+        # if user not in poll.users_from_response:
+        if Response.query.filter(Response.user_id == user.user_id, Response.poll_id == poll.poll_id).first():
             return render_template('add-response.html', poll=poll)
     else:
         # TODO: make a direct query to db
         if user not in poll.get_users_from_tally():
+        #Tally.query.filter(Tally.user_id == user.user_id).first():
             return render_template('add-tally.html', poll=poll)
 
     route = '/' + poll.short_code + '/success'
@@ -102,7 +101,7 @@ def add_user_input_to_db(short_code):
         text = request.form.get('response')
         
         response = Response(poll_id=poll.poll_id, user_id=user.user_id, text=text,
-                            created_at=datetime.now(), order=1)
+                            order=1)
         db.session.add(response)
         db.session.commit()
     
@@ -113,10 +112,9 @@ def add_user_input_to_db(short_code):
             response = Response.query.get(int(response_id))
 
             for tally in range(int(tally_num)):
-                tally = Tally(response_id=response.response_id, user_id=user.user_id, 
-                              created_at=datetime.now())
+                tally = Tally(response_id=response.response_id, user_id=user.user_id,)
                 db.session.add(tally)
-                db.session.commit()
+            db.session.commit()  # only commit once all Tallys are added
 
     flash('Your response has been recorded.')
     route = '/' + poll.short_code + '/success'
@@ -126,7 +124,7 @@ def add_user_input_to_db(short_code):
 @app.route('/<short_code>/r')
 def show_results(short_code):
     """Show poll results."""
-    
+
     poll = Poll.get_from_code(short_code)
 
     return render_template('results.html', poll=poll)

@@ -18,13 +18,28 @@ class PollType(db.Model):
     multi_select = db.Column(db.Boolean, nullable=False)
     tally_value_min = db.Column(db.Integer, nullable=False, default=1)
     tally_value_max = db.Column(db.Integer, nullable=False, default=1)
-    created_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
     polls = db.relationship('Poll')  # returns a list of all polls with poll type
 
     def __repr__(self):
         return "<Poll Type id={} name={}>".format(self.poll_type_id, self.name)
+
+    def __init__(self, name, collect_response, collect_tally, **kwargs):
+        """Create PollType from name, collect_response, and collect_tally
+           and add to db."""
+
+        self.name = name
+        self.collect_response = collect_response
+        self.collect_tally = collect_tally
+
+        if kwargs is not None:
+            for attr, val in kwargs.iteritems():
+                setattr(self, attr, val)
+
+        db.session.add(self)
+        db.session.commit()
 
 
 class Poll(db.Model):
@@ -46,7 +61,7 @@ class Poll(db.Model):
     tally_max = db.Column(db.Integer, nullable=True)
     open_at = db.Column(db.DateTime, nullable=True)
     close_at = db.Column(db.DateTime, nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
     responses = db.relationship('Response')  # returns a list of Response objects
@@ -56,22 +71,32 @@ class Poll(db.Model):
     def __repr__(self):
         return "<Poll id={} poll_type_id={} title={}>".format(self.poll_id, self.poll_type_id, self.title)
 
-    def __init__(self, poll_type_id, title, prompt, is_results_visible):
+    def __init__(self, poll_type_id, title, prompt, **kwargs):
+        """Create Poll from poll_type_id, title, and prompt
+           and add to db."""
+
         admin_code = uuid4().hex
         short_code = ShortUUID().random(length=8)
 
         # check for duplicates
+        while Poll.query.filter(Poll.admin_code == admin_code).first():
+            admin_code = uuid4().hex
+
         while Poll.query.filter(Poll.short_code == short_code).first():
             short_code = ShortUUID().random(length=8)
 
         self.admin_code = admin_code
         self.short_code = short_code
-        self.created_at=datetime.now()
         self.poll_type_id = poll_type_id
         self.title = title
         self.prompt = prompt
-        self.is_results_visible = is_results_visible
 
+        if kwargs is not None:
+            for attr, val in kwargs.iteritems():
+                setattr(self, attr, val)
+
+        db.session.add(self)
+        db.session.commit()
 
     def get_users_from_tally(self):
         responses = self.responses
@@ -88,9 +113,6 @@ class Poll(db.Model):
         return Poll.query.filter(Poll.short_code == short_code).one()
 
 
-
-
-
 class User(db.Model):
     """User model."""
 
@@ -104,7 +126,7 @@ class User(db.Model):
     session_id = db.Column(db.String(32), nullable=True)
     twitter = db.Column(db.String(20), nullable=True)
     phone = db.Column(db.String(20), nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
     admin_polls = db.relationship('Poll', secondary='poll_admins', backref='admins')  # returns a list of polls administered by user
@@ -115,23 +137,34 @@ class User(db.Model):
 
     @staticmethod
     def get_from_session(session, **kwargs):
-        """Queries and returns User by session_id. If None creates User."""
+        """Queries and returns User by session_id. Returns None if no kwargs
+        and creates User if kwargs present."""
+
         if session.get('id'):
             sid = session.get('id')
             user = User.query.filter(User.session_id == sid).one()
+            return user
         else:
-            user = User(created_at=datetime.now(), session_id=uuid4().hex)
-            session['id'] = user.session_id
-            db.session.add(user)
-            db.session.commit()
-        
-        if kwargs is not None:
-            for attr, val in kwargs.iteritems():
-                setattr(user, attr, val)
-            db.session.add(user)
-            db.session.commit()
-        
-        return user
+            if kwargs is not None:
+                sid = uuid4().hex
+
+                # check for duplicates
+                while User.query.filter(User.session_id == sid).first():
+                    sid = uuid4().hex
+
+                user = User(session_id=sid)
+                session['id'] = user.session_id
+
+                for attr, val in kwargs.iteritems():
+                    setattr(user, attr, val)
+
+                db.session.add(user)
+                db.session.commit()
+
+                return user
+
+            else:
+                return None
 
 
 class Response(db.Model):
@@ -145,7 +178,7 @@ class Response(db.Model):
     text = db.Column(db.String(256), nullable=False)
     order = db.Column(db.Integer, nullable=False)
     is_visible = db.Column(db.Boolean, nullable=False, default=True)  # Only use if Poll.is_moderated = True
-    created_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
     poll = db.relationship('Poll')  # returns Poll object
@@ -154,6 +187,19 @@ class Response(db.Model):
 
     def __repr__(self):
         return "<Response id={} poll_id={} text={}>".format(self.response_id, self.poll_id, self.text)
+
+    def __init__(self, poll_id, user_id, text, order, **kwargs):
+        """Create Response from poll_id, user_id, text, and order
+        and add to db."""
+
+        self.poll_id = poll_id
+        self.user_id = user_id
+        self.text = text
+        self.order = order
+
+        if kwargs is not None:
+            for attr, val in kwargs.iteritems():
+                setattr(self, attr, val)
 
     def value(self):
         value = 0
@@ -171,7 +217,7 @@ class Tally(db.Model):
     response_id = db.Column(db.Integer, db.ForeignKey('responses.response_id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     value = db.Column(db.Integer, nullable=False, default=1)
-    created_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
     response = db.relationship('Response')  # returns Response object
@@ -179,16 +225,28 @@ class Tally(db.Model):
     def __repr__(self):
         return "<Tally id={}>".format(self.tally_id)
 
+    def __init__(self, response_id, user_id, **kwargs):
+        """Create Tally from response_id and user_id and add to db."""
+
+        self.response_id = response_id
+        self.user_id = user_id
+
+        if kwargs is not None:
+            for attr, val in kwargs.iteritems():
+                setattr(self, attr, val)
+
 
 class AdminRole(db.Model):
     """Model for admin roles."""
 
     __tablename__ = 'admin_roles'
 
+    # For role permissions we can store boolean values or have a permissions column that stores dictionary
+
     role_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
     name = db.Column(db.String(20), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
@@ -204,11 +262,23 @@ class PollAdmin(db.Model):
     poll_id = db.Column(db.Integer, db.ForeignKey('polls.poll_id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('admin_roles.role_id'), nullable=False, default=1)
-    created_at = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
         return "<PollAdmin id={} poll_id={} user_id={}>".format(self.admin_id, self.poll_id, self.user_id)
+
+    def __init__(self, poll_id, user_id, **kwargs):
+        """Create PollAdmin from poll_id and user_id and add to db."""
+        self.poll_id = poll_id
+        self.user_id = user_id
+
+        if kwargs is not None:
+            for attr, val in kwargs.iteritems():
+                setattr(self, attr, val)
+        
+        db.session.add(self)
+        db.session.commit()
 
 
 def connect_to_db(app):
