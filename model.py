@@ -1,15 +1,16 @@
 from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
 
 # Implementation of flask_login sourced from: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 from flask_login import UserMixin
-from server import login
+from app import login
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from uuid import uuid4
 from datetime import datetime
 from shortuuid import ShortUUID
 
-db = SQLAlchemy()
+
 
 
 class PollType(db.Model):
@@ -189,9 +190,9 @@ class User(UserMixin, db.Model):
                 return None
 
 
-# @login.user_loader
-# def load_user(id):
-#     return User.query.get(int(id))
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
 
 
 class Response(db.Model):

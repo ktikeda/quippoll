@@ -1,19 +1,18 @@
-from sqlalchemy import func
-from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
+# from sqlalchemy import func
 from model import connect_to_db, db
-from server import app
+from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 from datetime import datetime
 
 def create_poll_types():
     """Create default poll types for all polls"""
-    
-    multi_choice = PollType(name='multiple choice', collect_response=False, 
+
+    multi_choice = PollType(name='multiple choice', collect_response=False,
         collect_tally=True, multi_select=False, created_at=datetime.now())
 
-    select_all = PollType(name='select all', collect_response=False, 
+    select_all = PollType(name='select all', collect_response=False,
         collect_tally=True, multi_select=True, created_at=datetime.now())
 
-    open_ended = PollType(name='open-ended', collect_response=True, 
+    open_ended = PollType(name='open-ended', collect_response=True,
         collect_tally=False, multi_select=False, created_at=datetime.now())
 
     db.session.add_all([multi_choice, select_all, open_ended])
@@ -33,6 +32,7 @@ def create_admin_roles():
 
 
 if __name__ == "__main__":
+    from app import app
     connect_to_db(app)
 
     # In case tables haven't been created, create them

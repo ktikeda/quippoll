@@ -4,16 +4,8 @@ from jinja2 import StrictUndefined
 from flask_login import LoginManager, current_user, login_user
 import json
 
-app = Flask(__name__)
-login = LoginManager(app)
-
+from app import app
 from model import connect_to_db, db
-from model import Poll, User, Response, Tally, PollAdmin
-
-app.jinja_env.undefined = StrictUndefined
-app.jinja_env.auto_reload = True
-
-app.secret_key = "secret"
 
 
 @app.route('/')
