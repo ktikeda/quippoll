@@ -23,6 +23,7 @@
     console.log(button);
     let response_id = button.val();
 
+    // TODO: consider changing tally to t/f boolean, look into jquery toggle class
     if (button.hasClass('selected')) {
     // decrement tally
       tallys[response_id] -= 1;
@@ -42,7 +43,10 @@
   }
 
   function selectTally(evt) {
-  // use for multiple choice polls  
+  // use for multiple choice polls
+
+  // TODO: only send property to server that has tally
+    
     let button = $('#' + evt.target.id);
     console.log(button);
     let response_id = button.val();

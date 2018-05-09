@@ -34,14 +34,16 @@
 <script>
   "use strict";
   let poll_type
-  // TODO: change back if selected back to multiple choice/select-all
+
   $('#poll_type').on('change', function() {
     poll_type = parseInt($('#poll_type option:selected').val());
     console.log(poll_type);
 
     if (poll_type === 3) {
       $('#response_options').addClass('hidden');
-  }
+    } else {
+      $('#response_options').removeClass('hidden');
+    }
   });
 
 </script>

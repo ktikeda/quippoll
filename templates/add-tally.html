@@ -8,6 +8,7 @@
     
     {% for response in poll.responses %}
         {# TODO: Select by Response.text #}
+        {# TODO: can also write some logic on the backend to query user and poll, and not add to db if already exists #}
         <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" name={{ response.response_id }} value="{{ response.response_id }}">{{ response.text }}</button><br>
 
     {% endfor %}
@@ -21,12 +22,16 @@
 <script type="text/javascript">
 
   let multiSelect = $('#multi_select').val();
-
-  if (multiSelect === 'true') {
+  console.log(multiSelect);
+  if (multiSelect === 'True') {
     $('.responseOption').on('click', changeTally);
   } else {
     $('.responseOption').on('click', selectTally);
   }
+  /* with ajax could use 200 code and then redirect via client
+   window.location to redirect on client. Can also look into error handlers with forms 
+  http://api.jquery.com/jquery.ajax/
+   */
 
 </script>
 {% endblock %}

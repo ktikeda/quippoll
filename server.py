@@ -106,10 +106,12 @@ def add_user_input(short_code):
     poll = Poll.get_from_code(short_code)
     user = User.get_from_session(session)
 
+    # TODO: make a direct query to db
     if poll.poll_type.collect_response:
         if user not in poll.users_from_response:
             return render_template('add-response.html', poll=poll)
     else:
+        # TODO: make a direct query to db
         if user not in poll.get_users_from_tally():
             return render_template('add-tally.html', poll=poll)
 
