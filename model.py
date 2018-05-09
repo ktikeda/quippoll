@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from uuid import uuid4
 from datetime import datetime
+from shortuuid import ShortUUID
 
 db = SQLAlchemy()
 
@@ -55,6 +56,23 @@ class Poll(db.Model):
     def __repr__(self):
         return "<Poll id={} poll_type_id={} title={}>".format(self.poll_id, self.poll_type_id, self.title)
 
+    def __init__(self, poll_type_id, title, prompt, is_results_visible):
+        admin_code = uuid4().hex
+        short_code = ShortUUID().random(length=8)
+
+        # check for duplicates
+        while Poll.query.filter(Poll.short_code == short_code).first():
+            short_code = ShortUUID().random(length=8)
+
+        self.admin_code = admin_code
+        self.short_code = short_code
+        self.created_at=datetime.now()
+        self.poll_type_id = poll_type_id
+        self.title = title
+        self.prompt = prompt
+        self.is_results_visible = is_results_visible
+
+
     def get_users_from_tally(self):
         responses = self.responses
         users = set()
@@ -68,6 +86,9 @@ class Poll(db.Model):
     @staticmethod
     def get_from_code(short_code):
         return Poll.query.filter(Poll.short_code == short_code).one()
+
+
+
 
 
 class User(db.Model):
@@ -93,7 +114,8 @@ class User(db.Model):
         return "<User id={}>".format(self.user_id)
 
     @staticmethod
-    def get_from_session(session): #TODO: look into *args
+    def get_from_session(session, **kwargs):
+        """Queries and returns User by session_id. If None creates User."""
         if session.get('id'):
             sid = session.get('id')
             user = User.query.filter(User.session_id == sid).one()
@@ -102,6 +124,13 @@ class User(db.Model):
             session['id'] = user.session_id
             db.session.add(user)
             db.session.commit()
+        
+        if kwargs is not None:
+            for attr, val in kwargs.iteritems():
+                setattr(user, attr, val)
+            db.session.add(user)
+            db.session.commit()
+        
         return user
 
 

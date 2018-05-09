@@ -39,62 +39,33 @@ def add_poll_to_db():
     poll_type = int(request.form.get('poll_type'))
     is_results_visible = bool(request.form.get('is_results_visible'))
     email = request.form.get('email')
-    # print title, prompt, poll_type, is_results_visible, email, responses
-
-    # TODO: refactor into get_from_session
-    # get or create User
-    if session.get('id'):
-        sid = session.get('id')
-        user = User.query.filter(User.session_id == sid).one()
-        # print user
-    else:
-        # create User and generate session_id
-        user = User(email=email, created_at=datetime.now(), session_id=uuid4().hex)
-        session['id'] = user.session_id
-        db.session.add(user)
-        db.session.commit()
-        # print user
+ 
+    user = User.get_from_session(session, email=email)
 
     # create Poll
-
-    # generate access code
-    # generate short code
-    admin_code = uuid4().hex
-    short_code = ShortUUID().random(length=8)
-
-    # check for duplicates
-    while Poll.query.filter(Poll.short_code == short_code).first():
-        short_code = ShortUUID().random(length=8)
-
     poll = Poll(poll_type_id=poll_type, title=title, prompt=prompt, 
-        short_code=short_code, admin_code=admin_code, is_results_visible=is_results_visible,
-        created_at=datetime.now())
+        is_results_visible=is_results_visible)
 
     db.session.add(poll)
     db.session.commit()
-    # print poll
 
     # create PollAdmin
     admin = PollAdmin(poll_id=poll.poll_id, user_id=user.user_id, created_at=datetime.now())
     db.session.add(admin)
     db.session.commit()
-    # print admin
 
     # TODO: send poll creation email to user
 
     # if not open-ended, create Response objects
-    if poll.poll_type.name != "open-ended":
+    if not poll.poll_type.collect_response:
         responses = request.form.get('responses')
         responses = responses.split('\n')
-        # print responses
 
         for response in responses:
             response = Response(poll_id=poll.poll_id, user_id=user.user_id, text=response.strip(),
                 order=responses.index(response), created_at=datetime.now())
             db.session.add(response)
         db.session.commit()
-
-        # print poll.responses
 
     return redirect('/' + poll.short_code)
 
@@ -126,28 +97,28 @@ def add_user_input_to_db(short_code):
     poll = Poll.get_from_code(short_code)
     user = User.get_from_session(session)
 
-    if poll.poll_type.collect_response:  # Add responses to db
+    # Add responses to db
+    if poll.poll_type.collect_response:
         text = request.form.get('response')
         
         response = Response(poll_id=poll.poll_id, user_id=user.user_id, text=text,
                             created_at=datetime.now(), order=1)
         db.session.add(response)
         db.session.commit()
-        print response
     
     else:  # Add tallys to db
         tallys = json.loads(request.form.get('tallys'))
 
         for response_id, tally_num in tallys.items():
             response = Response.query.get(int(response_id))
-            print response
+
             for tally in range(int(tally_num)):
                 tally = Tally(response_id=response.response_id, user_id=user.user_id, 
                               created_at=datetime.now())
                 db.session.add(tally)
                 db.session.commit()
-                print tally
 
+    flash('Your response has been recorded.')
     route = '/' + poll.short_code + '/success'
     return redirect(route)
 
@@ -157,7 +128,6 @@ def show_results(short_code):
     """Show poll results."""
     
     poll = Poll.get_from_code(short_code)
-    # print poll
 
     return render_template('results.html', poll=poll)
 
@@ -169,7 +139,6 @@ def success(short_code):
     poll = Poll.get_from_code(short_code)
 
     if poll.is_results_visible:
-        flash('Your response has been recorded.')
         route = '/' + poll.short_code + '/r'
         return redirect(route)
     else:
