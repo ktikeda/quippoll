@@ -1,21 +1,20 @@
 from flask import Flask, redirect, request, render_template, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_sqlalchemy import SQLAlchemy
 from jinja2 import StrictUndefined
-from datetime import datetime
-from uuid import uuid4
-from shortuuid import ShortUUID
+from flask_login import LoginManager
 import json
 
 from model import connect_to_db, db
-from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
+from model import Poll, User, Response, Tally, PollAdmin
 
 
 app = Flask(__name__)
+login = LoginManager(app)
 app.jinja_env.undefined = StrictUndefined
 app.jinja_env.auto_reload = True
 
 app.secret_key = "secret"
+
 
 @app.route('/')
 def index():
@@ -25,9 +24,10 @@ def index():
 
 @app.route('/add-poll')
 def add_poll():
-    """Add poll form."""
+    """Show add poll form."""
 
     return render_template('add-poll.html')
+
 
 @app.route('/add-poll', methods=["POST"])
 def add_poll_to_db():
@@ -43,7 +43,9 @@ def add_poll_to_db():
     # create and add objects to db
     user = User.get_from_session(session, email=email)
 
-    poll = Poll(poll_type_id=poll_type, title=title, prompt=prompt,
+    poll = Poll(poll_type_id=poll_type,
+                title=title, 
+                prompt=prompt,
                 is_results_visible=is_results_visible)
 
     admin = PollAdmin(poll_id=poll.poll_id, user_id=user.user_id)
@@ -52,6 +54,7 @@ def add_poll_to_db():
 
     # if not open-ended, create Response objects
     if not poll.poll_type.collect_response:
+        # parse responses from form
         responses = request.form.get('responses')
         responses = responses.split('\n')
 
@@ -74,15 +77,13 @@ def add_user_input(short_code):
     poll = Poll.get_from_code(short_code)
     user = User.get_from_session(session)
 
-    # TODO: make a direct query to db
     if poll.poll_type.collect_response:
-        # if user not in poll.users_from_response:
         if Response.query.filter(Response.user_id == user.user_id, Response.poll_id == poll.poll_id).first():
             return render_template('add-response.html', poll=poll)
     else:
         # TODO: make a direct query to db
+        # Tally.query.filter(Tally.user_id == user.user_id).first():
         if user not in poll.get_users_from_tally():
-        #Tally.query.filter(Tally.user_id == user.user_id).first():
             return render_template('add-tally.html', poll=poll)
 
     route = '/' + poll.short_code + '/success'
@@ -91,7 +92,7 @@ def add_user_input(short_code):
 
 @app.route('/<short_code>', methods=["POST"])
 def add_user_input_to_db(short_code):
-    """Poll response submission display"""
+    """Add tally/response data to db"""
 
     poll = Poll.get_from_code(short_code)
     user = User.get_from_session(session)
@@ -99,12 +100,14 @@ def add_user_input_to_db(short_code):
     # Add responses to db
     if poll.poll_type.collect_response:
         text = request.form.get('response')
-        
-        response = Response(poll_id=poll.poll_id, user_id=user.user_id, text=text,
+
+        response = Response(poll_id=poll.poll_id,
+                            user_id=user.user_id,
+                            text=text,
                             order=1)
         db.session.add(response)
         db.session.commit()
-    
+
     else:  # Add tallys to db
         tallys = json.loads(request.form.get('tallys'))
 
@@ -133,7 +136,7 @@ def show_results(short_code):
 @app.route('/<short_code>/success')
 def success(short_code):
     """Show success page."""
-    
+
     poll = Poll.get_from_code(short_code)
 
     if poll.is_results_visible:

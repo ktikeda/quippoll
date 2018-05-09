@@ -1,4 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
 from datetime import datetime
 from shortuuid import ShortUUID
@@ -113,27 +115,43 @@ class Poll(db.Model):
         return Poll.query.filter(Poll.short_code == short_code).one()
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     """User model."""
 
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
-    fname = db.Column(db.String(20), nullable=True)
-    lname = db.Column(db.String(20), nullable=True)
-    email = db.Column(db.String(100), nullable=True)
-    password = db.Column(db.String(20), nullable=True)
+    fname = db.Column(db.String(32), nullable=True)
+    lname = db.Column(db.String(32), nullable=True)
+    email = db.Column(db.String(128), nullable=True)
+    password_hash = db.Column(db.String(128), nullable=True)
     session_id = db.Column(db.String(32), nullable=True)
-    twitter = db.Column(db.String(20), nullable=True)
-    phone = db.Column(db.String(20), nullable=True)
+    twitter = db.Column(db.String(32), nullable=True)
+    phone = db.Column(db.String(32), nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
+
+    # flask_login columns
+    is_authenticated = db.Column(db.Boolean, nullable=True)
+    is_active = db.Column(db.Boolean, nullable=True)
+    is_anonymous = db.Column(db.Boolean, nullable=True)
 
     admin_polls = db.relationship('Poll', secondary='poll_admins', backref='admins')  # returns a list of polls administered by user
 
 
     def __repr__(self):
         return "<User id={}>".format(self.user_id)
+
+    # source: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
+    def get_id(self):
+        return self.user_id
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
 
     @staticmethod
     def get_from_session(session, **kwargs):
