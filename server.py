@@ -152,6 +152,24 @@ def show_profile():
         return redirect('/')
 
 
+@app.route('/delete', methods=['POST'])
+@login_required
+def delete_poll():
+    """Delete all data associated with a poll"""
+
+    short_code = request.form.get('p')
+
+    poll = Poll.get_from_code(short_code)
+
+    if current_user.is_admin(poll):
+        poll.delete()
+        flash('Your poll has been deleted.')
+    else:
+        flash('You do not have permission to delete this poll.')
+
+    return redirect('/profile')
+
+
 # Implementation of flask_login sourced from:
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 @login.user_loader
@@ -219,7 +237,7 @@ def register():
                                  fname=fname,
                                  lname=lname,
                                  email=email)
-        
+
     user.set_password(pw)
     db.session.add(user)
     db.session.commit()

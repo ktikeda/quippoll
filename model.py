@@ -114,6 +114,28 @@ class Poll(db.Model):
 
         return list(users)
 
+    def delete(self):
+        """Delete all data associated with a poll."""
+
+        # Delete Tally objects
+        responses = self.responses
+
+        for response in responses:
+            Tally.query.filter(Tally.response_id == response.response_id).delete()
+            db.session.commit()
+
+        # Delete Response objects
+        Response.query.filter(Response.poll_id == self.poll_id).delete()
+        db.session.commit()
+
+        # Delete PollAdmin objects
+        PollAdmin.query.filter(PollAdmin.poll_id == self.poll_id).delete()
+        db.session.commit()
+
+        # Delete Poll object
+        Poll.query.filter(Poll.poll_id == self.poll_id).delete()
+        db.session.commit()
+
     @staticmethod
     def get_from_code(short_code):
         return Poll.query.filter(Poll.short_code == short_code).one()
@@ -140,9 +162,22 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return "<User id={}>".format(self.user_id)
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        if kwargs is not None:
+            for attr, val in kwargs.iteritems():
+                setattr(self, attr, val)
+
         db.session.add(self)
         db.session.commit()
+
+    def is_admin(self, poll):
+        """Checks if user is an admin of poll. Returns T/F."""
+
+        if PollAdmin.query.filter(PollAdmin.user_id == self.user_id,
+                                  PollAdmin.poll_id == poll.poll_id).first():
+            return True
+        else:
+            return False
 
     # source: miguelgrinberg.com
     def get_id(self):
