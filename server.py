@@ -1,11 +1,12 @@
 from flask import Flask, redirect, request, render_template, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from jinja2 import StrictUndefined
-from flask_login import LoginManager, current_user, login_user
+from flask_login import LoginManager, current_user, login_user, logout_user
 import json
 
-from app import app
+from app import app, login
 from model import connect_to_db, db
+from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
 
 @app.route('/')
@@ -36,7 +37,7 @@ def add_poll_to_db():
     user = User.get_from_session(session, email=email)
 
     poll = Poll(poll_type_id=poll_type,
-                title=title, 
+                title=title,
                 prompt=prompt,
                 is_results_visible=is_results_visible)
 
@@ -142,6 +143,12 @@ def success(short_code):
 
 # Implementation of flask_login sourced from:
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
+@login.user_loader
+def load_user(user_id):
+    print 'id', user_id
+    return User.query.get(int(user_id))
+
+
 @app.route('/login')
 def show_login():
     if current_user.is_authenticated:
@@ -165,9 +172,18 @@ def login_db():
         return redirect('/login')
 
     # login user
-    login_user(user)
+    print "login", user
+    login_user(user, remember=True)
+    print current_user
 
     flash('You are logged in.')
+    return redirect('/')
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+
     return redirect('/')
 
 
@@ -188,20 +204,20 @@ def register():
     pw = request.form.get('password')
 
     # check if session_id present
-    user = User.get_from_session
+    user = User.get_from_session(session)
+    print user
 
     if user:
         user.fname = fname
         user.lname = lname
         user.email = email
-        user.set_password(pw)
     else:
         user = User(fname=fname,
                     lname=lname,
                     email=email)
-        user.set_password(pw)
-        db.session.add(user)
-
+        
+    user.set_password(pw)
+    db.session.add(user)
     db.session.commit()
 
     flash('Registration complete.')

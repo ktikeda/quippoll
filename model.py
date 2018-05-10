@@ -11,8 +11,6 @@ from datetime import datetime
 from shortuuid import ShortUUID
 
 
-
-
 class PollType(db.Model):
     """Poll type model. Attributes generate multiple-choice, select-all, open-ended polls."""
 
@@ -136,11 +134,6 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
-    # flask_login columns
-    is_authenticated = db.Column(db.Boolean, nullable=True)
-    is_active = db.Column(db.Boolean, nullable=True)
-    is_anonymous = db.Column(db.Boolean, nullable=True)
-
     admin_polls = db.relationship('Poll', secondary='poll_admins', backref='admins')  # returns a list of polls administered by user
 
 
@@ -188,11 +181,6 @@ class User(UserMixin, db.Model):
 
             else:
                 return None
-
-
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
 
 
 class Response(db.Model):
