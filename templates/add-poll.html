@@ -17,7 +17,9 @@
     Show Results: 
         <input type="radio" name="is_results_visible" value="True" checked> Yes
         <input type="radio" name="is_results_visible" value="False"> No<br>
+    {% if current_user.is_anonymous %}
     Email: <input type="text" name="email" required><br>
+    {% endif %}
     <!-- TODO: for multiple choice and select-all polls: Need js to add responses -->
     <div id="response_options" class="">
     <label>Response Options:</label><br>

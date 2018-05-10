@@ -1,6 +1,6 @@
 from flask import redirect, request, render_template, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 import json
 
 from app import app, login
@@ -140,6 +140,14 @@ def success(short_code):
         return render_template('success.html')
 
 
+@app.route('/profile')
+def show_profile():
+    if current_user.is_authenticated:
+        return render_template('user-profile.html')
+    else:
+        return redirect('/')
+
+
 # Implementation of flask_login sourced from:
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 @login.user_loader
@@ -175,7 +183,7 @@ def login_db():
     print current_user
 
     flash('You are logged in.')
-    return redirect('/')
+    return redirect('/profile')
 
 
 @app.route('/logout')
