@@ -30,10 +30,9 @@ def add_poll_to_db():
     prompt = request.form.get('prompt')
     poll_type = int(request.form.get('poll_type'))
     is_results_visible = bool(request.form.get('is_results_visible'))
-    email = request.form.get('email')
 
     # create and add objects to db
-    user = User.get_from_session(session, email=email)
+    user = User.get_user()
 
     poll = Poll(poll_type_id=poll_type,
                 title=title,
@@ -43,6 +42,7 @@ def add_poll_to_db():
     admin = PollAdmin(poll_id=poll.poll_id, user_id=user.user_id)
 
     # TODO: send poll creation email to user
+    # email = request.form.get('email')
 
     # if not open-ended, create Response objects
     if not poll.poll_type.collect_response:
@@ -67,7 +67,7 @@ def add_user_input(short_code):
     """Poll response submission display"""
 
     poll = Poll.get_from_code(short_code)
-    user = User.get_from_session(session)
+    user = User.get_user()
 
     if poll.poll_type.collect_response:
         if Response.query.filter(Response.user_id == user.user_id, Response.poll_id == poll.poll_id).first():
@@ -87,7 +87,7 @@ def add_user_input_to_db(short_code):
     """Add tally/response data to db"""
 
     poll = Poll.get_from_code(short_code)
-    user = User.get_from_session(session)
+    user = User.get_user()
 
     # TODO: Need to deal with assigning session_id to anon users
 
@@ -171,7 +171,7 @@ def login_db():
 
     # login user
     print "login", user
-    login_user(user, remember=True)
+    login_user(user)
     print current_user
 
     flash('You are logged in.')
@@ -180,7 +180,8 @@ def login_db():
 
 @app.route('/logout')
 def logout():
-    logout_user()
+    if current_user.is_authenticated:
+        logout_user()
 
     return redirect('/')
 
@@ -202,17 +203,10 @@ def register():
     pw = request.form.get('password')
 
     # check if session_id present
-    user = User.get_from_session(session)
-    print user
-
-    if user:
-        user.fname = fname
-        user.lname = lname
-        user.email = email
-    else:
-        user = User(fname=fname,
-                    lname=lname,
-                    email=email)
+    user = User.get_from_session(session,
+                                 fname=fname,
+                                 lname=lname,
+                                 email=email)
         
     user.set_password(pw)
     db.session.add(user)

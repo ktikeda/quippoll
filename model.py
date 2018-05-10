@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 # Implementation of flask_login sourced from: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from uuid import uuid4
@@ -151,34 +151,41 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def get_from_session(session, **kwargs):
-        """Queries and returns User by session_id. Returns None if no kwargs
-        and creates User if kwargs present."""
+        """Queries and returns User by session_id. If None, creates User with session_id."""
 
         if session.get('id'):
             sid = session.get('id')
             user = User.query.filter(User.session_id == sid).one()
-            return user
+
         else:
-            if kwargs is not None:
+
+            sid = uuid4().hex
+
+            # check for duplicates
+            while User.query.filter(User.session_id == sid).first():
                 sid = uuid4().hex
 
-                # check for duplicates
-                while User.query.filter(User.session_id == sid).first():
-                    sid = uuid4().hex
+            user = User(session_id=sid)
+            db.session.add(user)
+            db.session.commit()
 
-                user = User(session_id=sid)
-                session['id'] = user.session_id
+            session['id'] = user.session_id
 
-                for attr, val in kwargs.iteritems():
-                    setattr(user, attr, val)
+        if kwargs is not None:
+            for attr, val in kwargs.iteritems():
+                setattr(user, attr, val)
 
-                db.session.add(user)
-                db.session.commit()
+            db.session.add(user)
+            db.session.commit()
 
-                return user
+        return user
 
-            else:
-                return None
+    @staticmethod
+    def get_user():
+        if current_user.is_authenticated:
+            return current_user
+        else:
+            return User.get_from_session(session)
 
 
 class Response(db.Model):
