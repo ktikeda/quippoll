@@ -1,7 +1,6 @@
-from flask import Flask, redirect, request, render_template, session, flash
+from flask import redirect, request, render_template, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from jinja2 import StrictUndefined
-from flask_login import LoginManager, current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user
 import json
 
 from app import app, login
@@ -223,6 +222,7 @@ def register():
     flash('Registration complete.')
     return redirect('/login')
 
+# End flask_login routes
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

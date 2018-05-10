@@ -3,7 +3,6 @@ db = SQLAlchemy()
 
 # Implementation of flask_login sourced from: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 from flask_login import UserMixin
-from app import login
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from uuid import uuid4
@@ -71,7 +70,7 @@ class Poll(db.Model):
 
     responses = db.relationship('Response')  # returns a list of Response objects
     poll_type = db.relationship('PollType')  # returns PollType object
-    users_from_response = db.relationship('User', secondary='responses') #returns list of User objects who have created Response objects
+    users_from_response = db.relationship('User', secondary='responses')  #returns list of User objects who have created Response objects
 
     def __repr__(self):
         return "<Poll id={} poll_type_id={} title={}>".format(self.poll_id, self.poll_type_id, self.title)
@@ -136,12 +135,12 @@ class User(UserMixin, db.Model):
 
     admin_polls = db.relationship('Poll', secondary='poll_admins', backref='admins')  # returns a list of polls administered by user
 
-
     def __repr__(self):
         return "<User id={}>".format(self.user_id)
 
     # source: miguelgrinberg.com
     def get_id(self):
+        """Helper method required for flask_login"""
         return self.user_id
 
     def set_password(self, password):
@@ -149,7 +148,6 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-
 
     @staticmethod
     def get_from_session(session, **kwargs):
@@ -292,7 +290,7 @@ class PollAdmin(db.Model):
         if kwargs is not None:
             for attr, val in kwargs.iteritems():
                 setattr(self, attr, val)
-        
+
         db.session.add(self)
         db.session.commit()
 
