@@ -144,7 +144,6 @@ def success(short_code):
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 @login.user_loader
 def load_user(user_id):
-    print 'id', user_id
     return User.query.get(int(user_id))
 
 

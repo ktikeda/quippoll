@@ -16,7 +16,14 @@
         <li>{{ message }}</li>
     {% endfor %}
     </ul>
-    
+    {% if not current_user.is_authenticated %}
+    <a href="/register">Register</a>
+    <a href="/login">Login</a>
+    {% else %}
+    <a href="/logout">Logout</a>
+    <p>Hello {{ current_user.fname }}</p>
+    {% endif %}
+
     {% block content %}CONTENT{% endblock %}
 
 
