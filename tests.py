@@ -1,8 +1,8 @@
-from unittest import TestCase
 import unittest
 import server
+from unittest import TestCase
 from app import app
-from model import db, connect_to_db
+from model import db, connect_to_db, example_data
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
 
@@ -24,6 +24,26 @@ class FlaskTests(TestCase):
 
     def tearDown(self):
         pass
+
+class FlaskTestsDatabase(TestCase):
+
+    def setUp(self):
+        """Execute before each test"""
+        # Connect to test database
+        connect_to_db(app, "postgresql:///testdb")
+
+        # Create tables and add sample data
+        db.create_all()
+        example_data()
+
+    def tearDown(self):
+        """Do at end of every test."""
+
+        db.session.close()
+        db.drop_all()
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
