@@ -32,7 +32,10 @@ def add_poll_to_db():
     is_results_visible = bool(request.form.get('is_results_visible'))
 
     # create and add objects to db
-    user = User.get_user()
+    if current_user.is_authenticated:
+        user = current_user
+    else:
+        user = User()
 
     poll = Poll(poll_type_id=poll_type,
                 title=title,
@@ -143,6 +146,7 @@ def success(short_code):
 @app.route('/profile')
 def show_profile():
     if current_user.is_authenticated:
+        print current_user.admin_polls
         return render_template('user-profile.html')
     else:
         return redirect('/')

@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
+from flask import session
+
 # Implementation of flask_login sourced from: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 from flask_login import UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -138,6 +140,10 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return "<User id={}>".format(self.user_id)
 
+    def __init__(self):
+        db.session.add(self)
+        db.session.commit()
+
     # source: miguelgrinberg.com
     def get_id(self):
         """Helper method required for flask_login"""
@@ -166,8 +172,6 @@ class User(UserMixin, db.Model):
                 sid = uuid4().hex
 
             user = User(session_id=sid)
-            db.session.add(user)
-            db.session.commit()
 
             session['id'] = user.session_id
 
