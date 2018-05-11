@@ -92,8 +92,16 @@ class DBRouteTests(TestCase):
     def test_add_user_response_get(self):
         """"""
         result = self.client.get('/open')
-        # self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.status_code, 200)
         self.assertIn('<input type="text" id="response" name="response">', result.data)
+
+    def test_add_user_response_post(self):
+        """"""
+        result = self.client.post('/open',
+                                  data={ 'response': 'Yellow'},
+                                  follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Yellow', result.data)
 
     def test_login_valid(self):
         result = self.client.post('/login', 
