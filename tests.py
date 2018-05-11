@@ -49,7 +49,7 @@ class GetRouteTests(TestCase):
         pass
 
 
-class PostRouteTests(TestCase):
+class DBRouteTests(TestCase):
     """Tests routes with POST requests."""
 
     def setUp(self):
@@ -117,13 +117,22 @@ class PostRouteTests(TestCase):
 
         self.assertIn('Sorry, a user with that email already exists.', result.data)
 
-    def test_add_poll_to_db(self):
+    def test_add_tally_poll(self):
         result = self.client.post('/add-poll', 
                                   data={'title': 'Fav Num',
                                           'prompt': 'What is your fav number?',
                                           'poll_type': '1', 
                                           'is_results_visible': 'True',
                                           'responses': '1\n2\n3' },
+                                  follow_redirects=True)
+        self.assertIn('What is your fav number?', result.data)
+
+    def test_add_response_poll(self):
+        result = self.client.post('/add-poll', 
+                                  data={'title': 'Fav Num',
+                                          'prompt': 'What is your fav number?',
+                                          'poll_type': '3', 
+                                          'is_results_visible': 'True'},
                                   follow_redirects=True)
         self.assertIn('What is your fav number?', result.data)
 
