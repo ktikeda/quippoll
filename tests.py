@@ -5,12 +5,12 @@ from app import app
 from model import db, connect_to_db, example_data
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 from flask_login import current_user, login_user, logout_user
+from flask import session
 
 
-class RouteAnonymousTests(TestCase):
-    """Tests routes for anonymous users."""
-    
-    # Test routes with GET request
+class GetRouteTests(TestCase):
+    """Test routes with GET request"""
+
     def setUp(self):
         self.client = server.app.test_client()
         app.config['TESTING'] = True
@@ -53,23 +53,9 @@ class RouteAnonymousTests(TestCase):
     def tearDown(self):
         pass
 
-from contextlib import contextmanager
-from flask import appcontext_pushed, session
 
-@contextmanager
-def login_set(app, user):
-    def handler(sender, **kwargs):
-        login_user(user)
-        print current_user
-        print "Authenticated", current_user.is_authenticated
-    with appcontext_pushed.connected_to(handler, app):
-        yield
-
-class RouteAuthenticatedTests(TestCase):
-    """Tests routes for authenticated users."""
-
-    # Test routes with GET request
-    
+class PostRouteTests(TestCase):
+    """Tests routes with POST requests."""
 
     def setUp(self):
         self.client = server.app.test_client()
@@ -80,34 +66,27 @@ class RouteAuthenticatedTests(TestCase):
         db.create_all()
         example_data()
 
-
     def tearDown(self):
         """Do at end of every test."""
 
         db.session.close()
         db.drop_all()
 
-    def test_index(self):
-        user = User(fname='Karynn')
-        db.session.add(user)
-        db.session.commit()
+    def test_login_valid(self):
+        result = self.client.post('/login', 
+                                    data={ 'email': 'jane@mail.com', 
+                                           'password': '123' },
+                                    follow_redirects=True)
 
-        with app.test_request_context('/'):
-            login_user(user)
-            print session
-            print current_user
-            print 'is_authenticated', current_user.is_authenticated
-            result = self.client.get('/')
-            # self.assertEqual(result.status_code, 200)
-            # self.assertIn('Karynn', result.data)
+        self.assertIn('You are logged in.', result.data)
 
-    def test_login(self):
-        with self.client:
-            response = self.client.post('/login', { 'email': 'jane@mail.com', 'password': '123' })
+    def test_login_invalid(self):
+        result = self.client.post('/login', 
+                                    data={ 'email': 'jane@mail.com', 
+                                           'password': 'abc' },
+                                    follow_redirects=True)
 
-            # success
-            assertEquals(current_user.fname, 'Jane')
-
+        self.assertIn('Invalid email or password.', result.data)
 
 
 class FlaskTestsDatabase(TestCase):
@@ -126,8 +105,6 @@ class FlaskTestsDatabase(TestCase):
 
         db.session.close()
         db.drop_all()
-
-
 
 
 if __name__ == "__main__":

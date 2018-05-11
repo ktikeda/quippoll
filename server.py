@@ -203,13 +203,11 @@ def login():
 
     # validate user/password
     if user is None or not user.check_password(pw):
-        flash('Invalid email or password')
+        flash('Invalid email or password.')
         return redirect('/login')
 
     # login user
-    print "login", user
     login_user(user)
-    print current_user
 
     flash('You are logged in.')
     return redirect('/profile')
