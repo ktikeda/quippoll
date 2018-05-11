@@ -80,9 +80,17 @@ class PostRouteTests(TestCase):
 
         self.assertIn('You are logged in.', result.data)
 
-    def test_login_invalid(self):
+    def test_login__pw_invalid(self):
         result = self.client.post('/login', 
                                     data={ 'email': 'jane@mail.com', 
+                                           'password': 'abc' },
+                                    follow_redirects=True)
+
+        self.assertIn('Invalid email or password.', result.data)
+
+    def test_login__user_invalid(self):
+        result = self.client.post('/login', 
+                                    data={ 'email': 'joe@mail.com', 
                                            'password': 'abc' },
                                     follow_redirects=True)
 
