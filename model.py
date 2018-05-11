@@ -4,7 +4,7 @@ db = SQLAlchemy()
 from flask import session
 
 # Implementation of flask_login sourced from: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
-from flask_login import UserMixin, current_user
+from flask_login import UserMixin, current_user, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from uuid import uuid4
@@ -138,7 +138,7 @@ class Poll(db.Model):
 
     @staticmethod
     def get_from_code(short_code):
-        return Poll.query.filter(Poll.short_code == short_code).one()
+        return Poll.query.filter(Poll.short_code == short_code).first()
 
 
 class User(UserMixin, db.Model):
@@ -341,11 +341,11 @@ class PollAdmin(db.Model):
         db.session.commit()
 
 
-def connect_to_db(app):
+def connect_to_db(app, db_uri='postgresql:///quippoll'):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///quippoll'
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_ECHO'] = False
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
@@ -370,6 +370,7 @@ def example_data():
                 password_hash='pbkdf2:sha1:1000$jZyba5B5$c7da27f064ae8ec0c93d1f2e1789e9e3e19b49a3')
     user_responded = User(fname='Carly', lname='Banks', email='carly@mail.com',
                           password_hash='pbkdf2:sha1:1000$83T7iOeT$8154ddce2cd25af9688622aac45cb2054827a212')
+
     anon_user_responded = User(session_id='session')
 
     db.session.add_all([anon_user, anon_admin, admin, user, anon_user_responded])

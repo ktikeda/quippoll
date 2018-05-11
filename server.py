@@ -11,6 +11,9 @@ from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 @app.route('/')
 def index():
     """Homepage."""
+    print session
+    user = current_user
+    print "is_authenticated", user.is_authenticated
     return render_template('index.html')
 
 
@@ -72,18 +75,22 @@ def add_user_input(short_code):
     poll = Poll.get_from_code(short_code)
     user = User.get_user()
 
-    if poll.poll_type.collect_response:
-        if Response.query.filter(Response.user_id == user.user_id, Response.poll_id == poll.poll_id).first():
-            return render_template('add-response.html', poll=poll)
+    if poll is not None:
+        if poll.poll_type.collect_response:
+            if Response.query.filter(Response.user_id == user.user_id, Response.poll_id == poll.poll_id).first():
+                return render_template('add-response.html', poll=poll)
+        else:
+            # TODO: make a direct query to db
+            # Tally.query.filter(Tally.user_id == user.user_id).first():
+            if user not in poll.get_users_from_tally():
+                return render_template('add-tally.html', poll=poll)
+
+        route = '/' + poll.short_code + '/success'
     else:
-        # TODO: make a direct query to db
-        # Tally.query.filter(Tally.user_id == user.user_id).first():
-        if user not in poll.get_users_from_tally():
-            return render_template('add-tally.html', poll=poll)
+        flash('Sorry, that page does not exist.')
+        route = '/'
 
-    route = '/' + poll.short_code + '/success'
     return redirect(route)
-
 
 @app.route('/<short_code>', methods=["POST"])
 def add_user_input_to_db(short_code):
@@ -186,7 +193,7 @@ def show_login():
 
 
 @app.route('/login', methods=['POST'])
-def login_db():
+def login():
     # grab form data
     email = request.form.get('email')
     pw = request.form.get('password')
