@@ -73,7 +73,7 @@ class DBRouteTests(TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertIn('Sorry, that page does not exist.', result.data)
 
-    def test_add_user_tally(self):
+    def test_add_user_tally_get(self):
         """"""
         result = self.client.get('/multi')
         self.assertEqual(result.status_code, 200)
@@ -81,7 +81,15 @@ class DBRouteTests(TestCase):
         self.assertIn('Blue', result.data)
         self.assertIn('Yellow', result.data)
 
-    def test_add_user_response(self):
+    def test_add_user_tally_post(self):
+        """"""
+        result = self.client.post('/multi',
+                                  data={ 'tallys': '{"2": 1}'},
+                                  follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Blue: 1', result.data)
+
+    def test_add_user_response_get(self):
         """"""
         result = self.client.get('/open')
         # self.assertEqual(result.status_code, 200)

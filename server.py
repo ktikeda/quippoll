@@ -85,12 +85,10 @@ def add_user_input(short_code):
             if user not in poll.get_users_from_tally():
                 return render_template('add-tally.html', poll=poll)
 
-        route = '/' + poll.short_code + '/success'
     else:
         flash('Sorry, that page does not exist.')
         route = '/'
-
-    return redirect(route)
+        return redirect(route)
 
 @app.route('/<short_code>', methods=["POST"])
 def add_user_input_to_db(short_code):
