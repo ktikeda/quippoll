@@ -75,9 +75,9 @@ def add_user_input(short_code):
     poll = Poll.get_from_code(short_code)
     user = User.get_user()
 
-    if poll is not None:
+    if poll is not None:  # Ensure this is a valid poll route
         if poll.poll_type.collect_response:
-            if Response.query.filter(Response.user_id == user.user_id, Response.poll_id == poll.poll_id).first():
+            if not Response.query.filter(Response.user_id == user.user_id, Response.poll_id == poll.poll_id).first():
                 return render_template('add-response.html', poll=poll)
         else:
             # TODO: make a direct query to db

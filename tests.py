@@ -73,6 +73,20 @@ class DBRouteTests(TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertIn('Sorry, that page does not exist.', result.data)
 
+    def test_add_user_tally(self):
+        """"""
+        result = self.client.get('/multi')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Red', result.data)
+        self.assertIn('Blue', result.data)
+        self.assertIn('Yellow', result.data)
+
+    def test_add_user_response(self):
+        """"""
+        result = self.client.get('/open')
+        # self.assertEqual(result.status_code, 200)
+        self.assertIn('<input type="text" id="response" name="response">', result.data)
+
     def test_login_valid(self):
         result = self.client.post('/login', 
                                     data={ 'email': 'jane@mail.com', 

@@ -377,11 +377,14 @@ def example_data():
     db.session.commit()
 
     # Create polls
-    mc_poll = Poll(poll_type_id=1, title='Colors', prompt='What is your favorite color?',
+    mc_poll = Poll(poll_type_id=1, title='Colors',
+                   prompt='What is your favorite color?',
                    short_code='multi', admin_code='adminmc')
-    sa_poll = Poll(poll_type_id=2, title='Colors', prompt='What is your favorite color?',
+    sa_poll = Poll(poll_type_id=2, title='Colors',
+                   prompt='What is your favorite color?',
                    short_code='all', admin_code='adminsa')
-    oe_poll = Poll(poll_type_id=3, title='Colors', prompt='What is your favorite color?',
+    oe_poll = Poll(poll_type_id=3, title='Colors',
+                   prompt='What is your favorite color?',
                    short_code='open', admin_code='adminoe')
 
     db.session.add_all([mc_poll, sa_poll, oe_poll])
@@ -404,8 +407,8 @@ def example_data():
     mc_r2 = Response(poll_id=mc_poll.poll_id, user_id=admin.user_id, text='Blue', order=2)
     mc_r3 = Response(poll_id=mc_poll.poll_id, user_id=admin.user_id, text='Yellow', order=3)
 
-    sa_r1 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Red', order=1)
-    sa_r2 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Blue', order=2)
+    sa_r1 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Cyan', order=1)
+    sa_r2 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Magenta', order=2)
     sa_r3 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Yellow', order=3)
 
     oe_r1 = Response(poll_id=oe_poll.poll_id, user_id=user_responded.user_id, text='Red', order=1)
