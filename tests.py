@@ -53,31 +53,61 @@ class RouteAnonymousTests(TestCase):
     def tearDown(self):
         pass
 
+from contextlib import contextmanager
+from flask import appcontext_pushed, session
+
+@contextmanager
+def login_set(app, user):
+    def handler(sender, **kwargs):
+        login_user(user)
+        print current_user
+        print "Authenticated", current_user.is_authenticated
+    with appcontext_pushed.connected_to(handler, app):
+        yield
 
 class RouteAuthenticatedTests(TestCase):
-    """Tests routes for authenticated users."""   
+    """Tests routes for authenticated users."""
 
     # Test routes with GET request
+    
+
     def setUp(self):
         self.client = server.app.test_client()
         app.config['TESTING'] = True
         app.config['SECRET_KEY'] = 'key'
-        
+
         connect_to_db(app, "postgresql:///testdb")
         db.create_all()
         example_data()
+
 
     def tearDown(self):
         """Do at end of every test."""
 
         db.session.close()
-        db.drop_all()    
+        db.drop_all()
 
     def test_index(self):
-        result = self.client.get('/')
-        self.assertEqual(result.status_code, 200)
-        
-        print current_user
+        user = User(fname='Karynn')
+        db.session.add(user)
+        db.session.commit()
+
+        with app.test_request_context('/'):
+            login_user(user)
+            print session
+            print current_user
+            print 'is_authenticated', current_user.is_authenticated
+            result = self.client.get('/')
+            # self.assertEqual(result.status_code, 200)
+            # self.assertIn('Karynn', result.data)
+
+    def test_login(self):
+        with self.client:
+            response = self.client.post('/login', { 'email': 'jane@mail.com', 'password': '123' })
+
+            # success
+            assertEquals(current_user.fname, 'Jane')
+
 
 
 class FlaskTestsDatabase(TestCase):
