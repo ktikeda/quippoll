@@ -217,6 +217,7 @@ def login():
 def logout():
     if current_user.is_authenticated:
         logout_user()
+        flash('You have been logged out.')
 
     return redirect('/')
 
@@ -231,10 +232,16 @@ def show_registration():
 
 @app.route('/register', methods=['POST'])
 def register():
-    # grab form data
+    """Creates user by email if user with email does not already exist."""
+    
+    email = request.form.get('email')
+
+    if User.query.filter(User.email == email).first():
+        flash('Sorry, a user with that email already exists.')
+        return redirect('/register')
+
     fname = request.form.get('fname')
     lname = request.form.get('lname')
-    email = request.form.get('email')
     pw = request.form.get('password')
 
     # check if session_id present
@@ -247,7 +254,7 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    flash('Registration complete.')
+    flash('Your registration was successful.')
     return redirect('/login')
 
 # End flask_login routes

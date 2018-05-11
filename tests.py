@@ -96,6 +96,26 @@ class PostRouteTests(TestCase):
 
         self.assertIn('Invalid email or password.', result.data)
 
+    def test_register_valid(self):
+        result = self.client.post('/register', 
+                                    data={'fname': 'Bob',
+                                          'lname': 'New',
+                                          'email': 'new@mail.com', 
+                                          'password': '123' },
+                                    follow_redirects=True)
+
+        self.assertIn('Your registration was successful.', result.data)
+
+    def test_register_invalid(self):
+        result = self.client.post('/register', 
+                                    data={'fname': 'Bob',
+                                          'lname': 'New',
+                                          'email': 'jane@mail.com', 
+                                          'password': '123' },
+                                    follow_redirects=True)
+
+        self.assertIn('Sorry, a user with that email already exists.', result.data)
+
 
 class FlaskTestsDatabase(TestCase):
 
