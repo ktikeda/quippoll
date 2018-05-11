@@ -153,7 +153,6 @@ def success(short_code):
 @app.route('/profile')
 def show_profile():
     if current_user.is_authenticated:
-        print current_user.admin_polls
         return render_template('user-profile.html')
     else:
         return redirect('/')

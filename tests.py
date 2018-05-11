@@ -45,11 +45,6 @@ class GetRouteTests(TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertIn('Gather input in a snap.', result.data)
 
-    # Test routes with POST request
-    # def test_add_poll_to_db(self):
-    #     result = self.client.post('/add-poll', data={'title': 'Numbers'})
-    #     self.assertEqual(result.status_code, 200)
-
     def tearDown(self):
         pass
 
@@ -72,6 +67,12 @@ class PostRouteTests(TestCase):
         db.session.close()
         db.drop_all()
 
+    def test_bad_route(self):
+        """Test route that does not exist"""
+        result = self.client.get('/badroute', follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Sorry, that page does not exist.', result.data)
+
     def test_login_valid(self):
         result = self.client.post('/login', 
                                     data={ 'email': 'jane@mail.com', 
@@ -80,7 +81,7 @@ class PostRouteTests(TestCase):
 
         self.assertIn('You are logged in.', result.data)
 
-    def test_login__pw_invalid(self):
+    def test_login_pw_invalid(self):
         result = self.client.post('/login', 
                                     data={ 'email': 'jane@mail.com', 
                                            'password': 'abc' },
@@ -88,7 +89,7 @@ class PostRouteTests(TestCase):
 
         self.assertIn('Invalid email or password.', result.data)
 
-    def test_login__user_invalid(self):
+    def test_login_user_invalid(self):
         result = self.client.post('/login', 
                                     data={ 'email': 'joe@mail.com', 
                                            'password': 'abc' },
@@ -115,6 +116,16 @@ class PostRouteTests(TestCase):
                                     follow_redirects=True)
 
         self.assertIn('Sorry, a user with that email already exists.', result.data)
+
+    def test_add_poll_to_db(self):
+        result = self.client.post('/add-poll', 
+                                  data={'title': 'Fav Num',
+                                          'prompt': 'What is your fav number?',
+                                          'poll_type': '1', 
+                                          'is_results_visible': 'True',
+                                          'responses': '1\n2\n3' },
+                                  follow_redirects=True)
+        self.assertIn('What is your fav number?', result.data)
 
 
 class FlaskTestsDatabase(TestCase):

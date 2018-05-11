@@ -2,3 +2,5 @@ env/
 *.pyc
 .DS_Store
 secrets.sh
+htmlcov/
+.coverage
