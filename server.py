@@ -123,7 +123,7 @@ def add_user_input_to_db(short_code):
 
     flash('Your response has been recorded.')
     route = '/' + poll.short_code + '/success'
-    return redirect(route)
+    return route
 
 
 @app.route('/<short_code>/r')

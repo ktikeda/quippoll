@@ -4,15 +4,15 @@
 
 {% block content %}
 <h1>{{ poll.prompt }}</h1>
-<form name="poll_responses" action="/{{ poll.short_code }}" method="POST">
+<form name="poll_responses" id="poll_responses" action="/{{ poll.short_code }}" method="POST">
     
     {% for response in poll.responses %}
-        {# TODO: can also write some logic on the backend to query user and poll, and not add to db if already exists #}
         <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" name="responseOption{{ response.response_id }}" value="{{ response.text }}">{{ response.text }}</button><br>
 
     {% endfor %}
     <input type="hidden" id="tallys" name="tallys" value="{}">
     <input type="hidden" id="multi_select" name="multi_select" value="{{ poll.poll_type.multi_select }}">
+    <input type="hidden" id="poll" name="poll" value="{{ poll.short_code }}">
     <input type="submit" value="submit">
 </form>  
 
@@ -21,16 +21,16 @@
 <script type="text/javascript">
 
   let multiSelect = $('#multi_select').val();
-  console.log(multiSelect);
+  let route = '/' + $('#poll').val();
+  console.log(route);
+
   if (multiSelect === 'True') {
     $('.responseOption').on('click', changeTally);
   } else {
     $('.responseOption').on('click', selectTally);
   }
-  /* with ajax could use 200 code and then redirect via client
-   window.location to redirect on client. Can also look into error handlers with forms 
-  http://api.jquery.com/jquery.ajax/
-   */
+
+  $("#poll_responses").on("submit", submitForm);
 
 </script>
 {% endblock %}

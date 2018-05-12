@@ -142,7 +142,7 @@ class Poll(db.Model):
 
 
 class User(UserMixin, db.Model):
-    """User model."""
+    """User model. UserMixin from flask_login"""
 
     __tablename__ = 'users'
 
@@ -179,11 +179,11 @@ class User(UserMixin, db.Model):
         else:
             return False
 
-    # source: miguelgrinberg.com
     def get_id(self):
         """Helper method required for flask_login"""
         return self.user_id
 
+    # source: miguelgrinberg.com
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
