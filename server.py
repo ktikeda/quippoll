@@ -11,10 +11,10 @@ from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 @app.route('/')
 def index():
     """Homepage."""
-    print session
+    # print session
     user = current_user
-    print "is_authenticated", user.is_authenticated
-    return render_template('index.html', current_user=current_user)
+    # print "is_authenticated", user.is_authenticated
+    return render_template('index.html', current_user=user)
 
 
 @app.route('/add-poll')
@@ -113,13 +113,13 @@ def add_user_input_to_db(short_code):
     else:  # Add tallys to db
         tallys = json.loads(request.form.get('tallys'))
 
-        for response_id, tally_num in tallys.items():
-            response = Response.query.get(int(response_id))
+        for response_text in tallys:
+            response = Response.query.filter(Response.text == response_text,
+                                             Response.poll_id == poll.poll_id).one()
 
-            for tally in range(int(tally_num)):
-                tally = Tally(response_id=response.response_id, user_id=user.user_id,)
-                db.session.add(tally)
-            db.session.commit()  # only commit once all Tallys are added
+            tally = Tally(response_id=response.response_id, user_id=user.user_id)
+            db.session.add(tally)
+            db.session.commit()
 
     flash('Your response has been recorded.')
     route = '/' + poll.short_code + '/success'

@@ -9,7 +9,7 @@
     {% for response in poll.responses %}
         {# TODO: Select by Response.text #}
         {# TODO: can also write some logic on the backend to query user and poll, and not add to db if already exists #}
-        <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" name={{ response.response_id }} value="{{ response.response_id }}">{{ response.text }}</button><br>
+        <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" name="responseOption{{ response.response_id }}" value="{{ response.text }}">{{ response.text }}</button><br>
 
     {% endfor %}
     <input type="hidden" id="tallys" name="tallys" value="{}">

@@ -117,28 +117,28 @@ class Poll(db.Model):
     def delete(self):
         """Delete all data associated with a poll."""
 
-        # Delete Tally objects
+        # Delete Tally records
         responses = self.responses
 
         for response in responses:
             Tally.query.filter(Tally.response_id == response.response_id).delete()
             db.session.commit()
 
-        # Delete Response objects
+        # Delete Response records
         Response.query.filter(Response.poll_id == self.poll_id).delete()
         db.session.commit()
 
-        # Delete PollAdmin objects
+        # Delete PollAdmin records
         PollAdmin.query.filter(PollAdmin.poll_id == self.poll_id).delete()
         db.session.commit()
 
-        # Delete Poll object
+        # Delete Poll record
         Poll.query.filter(Poll.poll_id == self.poll_id).delete()
         db.session.commit()
 
     @staticmethod
     def get_from_code(short_code):
-        return Poll.query.filter(Poll.short_code == short_code).first()
+        return Poll.query.options(db.joinedload('responses')).filter(Poll.short_code == short_code).first()
 
 
 class User(UserMixin, db.Model):

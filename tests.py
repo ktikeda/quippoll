@@ -84,7 +84,7 @@ class DBRouteTests(TestCase):
     def test_add_user_tally_post(self):
         """"""
         result = self.client.post('/multi',
-                                  data={ 'tallys': '{"2": 1}'},
+                                  data={'tallys': '{"Blue": "True"}'},
                                   follow_redirects=True)
         self.assertEqual(result.status_code, 200)
         self.assertIn('Blue: 1', result.data)
@@ -98,10 +98,17 @@ class DBRouteTests(TestCase):
     def test_add_user_response_post(self):
         """"""
         result = self.client.post('/open',
-                                  data={ 'response': 'Yellow'},
+                                  data={'response': 'Yellow'},
                                   follow_redirects=True)
         self.assertEqual(result.status_code, 200)
         self.assertIn('Yellow', result.data)
+
+    def test_delete_poll_anon(self):
+        """"""
+        result = self.client.post('/delete',
+                                  data={ 'p': 'multi'},
+                                  follow_redirects=True)
+        self.assertEqual(result.status_code, 401)
 
     def test_login_valid(self):
         result = self.client.post('/login', 
