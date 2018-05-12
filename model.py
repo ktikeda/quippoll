@@ -382,7 +382,8 @@ def example_data():
                    short_code='multi', admin_code='adminmc')
     sa_poll = Poll(poll_type_id=2, title='Colors',
                    prompt='What is your favorite color?',
-                   short_code='all', admin_code='adminsa')
+                   short_code='all', admin_code='adminsa',
+                   is_results_visible=False)
     oe_poll = Poll(poll_type_id=3, title='Colors',
                    prompt='What is your favorite color?',
                    short_code='open', admin_code='adminoe')

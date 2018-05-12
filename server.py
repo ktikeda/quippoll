@@ -121,8 +121,13 @@ def add_user_input_to_db(short_code):
             db.session.add(tally)
             db.session.commit()
 
-    flash('Your response has been recorded.')
-    route = '/' + poll.short_code + '/success'
+    # Specify route
+    if poll.is_results_visible:
+        flash('Your response has been recorded.')
+        route = '/' + poll.short_code + '/r'
+    else:
+        route = '/' + poll.short_code + '/success'
+    
     return route
 
 
@@ -141,11 +146,7 @@ def success(short_code):
 
     poll = Poll.get_from_code(short_code)
 
-    if poll.is_results_visible:
-        route = '/' + poll.short_code + '/r'
-        return redirect(route)
-    else:
-        return render_template('success.html')
+    return render_template('success.html')
 
 
 @app.route('/profile')

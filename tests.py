@@ -74,7 +74,7 @@ class DBRouteTests(TestCase):
         self.assertIn('Sorry, that page does not exist.', result.data)
 
     def test_add_user_tally_get(self):
-        """"""
+        """Test poll display for tally"""
         result = self.client.get('/multi')
         self.assertEqual(result.status_code, 200)
         self.assertIn('Red', result.data)
@@ -82,29 +82,37 @@ class DBRouteTests(TestCase):
         self.assertIn('Yellow', result.data)
 
     def test_add_user_tally_post(self):
-        """"""
+        """Test poll input for tally"""
         result = self.client.post('/multi',
                                   data={'tallys': '{"Blue": "True"}'},
                                   follow_redirects=True)
         self.assertEqual(result.status_code, 200)
-        self.assertIn('Blue: 1', result.data)
+        self.assertIn('/multi/r', result.data)
+
+    def test_add_user_tally_post_hidden(self):
+        """Test poll input for tally, results not visible"""
+        result = self.client.post('/all',
+                                  data={'tallys': '{"Cyan": "True"}'},
+                                  follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('/all/success', result.data)
 
     def test_add_user_response_get(self):
-        """"""
+        """Test poll display for response"""
         result = self.client.get('/open')
         self.assertEqual(result.status_code, 200)
         self.assertIn('<input type="text" id="response" name="response">', result.data)
 
     def test_add_user_response_post(self):
-        """"""
+        """Test poll input for response"""
         result = self.client.post('/open',
                                   data={'response': 'Yellow'},
                                   follow_redirects=True)
         self.assertEqual(result.status_code, 200)
-        self.assertIn('Yellow', result.data)
+        self.assertIn('/open/r', result.data)
 
     def test_delete_poll_anon(self):
-        """"""
+        """Test poll deletion failure for anonymous user"""
         result = self.client.post('/delete',
                                   data={ 'p': 'multi'},
                                   follow_redirects=True)
