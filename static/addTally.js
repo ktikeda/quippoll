@@ -13,8 +13,7 @@ function addTally(evt) {
     }  else {
       tallys[response_key] = 1;
     }
-
-  $('#tallys').attr("value", JSON.stringify(tallys));
+  console.log(tallys);
 }
 
 function changeTally(evt) {
@@ -23,7 +22,6 @@ function changeTally(evt) {
   console.log(button);
   let response_key = button.val();
 
-  // TODO: consider changing tally to t/f boolean, look into jquery toggle class
   if (button.hasClass('selected')) {
     delete tallys[response_key];
     button.removeClass('selected');
@@ -33,14 +31,10 @@ function changeTally(evt) {
   }
 
   console.log(tallys);
-  console.log(JSON.stringify(tallys));
-  $('#tallys').attr("value", JSON.stringify(tallys));
 }
 
 function selectTally(evt) {
 // use for multiple choice polls
-
-// TODO: only send property to server that has tally
   
   let button = $('#' + evt.target.id);
   console.log(button);
@@ -66,15 +60,20 @@ function selectTally(evt) {
   }
 
   console.log(tallys);
-  $('#tallys').attr("value", JSON.stringify(tallys));
 }
 
 function submitForm(evt) {
   evt.preventDefault();
 
   let formInputs = {
-      "tallys": $("#tallys").val()
+      "tallys": JSON.stringify(tallys)
   };
+
+  console.log(formInputs);
+
+  let route = '/' + $('#poll').val();
+
+  console.log(route);
 
   $.post(route, 
        formInputs,
