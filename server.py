@@ -97,7 +97,7 @@ def add_user_input_to_db(short_code):
     poll = Poll.get_from_code(short_code)
     user = User.get_user()
 
-    # TODO: Need to deal with assigning session_id to anon users
+    # TODO: Write logic to query user and poll, and not add to db if already exists
 
     # Add responses to db
     if poll.poll_type.collect_response:

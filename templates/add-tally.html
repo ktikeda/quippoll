@@ -7,7 +7,6 @@
 <form name="poll_responses" action="/{{ poll.short_code }}" method="POST">
     
     {% for response in poll.responses %}
-        {# TODO: Select by Response.text #}
         {# TODO: can also write some logic on the backend to query user and poll, and not add to db if already exists #}
         <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" name="responseOption{{ response.response_id }}" value="{{ response.text }}">{{ response.text }}</button><br>
 
