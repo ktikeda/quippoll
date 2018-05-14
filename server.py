@@ -3,6 +3,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import current_user, login_user, logout_user, login_required
 import json
 
+from twilio.twiml.messaging_response import MessagingResponse
+
 from app import app, login
 from model import connect_to_db, db
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
@@ -16,6 +18,16 @@ def index():
     # print "is_authenticated", user.is_authenticated
     return render_template('index.html', current_user=user)
 
+@app.route("/sms", methods=['GET', 'POST'])
+def sms_ahoy_reply():
+    """Respond to incoming messages with a friendly SMS."""
+    # Start our response
+    resp = MessagingResponse()
+
+    # Add a message
+    resp.message("Ahoy! Thanks so much for your message.")
+
+    return str(resp)
 
 @app.route('/add-poll')
 def add_poll():
