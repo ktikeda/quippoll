@@ -32,12 +32,39 @@ def sms_find_poll():
 
     poll = Poll.get_from_code(sms)
 
-    if poll:
-        response.message('Your poll has been found.')
+    if 'short_code' in session:
+        response.redirect('/answer/' + session['short_code'])
+    elif poll:
+        response.redirect('/sms-poll/' + sms)
     else:
         response.message('That poll does not exist')
 
     return str(response)
+
+
+@app.route("/sms-poll/<short_code>", methods=['POST'])
+def sms_add_input(short_code):
+    poll = Poll.get_from_code(short_code)
+    
+    response = MessagingResponse()
+    response.message(poll.title)
+    response.message('Enter your response.')
+
+    session['short_code'] = poll.short_code
+
+    return str(response)
+
+@app.route('/answer/<short_code>', methods=['POST'])
+def sms_add_input_to_db(short_code):
+    poll = Poll.get_from_code(short_code)
+
+    sms = request.values['Body']
+
+    response = MessagingResponse()
+    response.message('Your response has been recorded.')
+
+    return str(response)
+
 
 @app.route('/add-poll')
 def add_poll():
