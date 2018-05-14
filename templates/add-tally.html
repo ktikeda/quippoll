@@ -6,14 +6,18 @@
 <h1>{{ poll.prompt }}</h1>
 <form name="poll_responses" id="poll_responses" action="/{{ poll.short_code }}" method="POST">
     
-    {% for response in poll.responses %}
-        <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" name="responseOption{{ response.response_id }}" value="{{ response.text }}">{{ response.text }}</button><br>
 
-    {% endfor %}
-    <input type="hidden" id="multi_select" name="multi_select" value="{{ poll.poll_type.multi_select }}">
-    <input type="hidden" id="poll" name="poll" value="{{ poll.short_code }}">
-    <input type="submit" value="submit">
-</form>  
+      {% for response in poll.responses %}
+          <button type="button" class="responseOption" id="responseOption{{ response.response_id }}" name="responseOption{{ response.response_id }}" value="{{ response.text }}">{{ response.order }}. {{ response.text }}</button><br>
+
+      {% endfor %}
+      <input type="hidden" id="multi_select" name="multi_select" value="{{ poll.poll_type.multi_select }}">
+      <input type="hidden" id="poll" name="poll" value="{{ poll.short_code }}">
+      <input type="submit" value="submit">
+
+</form>
+
+<p>Text {{ poll.short_code}} to respond via SMS.</p>
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="/static/addTally.js"></script>

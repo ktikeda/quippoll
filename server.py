@@ -23,47 +23,85 @@ def sms_find_poll():
     """Find poll from sms"""
     # Start our response
 
-    response = MessagingResponse()
+    resp = MessagingResponse()
 
     msid = request.values['MessageSid']
     sms = request.values['Body']
     phone = request.values['From']
     # Add a message
 
+    print sms
     poll = Poll.get_from_code(sms)
+    print poll
+    # del session['short_code']
 
     if 'short_code' in session:
-        response.redirect('/answer/' + session['short_code'])
+        resp.redirect('/answer/' + session['short_code'])
     elif poll:
-        response.redirect('/sms-poll/' + sms)
+        resp.redirect('/sms-poll/' + sms)
     else:
-        response.message('That poll does not exist')
+        resp.message('That poll does not exist')
 
-    return str(response)
+    return str(resp)
 
 
 @app.route("/sms-poll/<short_code>", methods=['POST'])
 def sms_add_input(short_code):
     poll = Poll.get_from_code(short_code)
-    
-    response = MessagingResponse()
-    response.message(poll.title)
-    response.message('Enter your response.')
+    phone = request.values['From']
+    user = User.query.filter(User.phone == phone).first()
+    resp = MessagingResponse()
 
-    session['short_code'] = poll.short_code
+    if user in poll.get_users_from_tally():
+        resp.message('You have already submitted a response.')
+    else:
+        resp.message(poll.title)
+        resp.message('Enter # of your response.')
 
-    return str(response)
+        session['short_code'] = poll.short_code
+
+    return str(resp)
 
 @app.route('/answer/<short_code>', methods=['POST'])
 def sms_add_input_to_db(short_code):
     poll = Poll.get_from_code(short_code)
-
+    print poll
+    print short_code
+    resp = MessagingResponse()
     sms = request.values['Body']
+    phone = request.values['From']
 
-    response = MessagingResponse()
-    response.message('Your response has been recorded.')
 
-    return str(response)
+    # Check that sms is a number
+    try:
+        order = int(sms)
+        print order
+        response = Response.query.filter(Response.poll_id == poll.poll_id,
+                                         Response.order == order).first()
+        # Check that response option exists
+        if response:
+            
+            # Check to see if user exists
+            user = User.query.filter(User.phone == phone).first()
+            if not user:
+                user = User(phone=phone)
+            
+            tally = Tally(response_id=response.response_id,
+                          user_id=user.user_id)
+            db.session.add(tally)
+            db.session.commit()
+
+            resp.message('Your response has been recorded.')
+
+            del session['short_code']
+
+        else:
+            resp.message('Sorry that response does not exist. Please enter another number.')
+
+    except:
+        resp.message('Sorry, please enter your response as a number.')
+    
+    return str(resp)
 
 
 @app.route('/add-poll')
@@ -109,7 +147,7 @@ def add_poll_to_db():
             response = Response(poll_id=poll.poll_id,
                                 user_id=user.user_id,
                                 text=response.strip(),
-                                order=responses.index(response))
+                                order=responses.index(response) + 1)
             db.session.add(response)
         db.session.commit()  # only commit once all Responses are added
 
