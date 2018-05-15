@@ -3,11 +3,34 @@
 {% block title %}{{ poll.title }}{% endblock %}
 
 {% block content %}
-<h1>{{ poll.prompt }}</h1>
 
+<h1>{{ poll.prompt }}</h1>
 
     {% for response in poll.responses %}
         {{ response.text }}{% if poll.poll_type.collect_tally %}: {{ response.value() }}{% endif %}<br>
 
     {% endfor %}
+
+  <div class="dounut-chart">
+    <canvas id="donutChart"></canvas>
+  <div id="donutLegend" class="chart-legend"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js" type="text/javascript"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript">
+    let options = { responsive: true };
+
+    let ctx_donut = $("#donutChart").get(0).getContext("2d");
+
+    $.get("/{{ poll.short_code }}/doughnut.json", function (data) {
+        let myDonutChart = new Chart(ctx_donut, {
+                                                type: 'doughnut',
+                                                data: data,
+                                                options: options
+                                              });
+        $('#donutLegend').html(myDonutChart.generateLegend());
+    });
+  </script>
+
 {% endblock %}

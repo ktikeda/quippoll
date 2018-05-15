@@ -1,4 +1,4 @@
-from flask import redirect, request, render_template, session, flash
+from flask import redirect, request, render_template, session, flash, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import current_user, login_user, logout_user, login_required
 import json
@@ -383,6 +383,38 @@ def sms_add_input_to_db(short_code):
     return str(resp)
 
 # End twilio routes
+
+
+# Start chart.js routes
+@app.route('/<short_code>/doughnut.json')
+def doughnut_results(short_code):
+    """Return data for results page."""
+    poll = Poll.get_from_code(short_code)
+
+    labels = []
+    data = []
+
+    for response in poll.responses:
+        labels.append(response.text)
+        data.append(response.value())
+
+    data_dict = {
+                "labels": labels,
+                "datasets": [
+                    {
+                        "data": data,
+                        "backgroundColor": [
+                            "#FF6384",
+                            "#36A2EB",
+                        ],
+                        "hoverBackgroundColor": [
+                            "#FF6384",
+                            "#36A2EB",
+                        ]
+                    }]
+                }
+
+    return jsonify(data_dict)
 
 
 if __name__ == "__main__":
