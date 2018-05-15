@@ -7,7 +7,7 @@
 <h1>{{ poll.prompt }}</h1>
 
     {% for response in poll.responses %}
-        <span id="response-{{ response.response_id }}">{{ response.text }}</span>{% if poll.poll_type.collect_tally %}: <span id="response-val-{{ response.response_id }}">{{ response.value() }}</span>{% endif %}<br>
+        <span id="response-{{ response.response_id }}">{{ response.text }}</span>{% if poll.poll_type.collect_tally %}: <span id="response-{{ response.response_id }}-val">{{ response.value() }}</span>{% endif %}<br>
 
     {% endfor %}
 <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
@@ -31,11 +31,18 @@
 
     // Event handler for server sent data.
     // The callback function is invoked whenever the server emits data
-    // to the client. The data is then displayed in the "Received"
-    // section of the page.
+    // to the client.
     socket.on('new_tally', function(data) {
-        console.log(data.response_id)
-        console.log(data.val)
+        console.log(data);
+        let tag = "#response-" + String(data.response_id) + "-val";
+
+        console.log(tag);
+
+        let currentVal = parseInt($(tag).html());
+
+        let newVal = currentVal + data.val;
+
+        $(tag).html(String(newVal));
 
     });
 

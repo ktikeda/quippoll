@@ -16,9 +16,11 @@ from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 def emit_new_tally(tally):
     """Send new tally data as server generated events to clients."""
 
+    print "Server emitted"
     socketio.emit('new_tally',
                   {'response_id': tally.response_id, 'val': tally.value},
                   namespace='/poll')
+
 
 
 @socketio.on('connect', namespace='/poll')
