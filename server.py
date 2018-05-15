@@ -28,14 +28,20 @@ def sms_find_poll():
     msid = request.values['MessageSid']
     sms = request.values['Body']
     phone = request.values['From']
-    # Add a message
-
-    print sms
     poll = Poll.get_from_code(sms)
-    print poll
     # del session['short_code']
 
+
     if 'short_code' in session:
+        short_code = session['short_code']
+        poll = Poll.get_from_code(short_code)
+        if poll.poll_type.multi_select:
+            if sms.upper() == 'Y':
+                del session['short_code']
+                resp.message('Thank you for responding.')
+                return str(resp)
+            if sms.upper() == 'N':
+                resp.redirect('/sms-poll/' + short_code)
         resp.redirect('/answer/' + session['short_code'])
     elif poll:
         resp.redirect('/sms-poll/' + sms)
@@ -107,6 +113,7 @@ def sms_add_input_to_db(short_code):
 
                 if poll.poll_type.multi_select:
                     resp.message('Are you done responding? Y/N')
+                    return str(resp)
                     # redirect for route for Y/N
 
                 del session['short_code']
