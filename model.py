@@ -282,6 +282,11 @@ class Response(db.Model):
             value += tally.value
         return value
 
+    @staticmethod
+    def get_response(poll, user):
+        return Response.query.filter(Response.user_id == user.user_id,
+                              Response.poll_id == poll.poll_id).first()
+
 
 class Tally(db.Model):
     """Tally model. Records value input when user selects a response."""

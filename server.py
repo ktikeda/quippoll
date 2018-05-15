@@ -30,19 +30,20 @@ def sms_find_poll():
     phone = request.values['From']
     poll = Poll.get_from_code(sms)
     # del session['short_code']
+    print session
 
 
     if 'short_code' in session:
         short_code = session['short_code']
         poll = Poll.get_from_code(short_code)
         if poll.poll_type.multi_select:
-            if sms.upper() == 'Y':
+            if sms.upper() == 'N':
                 del session['short_code']
                 resp.message('Thank you for responding.')
                 return str(resp)
-            if sms.upper() == 'N':
+            if sms.upper() == 'Y':
                 resp.redirect('/sms-poll/' + short_code)
-        resp.redirect('/answer/' + session['short_code'])
+        resp.redirect('/answer/' + short_code)
     elif poll:
         resp.redirect('/sms-poll/' + sms)
     else:
@@ -58,16 +59,13 @@ def sms_add_input(short_code):
     user = User.get_from_phone(phone)
     resp = MessagingResponse()
 
-    if ((poll.poll_type.collect_response and Response.query.filter(Response.user_id == user.user_id,
-                              Response.poll_id == poll.poll_id).first()) or
+    if ((poll.poll_type.collect_response and Response.get_response(poll=poll,user=user)) or
         (user in poll.get_users_from_tally() and not poll.poll_type.multi_select)):
         resp.message('You have already submitted a response.')
     elif poll.poll_type.collect_response:
-        resp.message(poll.title)
-        resp.message('Enter your response.')
+        resp.message(poll.prompt + '\n\nEnter your response.')
     else :
-        resp.message(poll.title)
-        resp.message('Enter # of your response.')
+        resp.message(poll.prompt + '\n\nEnter # of response option.')
 
     session['short_code'] = poll.short_code
 
@@ -91,7 +89,7 @@ def sms_add_input_to_db(short_code):
         db.session.add(response)
         db.session.commit()
 
-        resp.message('Your response has been recorded.')
+        resp.message('Your response "{}" has been recorded.'.format(response.text))
         del session['short_code']
 
     # Handle tallys
@@ -103,16 +101,20 @@ def sms_add_input_to_db(short_code):
                                              Response.order == order).first()
             # Check that response option exists
             if response:
-                
-                tally = Tally(response_id=response.response_id,
-                              user_id=user.user_id)
-                db.session.add(tally)
-                db.session.commit()
+                if Tally.query.filter(Tally.response_id == response.response_id,
+                                      Tally.user_id == user.user_id).first():
+                     
+                    resp.message('You have already responsed for "{}".'.format(response.text))
+                else:
+                    tally = Tally(response_id=response.response_id,
+                                  user_id=user.user_id)
+                    db.session.add(tally)
+                    db.session.commit()
 
-                resp.message('Your response has been recorded.')
+                    resp.message('Your response "{}" has been recorded.'.format(response.text))
 
                 if poll.poll_type.multi_select:
-                    resp.message('Are you done responding? Y/N')
+                    resp.message('Continue responding? Y/N')
                     return str(resp)
                     # redirect for route for Y/N
 
@@ -122,7 +124,7 @@ def sms_add_input_to_db(short_code):
                 resp.message('Sorry that response does not exist. Please enter another number.')
 
         except:
-            resp.message('Sorry, please enter your response as a number.')
+            resp.message('Sorry, please enter your response option as a number.')
     
     return str(resp)
 
