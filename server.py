@@ -39,7 +39,7 @@ def test_client_connect(message):
 @app.route('/')
 def index():
     """Homepage."""
-    # print session
+    print '/', session
     user = current_user
     # print "is_authenticated", user.is_authenticated
     return render_template('index.html', current_user=user)
@@ -99,6 +99,7 @@ def add_poll_to_db():
 @app.route('/<short_code>')
 def add_user_input(short_code):
     """Poll response submission display"""
+    print '/<short_code>', short_code
 
     poll = Poll.get_from_code(short_code)
     user = User.get_user()
@@ -121,6 +122,11 @@ def add_user_input(short_code):
         route = '/'
 
     return redirect(route)
+
+@app.route('/favicon.ico')
+def _():
+    print 'favicon'
+    return ''
 
 
 @app.route('/<short_code>', methods=["POST"])
@@ -459,7 +465,7 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     # Run server
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)
