@@ -146,7 +146,7 @@ def show_results(short_code):
 
     poll = Poll.get_from_code(short_code)
 
-    return render_template('results.html', poll=poll)
+    return render_template('results.html', poll=poll, async_mode=socketio.async_mode)
 
 
 @app.route('/<short_code>/success')
@@ -417,6 +417,35 @@ def doughnut_results(short_code):
                 }
 
     return jsonify(data_dict)
+# End chart.js routes
+
+
+# Begin socketio routes
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    while True:
+        socketio.sleep(10)
+        count += 1
+        socketio.emit('my_response',
+                      {'data': 'Server generated event', 'count': count},
+                      namespace='/test')
+
+
+@socketio.on('connect', namespace='/poll')
+def test_connect():
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(target=background_thread)
+    emit('my_response', {'data': 'Connected', 'count': 0})
+
+
+@socketio.on('client_connect', namespace='/poll')
+def test_message(message):
+    print message['data']
+
+# End socket.io routes
 
 
 if __name__ == "__main__":

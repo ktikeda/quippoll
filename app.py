@@ -21,5 +21,3 @@ async_mode = None
 socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
-
-

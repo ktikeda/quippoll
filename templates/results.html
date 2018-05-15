@@ -10,27 +10,34 @@
         {{ response.text }}{% if poll.poll_type.collect_tally %}: {{ response.value() }}{% endif %}<br>
 
     {% endfor %}
+<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+  $(document).ready( function() {
 
-  <div class="dounut-chart">
-    <canvas id="donutChart"></canvas>
-  <div id="donutLegend" class="chart-legend"></div>
-  </div>
+    namespace = '/poll';
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js" type="text/javascript"></script>
-  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script type="text/javascript">
-    let options = { responsive: true };
+    // Connect to the Socket.IO server.
+    // The connection URL has the following format:
+    //     http[s]://<domain>:<port>[/<namespace>]
+    let socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
-    let ctx_donut = $("#donutChart").get(0).getContext("2d");
-
-    $.get("/{{ poll.short_code }}/doughnut.json", function (data) {
-        let myDonutChart = new Chart(ctx_donut, {
-                                                type: 'doughnut',
-                                                data: data,
-                                                options: options
-                                              });
-        $('#donutLegend').html(myDonutChart.generateLegend());
+    // Event handler for new connections.
+    // The callback function is invoked when a connection with the
+    // server is established.
+    socket.on('connect', function() {
+        socket.emit('client_connect', {data: 'Client connected!'});
     });
-  </script>
+
+    // Event handler for server sent data.
+    // The callback function is invoked whenever the server emits data
+    // to the client. The data is then displayed in the "Received"
+    // section of the page.
+    socket.on('my_response', function(msg) {
+        $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ': ' + msg.data).html());
+    });
+
+  });
+</script>
 
 {% endblock %}
