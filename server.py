@@ -7,7 +7,8 @@ from twilio.twiml.messaging_response import Body, Message, Redirect, MessagingRe
 
 from flask_socketio import emit, disconnect
 
-from app import app, login, socketio, thread, thread_lock
+from app import app, login
+from app import socketio, thread, thread_lock
 from model import connect_to_db, db
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
@@ -32,9 +33,10 @@ def test_connect():
 def test_client_connect(message):
     print message['data']
 
-# End socket.io routes@app.route('/')
+# End socket.io routes
 
 
+@app.route('/')
 def index():
     """Homepage."""
     # print session
@@ -391,6 +393,8 @@ def sms_add_input_to_db(short_code):
                                   user_id=user.user_id)
                     db.session.add(tally)
                     db.session.commit()
+
+                    emit_new_result(response)
 
                     resp.message('Your response "{}" has been recorded.'.format(response.text))
 
