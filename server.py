@@ -152,10 +152,12 @@ def add_user_input_to_db(short_code):
             db.session.add(tally)
             db.session.commit()
 
-            global thread
-            with thread_lock:
-                if thread is None:
-                    thread = socketio.start_background_task(target=emit_new_tally, tally=tally)
+            emit_new_tally(tally)
+
+            # global thread
+            # with thread_lock:
+            #     if thread is None:
+            #         thread = socketio.start_background_task(target=emit_new_tally, tally=tally)
 
     # Specify route
     if poll.is_results_visible:
