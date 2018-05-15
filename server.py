@@ -18,116 +18,6 @@ def index():
     # print "is_authenticated", user.is_authenticated
     return render_template('index.html', current_user=user)
 
-@app.route("/sms", methods=['GET', 'POST'])
-def sms_find_poll():
-    """Find poll from sms"""
-    # Start our response
-
-    resp = MessagingResponse()
-
-    msid = request.values['MessageSid']
-    sms = request.values['Body']
-    phone = request.values['From']
-    poll = Poll.get_from_code(sms)
-    # del session['short_code']
-    print session
-
-
-    if 'short_code' in session:
-        short_code = session['short_code']
-        poll = Poll.get_from_code(short_code)
-        if poll.poll_type.multi_select:
-            if sms.upper() == 'N':
-                del session['short_code']
-                resp.message('Thank you for responding.')
-                return str(resp)
-            if sms.upper() == 'Y':
-                resp.redirect('/sms-poll/' + short_code)
-        resp.redirect('/answer/' + short_code)
-    elif poll:
-        resp.redirect('/sms-poll/' + sms)
-    else:
-        resp.message('That poll does not exist')
-
-    return str(resp)
-
-
-@app.route("/sms-poll/<short_code>", methods=['POST'])
-def sms_add_input(short_code):
-    poll = Poll.get_from_code(short_code)
-    phone = request.values['From']
-    user = User.get_from_phone(phone)
-    resp = MessagingResponse()
-
-    if ((poll.poll_type.collect_response and Response.get_response(poll=poll,user=user)) or
-        (user in poll.get_users_from_tally() and not poll.poll_type.multi_select)):
-        resp.message('You have already submitted a response.')
-    elif poll.poll_type.collect_response:
-        resp.message(poll.prompt + '\n\nEnter your response.')
-    else :
-        resp.message(poll.prompt + '\n\nEnter # of response option.')
-
-    session['short_code'] = poll.short_code
-
-    return str(resp)
-
-@app.route('/answer/<short_code>', methods=['POST'])
-def sms_add_input_to_db(short_code):
-    poll = Poll.get_from_code(short_code)
-    resp = MessagingResponse()
-    sms = request.values['Body']
-    phone = request.values['From']
-    user = User.get_from_phone(phone)
-
-    # Handle responses
-    if poll.poll_type.collect_response:
-
-        response = Response(poll_id=poll.poll_id,
-                            user_id=user.user_id,
-                            text=sms,
-                            order=1)
-        db.session.add(response)
-        db.session.commit()
-
-        resp.message('Your response "{}" has been recorded.'.format(response.text))
-        del session['short_code']
-
-    # Handle tallys
-    else:
-        # Check that sms is a number
-        try:
-            order = int(sms)
-            response = Response.query.filter(Response.poll_id == poll.poll_id,
-                                             Response.order == order).first()
-            # Check that response option exists
-            if response:
-                if Tally.query.filter(Tally.response_id == response.response_id,
-                                      Tally.user_id == user.user_id).first():
-                     
-                    resp.message('You have already responsed for "{}".'.format(response.text))
-                else:
-                    tally = Tally(response_id=response.response_id,
-                                  user_id=user.user_id)
-                    db.session.add(tally)
-                    db.session.commit()
-
-                    resp.message('Your response "{}" has been recorded.'.format(response.text))
-
-                if poll.poll_type.multi_select:
-                    resp.message('Continue responding? Y/N')
-                    return str(resp)
-                    # redirect for route for Y/N
-
-                del session['short_code']
-
-            else:
-                resp.message('Sorry that response does not exist. Please enter another number.')
-
-        except:
-            resp.message('Sorry, please enter your response option as a number.')
-    
-    return str(resp)
-
 
 @app.route('/add-poll')
 def add_poll():
@@ -157,7 +47,7 @@ def add_poll_to_db():
                 prompt=prompt,
                 is_results_visible=is_results_visible)
 
-    admin = PollAdmin(poll_id=poll.poll_id, user_id=user.user_id)
+    PollAdmin(poll_id=poll.poll_id, user_id=user.user_id)
 
     # TODO: send poll creation email to user
     # email = request.form.get('email')
@@ -196,15 +86,16 @@ def add_user_input(short_code):
                 return render_template('add-tally.html', poll=poll)
             # TODO: make a direct query to db
             # Tally.query.filter(Tally.user_id == user.user_id).first():
-            
+
         else:
             route = '/' + short_code + '/r'
 
     else:
         flash('Sorry, that page does not exist.')
         route = '/'
-    
+
     return redirect(route)
+
 
 @app.route('/<short_code>', methods=["POST"])
 def add_user_input_to_db(short_code):
@@ -243,7 +134,7 @@ def add_user_input_to_db(short_code):
         route = '/' + poll.short_code + '/r'
     else:
         route = '/' + poll.short_code + '/success'
-    
+
     return route
 
 
@@ -347,7 +238,7 @@ def show_registration():
 @app.route('/register', methods=['POST'])
 def register():
     """Creates user by email if user with email does not already exist."""
-    
+
     email = request.form.get('email')
 
     if User.query.filter(User.email == email).first():
@@ -372,6 +263,127 @@ def register():
     return redirect('/login')
 
 # End flask_login routes
+
+
+# Begin twilio routes
+@app.route("/sms", methods=['GET', 'POST'])
+def sms_find_poll():
+    """Find poll from sms"""
+    # Start our response
+
+    resp = MessagingResponse()
+    sms = request.values['Body']
+    poll = Poll.get_from_code(sms)
+    # del session['short_code']
+    print session
+
+    if 'short_code' in session:
+
+        short_code = session['short_code']
+        poll = Poll.get_from_code(short_code)
+
+        if poll.poll_type.multi_select:
+            if sms.upper() == 'N':
+                del session['short_code']
+                resp.message('Thank you for responding.')
+                return str(resp)
+            if sms.upper() == 'Y':
+                resp.redirect('/sms/' + short_code)
+        resp.redirect('/sms/' + short_code + '/input')
+    elif poll:
+        resp.redirect('/sms/' + sms)
+    else:
+        resp.message('That poll does not exist')
+
+    return str(resp)
+
+
+@app.route("/sms/<short_code>", methods=['POST'])
+def sms_add_input(short_code):
+    poll = Poll.get_from_code(short_code)
+    phone = request.values['From']
+    user = User.get_from_phone(phone)
+    resp = MessagingResponse()
+
+    if ((poll.poll_type.collect_response and Response.get_response(poll=poll, user=user)) or
+        (user in poll.get_users_from_tally() and not poll.poll_type.multi_select)):
+
+        resp.message('You have already submitted a response.')
+
+    elif poll.poll_type.collect_response:
+        resp.message(poll.prompt + '\n\nEnter your response.')
+
+    else:
+        resp.message(poll.prompt + '\n\nEnter # of response option.')
+
+    session['short_code'] = poll.short_code
+
+    return str(resp)
+
+
+@app.route('/sms/<short_code>/input', methods=['POST'])
+def sms_add_input_to_db(short_code):
+    poll = Poll.get_from_code(short_code)
+    resp = MessagingResponse()
+    sms = request.values['Body']
+    phone = request.values['From']
+    user = User.get_from_phone(phone)
+
+    # Handle responses
+    if poll.poll_type.collect_response:
+
+        response = Response(poll_id=poll.poll_id,
+                            user_id=user.user_id,
+                            text=sms,
+                            order=1)
+        db.session.add(response)
+        db.session.commit()
+
+        resp.message('Your response "{}" has been recorded.'.format(response.text))
+        del session['short_code']
+
+    # Handle tallys
+    else:
+        # Check that sms is a number
+        try:
+            order = int(sms)
+            response = poll.get_response_by(order=order)
+
+            # Check that response option exists
+            if response:
+
+                # Check that user hasn't already responded
+                if Tally.query.filter(Tally.response_id == response.response_id,
+                                      Tally.user_id == user.user_id).first():
+
+                    resp.message('You have already responsed for "{}".'.format(response.text))
+
+                # Add tally
+                else:
+                    tally = Tally(response_id=response.response_id,
+                                  user_id=user.user_id)
+                    db.session.add(tally)
+                    db.session.commit()
+
+                    resp.message('Your response "{}" has been recorded.'.format(response.text))
+
+                if poll.poll_type.multi_select:
+                    resp.message('Continue responding? Y/N')
+                    return str(resp)
+                    # redirect for route for Y/N
+
+                del session['short_code']
+
+            else:
+                resp.message('Sorry that response does not exist. Please enter another number.')
+
+        except:
+            resp.message('Sorry, please enter your response option as a number.')
+
+    return str(resp)
+
+# End twilio routes
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

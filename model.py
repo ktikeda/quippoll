@@ -136,6 +136,14 @@ class Poll(db.Model):
         Poll.query.filter(Poll.poll_id == self.poll_id).delete()
         db.session.commit()
 
+    def get_response_by(self, **kwargs):
+        attr = kwargs.keys()[0]
+        val = kwargs.values()[0]
+        if hasattr(Response, attr):
+            return Response.query.filter(Response.poll_id == self.poll_id, getattr(Response, attr) == val).first()
+        else:
+            return None
+
     @staticmethod
     def get_from_code(short_code):
         return Poll.query.options(db.joinedload('responses')).filter(Poll.short_code == short_code).first()
