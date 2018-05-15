@@ -5,7 +5,7 @@ import json
 
 from twilio.twiml.messaging_response import Body, Message, Redirect, MessagingResponse
 
-from flask_socketio import emit, join_room, leave_room, close_room, rooms, disconnect
+from flask_socketio import emit, disconnect
 
 from app import app, login, socketio, thread, thread_lock
 from model import connect_to_db, db
@@ -13,12 +13,12 @@ from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
 
 # Begin socketio routes
-def emit_new_tally(tally):
-    """Send new tally data as server generated events to clients."""
+def emit_new_result(response):
+    """Send new result data as server generated event to clients."""
 
     print "Server emitted"
-    socketio.emit('new_tally',
-                  {'response_id': tally.response_id, 'val': tally.value},
+    socketio.emit('new_result',
+                  {'response_id': response.response_id, 'val': response.value()},
                   namespace='/poll')
 
 
@@ -152,12 +152,8 @@ def add_user_input_to_db(short_code):
             db.session.add(tally)
             db.session.commit()
 
-            emit_new_tally(tally)
+            emit_new_result(response)
 
-            # global thread
-            # with thread_lock:
-            #     if thread is None:
-            #         thread = socketio.start_background_task(target=emit_new_tally, tally=tally)
 
     # Specify route
     if poll.is_results_visible:

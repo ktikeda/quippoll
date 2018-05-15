@@ -32,17 +32,13 @@
     // Event handler for server sent data.
     // The callback function is invoked whenever the server emits data
     // to the client.
-    socket.on('new_tally', function(data) {
+    socket.on('new_result', function(data) {
         console.log(data);
         let tag = "#response-" + String(data.response_id) + "-val";
 
         console.log(tag);
 
-        let currentVal = parseInt($(tag).html());
-
-        let newVal = currentVal + data.val;
-
-        $(tag).html(String(newVal));
+        $(tag).html(String(data.val));
 
     });
 
