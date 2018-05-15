@@ -23,7 +23,6 @@ def emit_new_result(response):
                   namespace='/poll')
 
 
-
 @socketio.on('connect', namespace='/poll')
 def test_connect():
     print 'Server is connected.'
