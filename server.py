@@ -5,7 +5,9 @@ import json
 
 from twilio.twiml.messaging_response import Body, Message, Redirect, MessagingResponse
 
-from app import app, login
+from flask_socketio import emit, join_room, leave_room, close_room, rooms, disconnect
+
+from app import app, login, socketio, thread, thread_lock
 from model import connect_to_db, db
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
@@ -429,4 +431,6 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 
-    app.run(port=5000, host='0.0.0.0')
+    # Run server
+    socketio.run(app, debug=True, host='0.0.0.0')
+    # app.run(port=5000, host='0.0.0.0')
