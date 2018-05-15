@@ -220,6 +220,21 @@ class User(UserMixin, db.Model):
         return user
 
     @staticmethod
+    def get_from_phone(phone, **kwargs):
+        user = User.query.filter(User.phone == phone).first()
+        if not user:
+            user = User(phone=phone)
+
+        if kwargs is not None:
+            for attr, val in kwargs.iteritems():
+                setattr(user, attr, val)
+
+            db.session.add(user)
+            db.session.commit()
+
+        return user
+
+    @staticmethod
     def get_user():
         if current_user.is_authenticated:
             return current_user
