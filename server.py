@@ -12,7 +12,27 @@ from model import connect_to_db, db
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
 
-@app.route('/')
+# Begin socketio routes
+def emit_new_tally(tally):
+    """Send new tally data as server generated events to clients."""
+
+    socketio.emit('new_tally',
+                  {'response_id': tally.response_id, 'val': tally.value},
+                  namespace='/poll')
+
+
+@socketio.on('connect', namespace='/poll')
+def test_connect():
+    print 'Server is connected.'
+
+
+@socketio.on('client_connect', namespace='/poll')
+def test_client_connect(message):
+    print message['data']
+
+# End socket.io routes@app.route('/')
+
+
 def index():
     """Homepage."""
     # print session
@@ -129,6 +149,11 @@ def add_user_input_to_db(short_code):
             tally = Tally(response_id=response.response_id, user_id=user.user_id)
             db.session.add(tally)
             db.session.commit()
+
+            global thread
+            with thread_lock:
+                if thread is None:
+                    thread = socketio.start_background_task(target=emit_new_tally, tally=tally)
 
     # Specify route
     if poll.is_results_visible:
@@ -420,34 +445,6 @@ def doughnut_results(short_code):
 # End chart.js routes
 
 
-# Begin socketio routes
-def background_thread():
-    """Example of how to send server generated events to clients."""
-    count = 0
-    while True:
-        socketio.sleep(10)
-        count += 1
-        socketio.emit('my_response',
-                      {'data': 'Server generated event', 'count': count},
-                      namespace='/test')
-
-
-@socketio.on('connect', namespace='/poll')
-def test_connect():
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(target=background_thread)
-    emit('my_response', {'data': 'Connected', 'count': 0})
-
-
-@socketio.on('client_connect', namespace='/poll')
-def test_message(message):
-    print message['data']
-
-# End socket.io routes
-
-
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
@@ -461,5 +458,5 @@ if __name__ == "__main__":
     DebugToolbarExtension(app)
 
     # Run server
-    socketio.run(app, debug=True, host='0.0.0.0')
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
     # app.run(port=5000, host='0.0.0.0')
