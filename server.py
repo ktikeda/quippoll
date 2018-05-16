@@ -25,7 +25,6 @@ def emit_new_result(response):
                   namespace='/poll')
 
 
-
 @socketio.on('connect', namespace='/poll')
 def test_connect():
     print 'Server is connected.'
@@ -133,25 +132,23 @@ def _():
 
 @app.route('/<short_code>', methods=["POST"])
 def add_response_to_db(short_code):
-    """Add tally/response data to db"""
+    """Add response data to db"""
 
     poll = Poll.get_from_code(short_code)
     user = User.get_user()
 
     # TODO: Write logic to query user and poll, and not add to db if already exists
 
-    # Add responses to db
-    if poll.poll_type.collect_response:
-        text = request.form.get('response')
+    text = request.form.get('response')
 
-        response = Response(poll_id=poll.poll_id,
-                            user_id=user.user_id,
-                            text=text,
-                            order=1)
-        db.session.add(response)
-        db.session.commit()
+    response = Response(poll_id=poll.poll_id,
+                        user_id=user.user_id,
+                        text=text,
+                        order=1)
+    db.session.add(response)
+    db.session.commit()
 
-        emit_new_result(response)
+    emit_new_result(response)
 
     # Specify route
     if poll.is_results_visible:
@@ -165,27 +162,13 @@ def add_response_to_db(short_code):
 
 @app.route('/<short_code>.json', methods=["POST"])
 def add_tally_to_db(short_code):
-    """Add tally/response data to db"""
+    """Add tally data to db"""
 
     poll = Poll.get_from_code(short_code)
     user = User.get_user()
 
     # TODO: Write logic to query user and poll, and not add to db if already exists
 
-    # Add responses to db
-    # if poll.poll_type.collect_response:
-    #     text = request.form.get('response')
-
-    #     response = Response(poll_id=poll.poll_id,
-    #                         user_id=user.user_id,
-    #                         text=text,
-    #                         order=1)
-    #     db.session.add(response)
-    #     db.session.commit()
-
-    #     emit_new_result(response)
-
-    # else:  # Add tallys to db
     tallys = json.loads(request.form.get('tallys'))
 
     for response_text in tallys:
@@ -197,7 +180,6 @@ def add_tally_to_db(short_code):
         db.session.commit()
 
         emit_new_result(response)
-
 
     # Specify route
     if poll.is_results_visible:
