@@ -67,6 +67,8 @@ class Poll(db.Model):
     tally_max = db.Column(db.Integer, nullable=True)
     open_at = db.Column(db.DateTime, nullable=True)
     close_at = db.Column(db.DateTime, nullable=True)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
@@ -244,6 +246,7 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def get_user():
+        """Checks for user or creates one if none found."""
         if current_user.is_authenticated:
             return current_user
         else:

@@ -234,6 +234,17 @@ def delete_poll():
     return redirect('/profile')
 
 
+@app.route('/<short_code>/settings')
+def show_poll_settings(short_code):
+    poll = Poll.get_from_code(short_code)
+    return render_template('settings.html', poll=poll)
+
+
+@app.route('/locate')
+def locate_user():
+    return render_template('locate.html')
+
+
 # Implementation of flask_login sourced from:
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 @login.user_loader
@@ -440,6 +451,13 @@ def sms_add_input_to_db(short_code):
 
 
 # Start chart.js routes
+@app.route('/<short_code>/d')
+def show_doughnut_results(short_code):
+    poll = Poll.get_from_code(short_code)
+
+    return render_template('doughnut-chart.html', poll=poll)
+
+
 @app.route('/<short_code>/doughnut.json')
 def doughnut_results(short_code):
     """Return data for results page."""

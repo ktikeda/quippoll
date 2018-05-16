@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<h1>Poll Settings</h1>
+
+<form>
+  <div>Title: <input type="text" id="title" name="title" value="{{ poll.title }}"></div>
+
+  <div>Short Code: <input type="text" id="short-code" name="short-code" value="{{ poll.short_code }}"></div>
+
+  <div>Show Results: <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label></div>
+
+  <div>Poll Live: <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label></div>
+
+<div id="geolocation"><button id="set-location">Set Poll Location</button></div>
+  <div>Latitude: <input type="text" id="lat" name="lat" value="" readonly></div>
+  <div>Longitude: <input type="text" id="long" name="long" value="" readonly></div>
+
+</form>
+
+<button onclick="getLocation()">Locate Me</button>
+
+
+<script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+let lat = $("#lat");
+let lng = $("#long");
+
+function getLocation(evt) {
+    evt.preventDefault();
+    if (navigator.geolocation) {
+        console.log("Finding location");
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        $('#geolocation').append("Geolocation is not supported by this browser.");
+    }
+}
+function showPosition(position) {
+    console.log('Setting location');
+    lat.val(position.coords.latitude);
+    lng.val(position.coords.longitude); 
+}
+
+$('#set-location').on('click', getLocation);
+
+</script>
+
+{% endblock %}

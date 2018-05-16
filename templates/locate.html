@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Locate{% endblock %}
+
+{% block content %}
+
+<p>Find poll by your location:</p>
+
+<button onclick="getLocation()">Locate Me</button>
+
+<p id="location"></p>
+
+<script>
+let x = document.getElementById("location");
+function getLocation() {
+    if (navigator.geolocation) {
+        console.log("Finding location");
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+}
+function showPosition(position) {
+    console.log('Printing location.');
+    x.innerHTML = "Latitude: " + position.coords.latitude + 
+    "<br>Longitude: " + position.coords.longitude; 
+}
+</script>
+
+{% endblock %}
