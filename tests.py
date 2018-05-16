@@ -83,7 +83,7 @@ class DBRouteTests(TestCase):
 
     def test_add_user_tally_post(self):
         """Test poll input for tally"""
-        result = self.client.post('/multi',
+        result = self.client.post('/multi.json',
                                   data={'tallys': '{"Blue": "True"}'},
                                   follow_redirects=True)
         self.assertEqual(result.status_code, 200)
@@ -91,7 +91,7 @@ class DBRouteTests(TestCase):
 
     def test_add_user_tally_post_hidden(self):
         """Test poll input for tally, results not visible"""
-        result = self.client.post('/all',
+        result = self.client.post('/all.json',
                                   data={'tallys': '{"Cyan": "True"}'},
                                   follow_redirects=True)
         self.assertEqual(result.status_code, 200)
@@ -109,7 +109,7 @@ class DBRouteTests(TestCase):
                                   data={'response': 'Yellow'},
                                   follow_redirects=True)
         self.assertEqual(result.status_code, 200)
-        self.assertIn('/open/r', result.data)
+        self.assertIn('Yellow', result.data)
 
     def test_delete_poll_anon(self):
         """Test poll deletion failure for anonymous user"""
