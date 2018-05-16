@@ -5,11 +5,15 @@
 {% block content %}
 
 <h1>{{ poll.prompt }}</h1>
+  
+<div id="results">
+  {% for response in poll.responses %}
+      
+      <span id="response-{{ response.response_id }}" value="{{ response.text }}">{{ response.text }}</span>{% if poll.poll_type.collect_tally %}: <span id="response-{{ response.response_id }}-val">{{ response.value() }}</span>{% endif %}<br>
 
-    {% for response in poll.responses %}
-        <span id="response-{{ response.response_id }}">{{ response.text }}</span>{% if poll.poll_type.collect_tally %}: <span id="response-{{ response.response_id }}-val">{{ response.value() }}</span>{% endif %}<br>
+  {% endfor %}
+</div>
 
-    {% endfor %}
 <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
 <script type="text/javascript" charset="utf-8">
@@ -34,11 +38,21 @@
     // to the client.
     socket.on('new_result', function(data) {
         console.log(data);
-        let tag = "#response-" + String(data.response_id) + "-val";
+        
+        if (data.val) {
+          let tag = "#response-" + String(data.response_id) + "-val";
 
-        console.log(tag);
+          console.log(tag);
 
-        $(tag).html(String(data.val));
+          $(tag).html(String(data.val));
+        } else {
+          let id = "response-" + String(data.response_id);
+
+          console.log(id);
+
+          $('#results').append($('<span id="' + id + '">' + data.response + '</span><br>'));
+
+        }
 
     });
 

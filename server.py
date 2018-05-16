@@ -19,8 +19,11 @@ def emit_new_result(response):
 
     print "Server emitted"
     socketio.emit('new_result',
-                  {'response_id': response.response_id, 'val': response.value()},
+                  {'response': response.text,
+                   'response_id': response.response_id,
+                   'val': response.value()},
                   namespace='/poll')
+
 
 
 @socketio.on('connect', namespace='/poll')
@@ -116,9 +119,9 @@ def add_user_input(short_code):
         else:
             route = '/' + short_code + '/r'
 
-    else:
-        flash('Sorry, that page does not exist.')
-        route = '/'
+    
+    flash('Sorry, that page does not exist.')
+    route = '/'
 
     return redirect(route)
 
@@ -129,7 +132,7 @@ def _():
 
 
 @app.route('/<short_code>', methods=["POST"])
-def add_user_input_to_db(short_code):
+def add_response_to_db(short_code):
     """Add tally/response data to db"""
 
     poll = Poll.get_from_code(short_code)
@@ -148,18 +151,52 @@ def add_user_input_to_db(short_code):
         db.session.add(response)
         db.session.commit()
 
-    else:  # Add tallys to db
-        tallys = json.loads(request.form.get('tallys'))
+        emit_new_result(response)
 
-        for response_text in tallys:
-            response = Response.query.filter(Response.text == response_text,
-                                             Response.poll_id == poll.poll_id).one()
+    # Specify route
+    if poll.is_results_visible:
+        flash('Your response has been recorded.')
+        route = '/' + poll.short_code + '/r'
+    else:
+        route = '/' + poll.short_code + '/success'
 
-            tally = Tally(response_id=response.response_id, user_id=user.user_id)
-            db.session.add(tally)
-            db.session.commit()
+    return redirect(route)
 
-            emit_new_result(response)
+
+@app.route('/<short_code>.json', methods=["POST"])
+def add_tally_to_db(short_code):
+    """Add tally/response data to db"""
+
+    poll = Poll.get_from_code(short_code)
+    user = User.get_user()
+
+    # TODO: Write logic to query user and poll, and not add to db if already exists
+
+    # Add responses to db
+    # if poll.poll_type.collect_response:
+    #     text = request.form.get('response')
+
+    #     response = Response(poll_id=poll.poll_id,
+    #                         user_id=user.user_id,
+    #                         text=text,
+    #                         order=1)
+    #     db.session.add(response)
+    #     db.session.commit()
+
+    #     emit_new_result(response)
+
+    # else:  # Add tallys to db
+    tallys = json.loads(request.form.get('tallys'))
+
+    for response_text in tallys:
+        response = Response.query.filter(Response.text == response_text,
+                                         Response.poll_id == poll.poll_id).one()
+
+        tally = Tally(response_id=response.response_id, user_id=user.user_id)
+        db.session.add(tally)
+        db.session.commit()
+
+        emit_new_result(response)
 
 
     # Specify route
@@ -464,7 +501,7 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    # DebugToolbarExtension(app)
+    DebugToolbarExtension(app)
 
     # Run server
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)
