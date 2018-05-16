@@ -5,22 +5,20 @@
 {% block content %}
 <h1>Poll Settings</h1>
 
-<form>
-  <div>Title: <input type="text" id="title" name="title" value="{{ poll.title }}"></div>
 
-  <div>Short Code: <input type="text" id="short-code" name="short-code" value="{{ poll.short_code }}"></div>
+  <div>Title: <input type="text" id="title" class="input" value="{{ poll.title }}"></div>
 
-  <div>Show Results: <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label></div>
+  <div>Short Code: <input type="text" id="short-code" class="input" value="{{ poll.short_code }}"></div>
 
-  <div>Poll Live: <label class="switch"><input type="checkbox" checked><span class="slider round"></span></label></div>
+  <div>Show Results: <label class="switch"><input type="checkbox" id="results" class="input" checked><span class="slider round"></span></label></div>
 
-<div id="geolocation"><button id="set-location">Set Poll Location</button></div>
-  <div>Latitude: <input type="text" id="lat" name="lat" value="" readonly></div>
-  <div>Longitude: <input type="text" id="long" name="long" value="" readonly></div>
+  <div>Poll Live: <label class="switch"><input type="checkbox" id="open" class="input" checked><span class="slider round"></span></label></div>
 
-</form>
+  <div id="geolocation"><button id="set-location">Set Poll Location</button></div>
+  <div>Latitude: <input type="text" id="lat" value="" readonly></div>
+  <div>Longitude: <input type="text" id="long" value="" readonly></div>
 
-<button onclick="getLocation()">Locate Me</button>
+
 
 
 <script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -44,6 +42,18 @@ function showPosition(position) {
 }
 
 $('#set-location').on('click', getLocation);
+
+$('.input').on('change', function(evt) {
+  let selector = $('#' + evt.target.id);
+  let key = evt.target.id;
+  let value = selector.val();
+  let data = {key : value}
+  let shortCode = $('#short-code').val()
+  let route = window.location.href
+
+  $.post(route, data, function() {selector.after("Saved");});
+});
+
 
 </script>
 
