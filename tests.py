@@ -241,6 +241,9 @@ class DBRouteTests(TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertIn('/locate', result.data)
 
+    def test_locate_multiple(self):
+        pass
+
 
 class FlaskTestsDatabase(TestCase):
 
