@@ -10,21 +10,20 @@
 
   <div>Short Code: <input type="text" id="short_code" class="input" value="{{ poll.short_code }}"></div>
 
-  <div>Show Results: <label class="switch"><input type="checkbox" id="is_results_visible" class="input" checked><span class="slider round"></span></label></div>
+<!--   <div>Show Results: <label class="switch"><input type="checkbox" id="is_results_visible" class="input" checked><span class="slider round"></span></label></div>
 
-  <div>Poll Live: <label class="switch"><input type="checkbox" id="is_open" class="input" checked><span class="slider round"></span></label></div>
+  <div>Poll Live: <label class="switch"><input type="checkbox" id="is_open" class="input" checked><span class="slider round"></span></label></div> -->
 
   <div id="geolocation"><button id="set-location">Set Poll Location</button></div>
-  <div>Latitude: <input type="text" id="lat" value="" readonly></div>
-  <div>Longitude: <input type="text" id="long" value="" readonly></div>
+  <div>Latitude: <input type="text" id="latitude" value="" ></div>
+  <div>Longitude: <input type="text" id="longitude" value="" ></div>
 
 
 
 
 <script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
-let lat = $("#lat");
-let lng = $("#long");
+
 
 function getLocation(evt) {
     evt.preventDefault();
@@ -36,26 +35,34 @@ function getLocation(evt) {
     }
 }
 function showPosition(position) {
+    let lat = $("#latitude");
+    let lng = $("#longitude");
     console.log('Setting location');
-    lat.val(position.coords.latitude);
-    lng.val(position.coords.longitude); 
+    lat.attr('value', position.coords.latitude);
+    lng.attr('value', position.coords.longitude); 
+
+    data = {'latitude': position.coords.latitude,
+            'longitude': position.coords.longitude};
+    let route = window.location.href;
+    $.post(route, data, function(result) {$('#geolocation').after(result);});
 }
 
-$('#set-location').on('click', getLocation);
-
-$('.input').on('change', function(evt) {
+function sendJson(evt) {
   let selector = $('#' + evt.target.id);
   let key = evt.target.id;
   let value = selector.val();
   let data = {};
   data[key] = value;
-  let shortCode = $('#short-code').val();
   let route = window.location.href;
 
   console.log(data);
 
   $.post(route, data, function() {selector.after("Saved");});
-});
+}
+
+$('#set-location').on('click', getLocation);
+
+$('input').on('change', sendJson);
 
 
 </script>

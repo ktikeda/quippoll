@@ -235,26 +235,28 @@ def delete_poll():
     return redirect('/profile')
 
 
-@app.route('/<short_code>/settings')
-def show_poll_settings(short_code):
-    poll = Poll.get_from_code(short_code)
+@app.route('/poll/<int:poll_id>/settings')
+def show_poll_settings(poll_id):
+    poll = Poll.query.get(poll_id)
     return render_template('settings.html', poll=poll)
 
-@app.route('/<short_code>/settings', methods=['POST'])
-def update_poll_settings(short_code):
-    poll = Poll.get_from_code(short_code)
+@app.route('/poll/<int:poll_id>/settings', methods=['POST'])
+def update_poll_settings(poll_id):
+    poll = Poll.query.get(poll_id)
     data = request.form.to_dict()
     print data
 
-    attr = data.keys()[0]
-    val = data.values()[0]
+    for attr, val in data.iteritems():
+        print attr
+        print val
 
-    print val
+        if attr == 'short_code' and Poll.get_from_code(val):
+            return 'This short code is already in use.'
 
-    setattr(poll, attr, val)
-    poll.updated_at = datetime.now()
-    db.session.add(poll)
-    db.session.commit()
+        setattr(poll, attr, val)
+        poll.updated_at = datetime.now()
+        db.session.add(poll)
+        db.session.commit()
 
 
     # import pdb; pdb.set_trace()
