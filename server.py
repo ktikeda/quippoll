@@ -13,6 +13,8 @@ from app import socketio, thread, thread_lock
 from model import connect_to_db, db
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
+# import pdb; pdb.set_trace()
+
 
 # Begin socketio routes
 def emit_new_result(response):
@@ -238,17 +240,19 @@ def delete_poll():
 @app.route('/poll/<int:poll_id>/settings')
 def show_poll_settings(poll_id):
     poll = Poll.query.get(poll_id)
-    return render_template('settings.html', poll=poll)
+
+    if current_user.is_authenticated and current_user.is_admin(poll):
+        return render_template('settings.html', poll=poll)
+    else:
+        return redirect('/')
+
 
 @app.route('/poll/<int:poll_id>/settings', methods=['POST'])
 def update_poll_settings(poll_id):
     poll = Poll.query.get(poll_id)
     data = request.form.to_dict()
-    print data
 
     for attr, val in data.iteritems():
-        print attr
-        print val
 
         if attr == 'short_code' and Poll.get_from_code(val):
             return 'This short code is already in use.'
@@ -258,8 +262,6 @@ def update_poll_settings(poll_id):
         db.session.add(poll)
         db.session.commit()
 
-
-    # import pdb; pdb.set_trace()
     status = 'Saved'
     return status
 
@@ -268,22 +270,25 @@ def update_poll_settings(poll_id):
 def locate_user():
     return render_template('locate.html')
 
+
 @app.route('/locate', methods=['POST'])
 def locate_poll():
+    """Receives lat/long and attempts to locate poll near coordinates."""
+
     lat = float(request.form.get('latitude'))
     lng = float(request.form.get('longitude'))
-    print lat
-    print lng
-    radius = 0.001
+    radius = 0.0001  # Radius is about 36 ft
 
     polls = Poll.query.filter( (Poll.latitude > lat - radius) & (Poll.latitude < lat + radius) &
-                              (Poll.longitude > lng - radius) & (Poll.longitude < lng + radius)).all()
-    print polls
+                               (Poll.longitude > lng - radius) & (Poll.longitude < lng + radius)).all()
 
     if len(polls) == 1:
         poll = polls[0]
         route = '/' + poll.short_code
-        
+
+    elif polls:
+        flash('More than one poll was found.')
+        route = '/locate'
     else:
         flash('Sorry we could not find any polls near you.')
         route = '/locate'

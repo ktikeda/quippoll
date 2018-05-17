@@ -45,8 +45,11 @@ class GetRouteTests(TestCase):
         self.assertEqual(result.status_code, 200)
         self.assertIn('Gather input in a snap.', result.data)
 
-    def tearDown(self):
-        pass
+    def test_locate(self):
+        result = self.client.get('/locate')
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Locate', result.data)
+
 
 
 class DBRouteTests(TestCase):
@@ -180,6 +183,63 @@ class DBRouteTests(TestCase):
                                           'is_results_visible': 'True'},
                                   follow_redirects=True)
         self.assertIn('What is your fav number?', result.data)
+
+    def test_delete_poll(self):
+        pass
+
+    def test_delete_poll_anon(self):
+        pass
+
+    def test_delete_poll_not_admin(self):
+        pass
+
+    def test_add_tally_poll_repeat(self):
+        pass
+
+    def test_add_response_poll_repeat(self):
+        pass
+
+    def test_poll_settings(self):
+        pass
+
+    def test_poll_settings_not_admin(self):
+        result = self.client.get('/poll/1/settings', follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('Gather input in a snap.', result.data)
+
+    def test_update_poll_settings(self):
+        result = self.client.post('/poll/1/settings',
+                                  data={'title': 'My Colors'})
+        self.assertIn('Saved', result.data)
+
+    def test_update_poll_settings_bad_short_code(self):
+        result = self.client.post('/poll/1/settings', 
+                                  data={'short_code': 'open'})
+        self.assertIn('This short code is already in use.', result.data)
+
+    def test_locate(self):
+        result = self.client.post('/locate', 
+                                  data={'latitude': '37.7888197',
+                                        'longitude': '-122.4116021'},
+                                  follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('/multi', result.data)
+
+    def test_locate_lat_fail(self):
+        result = self.client.post('/locate', 
+                                  data={'latitude': '38.7888197',
+                                        'longitude': '-122.4116021'},
+                                  follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('/locate', result.data)
+
+    def test_locate_long_fail(self):
+        result = self.client.post('/locate', 
+                                  data={'latitude': '37.7888197',
+                                        'longitude': '-123.4116021'},
+                                  follow_redirects=True)
+        self.assertEqual(result.status_code, 200)
+        self.assertIn('/locate', result.data)
 
 
 class FlaskTestsDatabase(TestCase):

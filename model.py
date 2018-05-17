@@ -410,7 +410,9 @@ def example_data():
     # Create polls
     mc_poll = Poll(poll_type_id=1, title='Colors',
                    prompt='What is your favorite color?',
-                   short_code='multi', admin_code='adminmc')
+                   short_code='multi', admin_code='adminmc',
+                   latitude=37.7888197,
+                   longitude=-122.4116021)
     sa_poll = Poll(poll_type_id=2, title='Colors',
                    prompt='What is your favorite color?',
                    short_code='all', admin_code='adminsa',
