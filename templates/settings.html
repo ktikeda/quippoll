@@ -15,8 +15,8 @@
   <div>Poll Live: <label class="switch"><input type="checkbox" id="is_open" class="input" checked><span class="slider round"></span></label></div> -->
 
   <div id="geolocation"><button id="set-location">Set Poll Location</button></div>
-  <div>Latitude: <input type="text" id="latitude" value="" ></div>
-  <div>Longitude: <input type="text" id="longitude" value="" ></div>
+  <div>Latitude: <input type="text" id="latitude" value="{{ poll.latitude }}" readonly></div>
+  <div>Longitude: <input type="text" id="longitude" value="{{ poll.longitude }}" readonly></div>
 
 
 
@@ -44,7 +44,7 @@ function showPosition(position) {
     data = {'latitude': position.coords.latitude,
             'longitude': position.coords.longitude};
     let route = window.location.href;
-    $.post(route, data, function(result) {$('#geolocation').after(result);});
+    $.post(route, data, function(result) {$('#geolocation').append(result);});
 }
 
 function sendJson(evt) {

@@ -268,6 +268,28 @@ def update_poll_settings(poll_id):
 def locate_user():
     return render_template('locate.html')
 
+@app.route('/locate', methods=['POST'])
+def locate_poll():
+    lat = float(request.form.get('latitude'))
+    lng = float(request.form.get('longitude'))
+    print lat
+    print lng
+    radius = 0.001
+
+    polls = Poll.query.filter( (Poll.latitude > lat - radius) & (Poll.latitude < lat + radius) &
+                              (Poll.longitude > lng - radius) & (Poll.longitude < lng + radius)).all()
+    print polls
+
+    if len(polls) == 1:
+        poll = polls[0]
+        route = '/' + poll.short_code
+        
+    else:
+        flash('Sorry we could not find any polls near you.')
+        route = '/locate'
+
+    return route
+
 
 # Implementation of flask_login sourced from:
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins

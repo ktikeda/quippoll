@@ -9,17 +9,28 @@
 <button onclick="getLocation()">Locate Me</button>
 
 <p id="location"></p>
-
+<script type="text/javascript" src="//code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
 let x = document.getElementById("location");
+
 function getLocation() {
     if (navigator.geolocation) {
         console.log("Finding location");
-        navigator.geolocation.getCurrentPosition(showPosition);
+        navigator.geolocation.getCurrentPosition(sendLocation);
     } else {
         x.innerHTML = "Geolocation is not supported by this browser.";
     }
 }
+
+function sendLocation(position) {
+    console.log('Sending location.');
+    data = {'latitude': position.coords.latitude,
+            'longitude': position.coords.longitude};
+    let route = window.location.href;
+    $.post(route, data, response_route => window.location.assign(response_route));
+}
+
+
 function showPosition(position) {
     console.log('Printing location.');
     x.innerHTML = "Latitude: " + position.coords.latitude + 
