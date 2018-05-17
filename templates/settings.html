@@ -47,9 +47,12 @@ $('.input').on('change', function(evt) {
   let selector = $('#' + evt.target.id);
   let key = evt.target.id;
   let value = selector.val();
-  let data = {key : value}
-  let shortCode = $('#short-code').val()
-  let route = window.location.href
+  let data = {};
+  data[key] = value;
+  let shortCode = $('#short-code').val();
+  let route = window.location.href;
+
+  console.log(data);
 
   $.post(route, data, function() {selector.after("Saved");});
 });
