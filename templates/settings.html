@@ -8,11 +8,11 @@
 
   <div>Title: <input type="text" id="title" class="input" value="{{ poll.title }}"></div>
 
-  <div>Short Code: <input type="text" id="short-code" class="input" value="{{ poll.short_code }}"></div>
+  <div>Short Code: <input type="text" id="short_code" class="input" value="{{ poll.short_code }}"></div>
 
-  <div>Show Results: <label class="switch"><input type="checkbox" id="results" class="input" checked><span class="slider round"></span></label></div>
+  <div>Show Results: <label class="switch"><input type="checkbox" id="is_results_visible" class="input" checked><span class="slider round"></span></label></div>
 
-  <div>Poll Live: <label class="switch"><input type="checkbox" id="open" class="input" checked><span class="slider round"></span></label></div>
+  <div>Poll Live: <label class="switch"><input type="checkbox" id="is_open" class="input" checked><span class="slider round"></span></label></div>
 
   <div id="geolocation"><button id="set-location">Set Poll Location</button></div>
   <div>Latitude: <input type="text" id="lat" value="" readonly></div>

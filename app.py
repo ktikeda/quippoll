@@ -21,3 +21,13 @@ async_mode = None
 socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
+
+# Allow regex in routes via https://stackoverflow.com/questions/5870188/does-flask-support-regular-expressions-in-its-url-routing
+from werkzeug.routing import BaseConverter
+class RegexConverter(BaseConverter):
+    def __init__(self, url_map, *items):
+        super(RegexConverter, self).__init__(url_map)
+        self.regex = items[0]
+
+app.url_map.converters['regex'] = RegexConverter
+app.url_map.strict_slashes = False
