@@ -287,6 +287,7 @@ class Response(db.Model):
             for attr, val in kwargs.iteritems():
                 setattr(self, attr, val)
 
+    # TODO: Make this a SQL query
     def value(self):
         value = 0
         for tally in self.tallys:
