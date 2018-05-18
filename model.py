@@ -400,6 +400,7 @@ def example_data():
     user = User(fname='John', lname='Doe', email='john@mail.com',
                 password_hash='pbkdf2:sha1:1000$jZyba5B5$c7da27f064ae8ec0c93d1f2e1789e9e3e19b49a3')
     user_responded = User(fname='Carly', lname='Banks', email='carly@mail.com',
+                          phone='+14153334444',
                           password_hash='pbkdf2:sha1:1000$83T7iOeT$8154ddce2cd25af9688622aac45cb2054827a212')
 
     anon_user_responded = User(session_id='session')
@@ -457,11 +458,10 @@ def example_data():
 
     sa_r1_t1 = Tally(response_id=sa_r1.response_id, user_id=user_responded.user_id)
     sa_r1_t2 = Tally(response_id=sa_r1.response_id, user_id=anon_user_responded.user_id)
-    sa_r2_t1 = Tally(response_id=sa_r2.response_id, user_id=user_responded.user_id)
-    sa_r2_t2 = Tally(response_id=sa_r2.response_id, user_id=anon_user_responded.user_id)
+    sa_r2_t1 = Tally(response_id=sa_r2.response_id, user_id=anon_user_responded.user_id)
     sa_r3_t1 = Tally(response_id=sa_r3.response_id, user_id=user_responded.user_id)
 
-    db.session.add_all([mc_r1_t1, mc_r1_t2, sa_r1_t1, sa_r1_t2, sa_r2_t1, sa_r2_t2, sa_r3_t1])
+    db.session.add_all([mc_r1_t1, mc_r1_t2, sa_r1_t1, sa_r1_t2, sa_r2_t1, sa_r3_t1])
     db.session.commit()
 
 

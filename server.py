@@ -380,7 +380,7 @@ def register():
 
 
 # Begin twilio routes
-@app.route("/sms", methods=['GET', 'POST'])
+@app.route("/sms", methods=['POST'])
 def sms_find_poll():
     """Find poll from sms"""
     # Start our response
@@ -389,7 +389,6 @@ def sms_find_poll():
     sms = request.values['Body']
     poll = Poll.get_from_code(sms)
     # del session['short_code']
-    print session
 
     if 'short_code' in session:
 
@@ -397,12 +396,14 @@ def sms_find_poll():
         poll = Poll.get_from_code(short_code)
 
         if poll.poll_type.multi_select:
-            if sms.upper() == 'N':
+            if sms[0].upper() == 'N':
                 del session['short_code']
                 resp.message('Thank you for responding.')
                 return str(resp)
-            if sms.upper() == 'Y':
+            elif sms[0].upper() == 'Y':
                 resp.redirect('/sms/' + short_code)
+            else:
+                resp.message('Please type "Y" for Yes or "N" for No.')
         resp.redirect('/sms/' + short_code + '/input')
     elif poll:
         resp.redirect('/sms/' + sms)
@@ -413,7 +414,7 @@ def sms_find_poll():
 
 
 @app.route("/sms/<short_code>", methods=['POST'])
-def sms_add_input(short_code):
+def sms_show_prompt(short_code):
     poll = Poll.get_from_code(short_code)
     phone = request.values['From']
     user = User.get_from_phone(phone)
@@ -436,7 +437,7 @@ def sms_add_input(short_code):
 
 
 @app.route('/sms/<short_code>/input', methods=['POST'])
-def sms_add_input_to_db(short_code):
+def sms_add_input(short_code):
     poll = Poll.get_from_code(short_code)
     resp = MessagingResponse()
     sms = request.values['Body']
