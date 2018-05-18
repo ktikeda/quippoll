@@ -542,6 +542,22 @@ def doughnut_results(short_code):
 # End chart.js routes
 
 
+@app.route('/<short_code>/r/data.json')
+def chart_results(short_code):
+    """Return data for results page."""
+    poll = Poll.get_from_code(short_code)
+
+    responses = [{'response_id' : response.response_id, 
+                  'order' : response.order, 
+                  'text' : response.text,
+                  'value' : response.value(),
+                  'is_visible': response.is_visible} for response in poll.responses]
+
+    print responses
+
+    return jsonify({"responses" : responses})
+
+
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
