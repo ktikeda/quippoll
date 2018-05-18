@@ -257,8 +257,6 @@ class TwilioTests(TestCase):
         db.create_all()
         example_data()
 
-
-
     def tearDown(self):
         """Do at end of every test."""
 
@@ -356,9 +354,9 @@ class TwilioTests(TestCase):
 
     def test_all_input(self):
         result = self.client.post('/sms/all/input',
-                          data={'From': '+14153330000',
-                                'Body': '1'})
-        self.assertIn('Your response "Cyan" has been recorded.', result.data)
+                          data={'From': '+14153334444',
+                                'Body': '2'})
+        self.assertIn('Your response "Magenta" has been recorded.', result.data)
         self.assertIn('Continue responding? Y/N', result.data)
 
     def test_multi_user_responded(self):

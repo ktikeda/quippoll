@@ -27,7 +27,7 @@ class PollType(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
-    polls = db.relationship('Poll')  # returns a list of all polls with poll type
+    polls = db.relationship('Poll', lazy='joined')  # returns a list of all polls with poll type
 
     def __repr__(self):
         return "<Poll Type id={} name={}>".format(self.poll_type_id, self.name)
@@ -73,7 +73,7 @@ class Poll(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
 
     responses = db.relationship('Response')  # returns a list of Response objects
-    poll_type = db.relationship('PollType')  # returns PollType object
+    poll_type = db.relationship('PollType', lazy='joined')  # returns PollType object
     users_from_response = db.relationship('User', secondary='responses')  #returns list of User objects who have created Response objects
 
     def __repr__(self):
@@ -167,7 +167,7 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
-    admin_polls = db.relationship('Poll', secondary='poll_admins', backref='admins')  # returns a list of polls administered by user
+    admin_polls = db.relationship('Poll', secondary='poll_admins', backref='admins', lazy='joined')  # returns a list of polls administered by user
 
     def __repr__(self):
         return "<User id={}>".format(self.user_id)
