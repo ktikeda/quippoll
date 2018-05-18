@@ -37,4 +37,11 @@ $(document).ready( function() {
 
     });
 
+    function subscribeNewResult(cb, id) {
+      socket.on('new_result_' + id, function(data) {
+        console.log(data);
+        cb(null, data);
+      socket.emit('subscribeNewResult', 1000);
+    }
+
   });

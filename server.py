@@ -28,6 +28,17 @@ def emit_new_result(response):
                   namespace='/poll')
 
 
+def emit_new_result_id(response):
+    """Send new result data as server generated event to clients."""
+
+    print "Server emitted"
+    socketio.emit('new_result' + str(response.response_id),
+                  {'response': response.text,
+                   'response_id': response.response_id,
+                   'val': response.value()},
+                  namespace='/poll')
+
+
 @socketio.on('connect', namespace='/poll')
 def test_connect():
     print 'Server is connected.'
@@ -151,6 +162,7 @@ def add_response_to_db(short_code):
     db.session.commit()
 
     emit_new_result(response)
+    emit_new_result_id(response)
 
     # Specify route
     if poll.is_results_visible:
@@ -182,6 +194,7 @@ def add_tally_to_db(short_code):
         db.session.commit()
 
         emit_new_result(response)
+        emit_new_result_id(response)
 
     # Specify route
     if poll.is_results_visible:
