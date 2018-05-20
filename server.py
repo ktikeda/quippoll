@@ -212,7 +212,7 @@ def show_results(short_code):
 
     poll = Poll.get_from_code(short_code)
 
-    return render_template('results.html', poll=poll, async_mode=socketio.async_mode)
+    return render_template('results-react.html', poll=poll, ) #async_mode=socketio.async_mode
 
 
 @app.route('/<short_code>/success')
@@ -568,7 +568,8 @@ def chart_results(short_code):
 
     print responses
 
-    return jsonify({"responses" : responses})
+    #return 'apple'
+    return jsonify({"poll_id" : poll.poll_id, "prompt" : poll.prompt, "responses" : responses})
 
 
 if __name__ == "__main__":

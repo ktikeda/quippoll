@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ poll.title }}{% endblock %}
+
+{% block content %}
+
+<div id="root"> <!-- component will go in this div --> </div>
+
+<script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+
+<!-- semiotic charts -->
+<script type="text/javascript" src="https://unpkg.com/semiotic/dist/semiotic.min.js"></script>
+
+<script src="/static/semiotic.jsx" type="text/jsx"></script>
+
+{% endblock %}
