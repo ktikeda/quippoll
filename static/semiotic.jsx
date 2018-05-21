@@ -2,12 +2,6 @@
 /* class-start*/
 const { OrdinalFrame } = Semiotic;
 
-const StaticData = [
-  { response: "Red", tallys: 10}, // could be it's own response class
-  { response: "Yellow", tallys: 5},
-  { response: "Blue", tallys: 20}
-];  
-
 class Response extends React.Component {
   constructor(props) {
     super(props);
@@ -15,18 +9,23 @@ class Response extends React.Component {
   } // end constructor
 
   render() {
-    return <div>{this.props.text} : {this.props.value}</div>;
+    return (<div>{this.props.order}. {this.props.text} : {this.props.value}</div>)
   } // end render
 
 }
 
 class Poll extends React.Component {
   constructor(props) {
-      super(props);
-      this.state = {prompt : null,
-                    responseData: []
-                    }; // end this.state
+    super(props);
+    this.state = {prompt : null,
+                  responseData: []
+                  };
+    this.onNewResult = this.onNewResult.bind(this);
   } // end constructor
+
+  onNewResult(x) {
+    this.setState({ zipcode });
+  }
 
   render() {
         
@@ -39,9 +38,9 @@ class Poll extends React.Component {
           {responses.sort((a, b) => a.order - b.order ).map(function(response){
             return <Response 
                       key={ response.response_id } 
-                      order={response.order}
-                      text={response.text} 
-                      value={response.value} />;
+                      order={ response.order }
+                      text={ response.text } 
+                      value={ response.value } />;
           })}
         <Chart data={responses} />
       </div>
@@ -62,45 +61,23 @@ class Poll extends React.Component {
 class Chart extends React.Component {
   constructor(props) {
       super(props);
-
-      // result = {'response': response.text, 'response_id': response.response_id, 'val': response.value()}
-      //subscribeNewResult((err, result) => this.setState({value})); // need to locate response and reassign value
-
-      this.state = {
-        chartData : [], //[{}, {}, {}]
-        responses: null
-      };
-
-      this.onNewResult = this.onNewResult.bind(this);
     }
-
-  onNewResult(x) {
-    this.setState({ zipcode });
-  }
 
   render() {
     const chartData = this.props.data; 
     return (<div>
     <OrdinalFrame
-          //data={this.props.children}
           data={chartData}
           oAccessor={"text"}
           rAccessor={"value"}
           style={{ fill: "#00a2ce", stroke: "white" }}
           type={"bar"}
           // projection={"radial"}
-          oLabel={true}
-    />
+          oLabel={true} />
     </div>);
   } // End of the render function
 
-  componentDidMount() {
-    fetch(window.location.href + '/data.json')
-    .then(response => response.json())
-    .then(data => this.setState({ chartData: data.responses }))
-  }
-
-} // End of the component
+} // End of Chart
 
 
 /* class-end */
@@ -108,10 +85,7 @@ class Chart extends React.Component {
 /* main-start */
 
 ReactDOM.render(
-    <Poll >
-        //{(result) => { result.then(rsp => console.log(rsp) ) }}
-
-    </Poll>,
+    <Poll />,
     document.getElementById("root")
 );
 /* main-end */
