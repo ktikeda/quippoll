@@ -20,10 +20,10 @@ class Poll extends React.Component {
     this.state = {id : null,
                   prompt : null,
                   responseData: [],
-                  graph : 'text'
+                  chart : 'text'
                   };
 
-    this.setGraph = this.setGraph.bind(this);
+    this.setChart = this.setChart.bind(this);
 
     onNewResult(this.props.id, 
       (err, data) => {
@@ -33,31 +33,40 @@ class Poll extends React.Component {
 
   } // end constructor
 
-  setGraph(evt) {
+  setChart(evt) {
     let type = evt.target.id;
-    this.setState({graph : type});
+    console.log(type);
+    this.setState({chart : type});
   }
 
 
   render() {
         
     let responses = this.state.responseData;
+    let chart = this.state.chart;
     console.log(responses);
+    console.log(chart);
     
     return (
       <div>
-        <button id="pie" onClick={ this.setGraph }><i className="fas fa-chart-pie"></i></button>
-        <button id="bar" onClick={ this.setGraph }><i className="fas fa-chart-bar"></i></button>
-        <button id="text" onClick={ this.setGraph }><i className="fas fa-font"></i></button>
+        <button id="pie" onClick={ this.setChart }><i className="fas fa-chart-pie"></i></button>
+        <button id="bar" onClick={ this.setChart }><i className="fas fa-chart-bar"></i></button>
+        <button id="text" onClick={ this.setChart }><i className="fas fa-font"></i></button>
         <h1>{this.state.prompt}</h1>
-          {responses.sort((a, b) => a.order - b.order ).map(function(response){
-            return <Response 
-                      key={ response.response_id } 
-                      order={ response.order }
-                      text={ response.text } 
-                      value={ response.value } />;
-          })}
-        <Chart data={responses} />
+          
+            {responses.sort((a, b) => a.order - b.order ).map(function(response){
+              return <Response 
+                        key={ response.response_id } 
+                        order={ response.order }
+                        text={ response.text } 
+                        value={ response.value } />;
+            })}
+            
+            { (chart === 'bar') ? 
+              (<BarChart data={responses} />) : 
+              ((chart === 'pie') ? 
+               (<PieChart data={responses} />) : (<p>{chart}</p>))
+            }
       </div>
 
     ) // end of return
@@ -75,13 +84,14 @@ class Poll extends React.Component {
 
 } // End of Poll
 
-class Chart extends React.Component {
+class BarChart extends React.Component {
   constructor(props) {
       super(props);
     }
 
   render() {
     const chartData = this.props.data; 
+
     return (<div>
     <OrdinalFrame
           data={chartData}
@@ -93,7 +103,30 @@ class Chart extends React.Component {
     </div>);
   } // End of the render function
 
-} // End of Chart
+} // End of BarChart
+
+class PieChart extends React.Component {
+  constructor(props) {
+      super(props);
+    }
+
+  render() {
+    const chartData = this.props.data; 
+
+    return (<div>
+    <OrdinalFrame
+          data={chartData}
+          oAccessor={"text"}
+          rAccessor={() => 1}
+          dynamicColumnWidth={"value"}
+          style={{ fill: "#00a2ce", stroke: "white" }}
+          type={"bar"}
+          projection={"radial"}
+          oLabel={true} />
+    </div>);
+  } // End of the render function
+
+} // End of PieChart
 
 
 /* class-end */
