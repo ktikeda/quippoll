@@ -1,4 +1,4 @@
-$(document).ready( function() {
+// $(document).ready( function() {
 
     let namespace = '/poll';
 
@@ -37,12 +37,12 @@ $(document).ready( function() {
 
     });
 
-    function subscribeNewResult(cb, id) {
+    function onNewResult(id, cb) {
       socket.on('new_result_' + id, function(data) {
         console.log(data);
         cb(null, data);
       });
-      socket.emit('subscribeNewResult', 1000);
+      socket.emit('onNewResult', 1000);
     }
 
-  });
+  // });

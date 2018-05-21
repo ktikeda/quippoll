@@ -17,15 +17,18 @@ class Response extends React.Component {
 class Poll extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {prompt : null,
+    this.state = {id : null,
+                  prompt : null,
                   responseData: []
                   };
-    this.onNewResult = this.onNewResult.bind(this);
+    
+    //this.onNewResult = this.onNewResult.bind(this);
+
+    onNewResult(this.props.id, (err, data) => this.setState({ responseData : data.responses })
+    ); // end onNewResult
+
   } // end constructor
 
-  onNewResult(x) {
-    this.setState({ zipcode });
-  }
 
   render() {
         
@@ -52,8 +55,10 @@ class Poll extends React.Component {
   componentDidMount() {
     let resp = fetch(window.location.href + '/data.json').then(response => response.json());
 
+    resp.then( data => this.setState({ id: data.poll_id }));
     resp.then( data => this.setState({ prompt: data.prompt }));
     resp.then( data => this.setState({ responseData: data.responses }));
+  
   } // end componentDidMount
 
 } // End of Poll
@@ -72,7 +77,6 @@ class Chart extends React.Component {
           rAccessor={"value"}
           style={{ fill: "#00a2ce", stroke: "white" }}
           type={"bar"}
-          // projection={"radial"}
           oLabel={true} />
     </div>);
   } // End of the render function
@@ -85,7 +89,7 @@ class Chart extends React.Component {
 /* main-start */
 
 ReactDOM.render(
-    <Poll />,
+    <Poll id="1" />,
     document.getElementById("root")
 );
 /* main-end */

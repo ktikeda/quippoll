@@ -28,14 +28,19 @@ def emit_new_result(response):
                   namespace='/poll')
 
 
-def emit_new_result_id(response):
+def emit_new_result_id(poll):
     """Send new result data as server generated event to clients."""
 
     print "Server emitted"
-    socketio.emit('new_result' + str(response.response_id),
-                  {'response': response.text,
-                   'response_id': response.response_id,
-                   'val': response.value()},
+
+    responses = [{'response_id' : response.response_id, 
+                  'order' : response.order, 
+                  'text' : response.text,
+                  'value' : response.value(),
+                  'is_visible': response.is_visible} for response in poll.responses]
+
+    socketio.emit('new_result_' + str(poll.poll_id),
+                  {"poll_id" : poll.poll_id, "prompt" : poll.prompt, "responses" : responses},
                   namespace='/poll')
 
 
@@ -161,8 +166,8 @@ def add_response_to_db(short_code):
     db.session.add(response)
     db.session.commit()
 
-    emit_new_result(response)
-    emit_new_result_id(response)
+    # emit_new_result(response)
+    emit_new_result_id(poll)
 
     # Specify route
     if poll.is_results_visible:
@@ -193,8 +198,8 @@ def add_tally_to_db(short_code):
         db.session.add(tally)
         db.session.commit()
 
-        emit_new_result(response)
-        emit_new_result_id(response)
+        # emit_new_result(response)
+        emit_new_result_id(poll)
 
     # Specify route
     if poll.is_results_visible:
@@ -493,7 +498,8 @@ def sms_add_input(short_code):
                     db.session.add(tally)
                     db.session.commit()
 
-                    emit_new_result(response)
+                    # emit_new_result(response)
+                    emit_new_result_id(poll)
 
                     resp.message('Your response "{}" has been recorded.'.format(response.text))
 
