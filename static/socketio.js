@@ -1,11 +1,9 @@
-// $(document).ready( function() {
-
-    let namespace = '/poll';
+    const namespace = '/poll';
 
     // Connect to the Socket.IO server.
     // The connection URL has the following format:
     //     http[s]://<domain>:<port>[/<namespace>]
-    let socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
+    const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
 
     // Event handler for new connections.
     // The callback function is invoked when a connection with the
@@ -44,5 +42,3 @@
       });
       socket.emit('onNewResult', 1000);
     }
-
-  // });

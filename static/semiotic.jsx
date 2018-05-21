@@ -19,15 +19,24 @@ class Poll extends React.Component {
     super(props);
     this.state = {id : null,
                   prompt : null,
-                  responseData: []
+                  responseData: [],
+                  graph : 'text'
                   };
-    
-    //this.onNewResult = this.onNewResult.bind(this);
 
-    onNewResult(this.props.id, (err, data) => this.setState({ responseData : data.responses })
-    ); // end onNewResult
+    this.setGraph = this.setGraph.bind(this);
+
+    onNewResult(this.props.id, 
+      (err, data) => {
+        this.setState({ responseData : data.responses })
+        this.setState({ prompt : data.prompt })
+    }); // end onNewResult
 
   } // end constructor
+
+  setGraph(evt) {
+    let type = evt.target.id;
+    this.setState({graph : type});
+  }
 
 
   render() {
@@ -37,6 +46,9 @@ class Poll extends React.Component {
     
     return (
       <div>
+        <button id="pie" onClick={ this.setGraph }><i className="fas fa-chart-pie"></i></button>
+        <button id="bar" onClick={ this.setGraph }><i className="fas fa-chart-bar"></i></button>
+        <button id="text" onClick={ this.setGraph }><i className="fas fa-font"></i></button>
         <h1>{this.state.prompt}</h1>
           {responses.sort((a, b) => a.order - b.order ).map(function(response){
             return <Response 
