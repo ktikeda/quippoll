@@ -255,35 +255,6 @@ def delete_poll():
     return redirect('/profile')
 
 
-@app.route('/poll/<int:poll_id>/settings')
-def show_poll_settings(poll_id):
-    poll = Poll.query.get(poll_id)
-
-    if current_user.is_authenticated and current_user.is_admin(poll):
-        return render_template('settings.html', poll=poll)
-    else:
-        return redirect('/')
-
-
-@app.route('/poll/<int:poll_id>/settings', methods=['POST'])
-def update_poll_settings(poll_id):
-    poll = Poll.query.get(poll_id)
-    data = request.form.to_dict()
-
-    for attr, val in data.iteritems():
-
-        if attr == 'short_code' and Poll.get_from_code(val):
-            return 'This short code is already in use.'
-
-        setattr(poll, attr, val)
-        poll.updated_at = datetime.now()
-        db.session.add(poll)
-        db.session.commit()
-
-    status = 'Saved'
-    return status
-
-
 @app.route('/locate')
 def locate_user():
     return render_template('locate.html')
@@ -576,6 +547,35 @@ def chart_results(short_code):
 
     #return 'apple'
     return jsonify({"poll_id" : poll.poll_id, "prompt" : poll.prompt, "responses" : responses})
+
+
+@app.route('/poll/<int:poll_id>/settings')
+def show_poll_settings(poll_id):
+    poll = Poll.query.get(poll_id)
+
+    if current_user.is_authenticated and current_user.is_admin(poll):
+        return render_template('settings.html', poll=poll)
+    else:
+        return redirect('/')
+
+
+@app.route('/poll/<int:poll_id>/settings', methods=['POST'])
+def update_poll_settings(poll_id):
+    poll = Poll.query.get(poll_id)
+    data = request.form.to_dict()
+
+    for attr, val in data.iteritems():
+
+        if attr == 'short_code' and Poll.get_from_code(val):
+            return 'This short code is already in use.'
+
+        setattr(poll, attr, val)
+        poll.updated_at = datetime.now()
+        db.session.add(poll)
+        db.session.commit()
+
+    status = 'Saved'
+    return status
 
 
 @app.route('/response/<int:response_id>/data.json')

@@ -1,6 +1,7 @@
 // "use strict";
 /* class-start*/
 const { OrdinalFrame } = Semiotic;
+import {SortableContainer, SortableElement} from 'react-sortable-hoc';
 
 class Response extends React.Component {
   constructor(props) {
@@ -36,7 +37,7 @@ class Response extends React.Component {
 
     $.post('/response/' + this.props.id + '/data.json',
       data,
-      () => console.log('Saved'));
+      (resp) => console.log(resp));
 
     
   } // end sendText
@@ -114,10 +115,10 @@ class Poll extends React.Component {
 
     $.post('/poll/' + this.props.id + '/settings',
       data,
-      () => console.log('Saved'));
+      (resp) => console.log(resp));
 
     
-  } // end sendText
+  } // end sendPrompt
 
   showNav() {
     if (this.state.mode === 'results') {
@@ -173,24 +174,40 @@ class Poll extends React.Component {
   } // end showPrompt
 
 
+
+
   render() {
     
     let responses = this.state.responseData;
     responses = responses.sort((a, b) => a.order - b.order );
     let mode = this.state.mode
-    
+
+
+    const SortableItem = SortableElement(({response}) =>
+      <li><Response 
+            key={ response.response_id } 
+            id={ response.response_id } 
+            mode={ mode } />;
+      </li>
+    );
+
+    const SortableList = SortableContainer(({responses}) => {
+      return (
+        <ul>
+          {responses.map((response, index) => (
+            <SortableItem key={`item-${index}`} index={index} value={response} />
+          ))}
+        </ul>
+      );
+    });
+      
     return(
       <div> 
         { this.showNav() }
 
         { this.showPrompt() }
             
-          {responses.map(function(response){
-            return <Response 
-                      key={ response.response_id } 
-                      id={ response.response_id } 
-                      mode={ mode } />;
-          })}
+        { SortableList }
         
         { this.showResults(responses) }
         
