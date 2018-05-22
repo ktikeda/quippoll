@@ -13,12 +13,18 @@ class Response extends React.Component {
                   };
 
     this.sendText = this.sendText.bind(this);
+    this.handleChange = this.handleChange.bind(this);
 
   } // end constructor
 
+  handleChange(evt) {
+    this.setState({ text : evt.target.value });
+  } // sendText
+
   sendText(evt) {
     console.log(this.props.id);
-    this.setState({ text : evt.target.value });
+    console.log(this.state.text);
+    
   } // sendText
 
   render() {
@@ -32,7 +38,7 @@ class Response extends React.Component {
     if (mode === 'respond') {
       return (<div><button className="response-option btn btn-primary btn-lg btn-block">{text}</button><br/></div>);
     } else if (mode === 'edit') {
-      return (<div><input type="text" id={id} className="" value={text} onChange={this.sendText}/></div>);
+      return (<div><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} /></div>);
     } else if (mode === 'results') {
       return (<div>{order}. {text} : {value}</div>);
     } // end if
@@ -57,7 +63,7 @@ class Poll extends React.Component {
                   prompt : null,
                   responseData: [],
                   chart : 'text',
-                  mode : 'results'
+                  mode : 'edit'
                   };
 
     this.setChart = this.setChart.bind(this);
@@ -100,8 +106,6 @@ class Poll extends React.Component {
       return (
         <div>
           
-          
-              
               { (chart === 'bar') ? 
                 (<BarChart data={responses} />) : 
                 ((chart === 'pie') ? 
