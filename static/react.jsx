@@ -6,19 +6,47 @@ class Response extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = {text : "",
+                  order: "",
+                  value : "",
+                  isVisible : "",
+                  };
+
+    this.sendText = this.sendText.bind(this);
+
   } // end constructor
 
-
+  sendText(evt) {
+    console.log(this.props.id);
+    this.setState({ text : evt.target.value });
+  } // sendText
 
   render() {
-    let mode = this.props.mode
+    let mode = this.props.mode;
+    let id = "response-opt-" + this.props.id;
+    let text = this.state.text;
+    let order = this.state.order;
+    let value = this.state.value;
+    let isVisible = this.state.isVisible;
 
     if (mode === 'respond') {
-      return (<div><button className="response-option btn btn-primary btn-lg btn-block">{this.props.text}</button></div>);
+      return (<div><button className="response-option btn btn-primary btn-lg btn-block">{text}</button><br/></div>);
+    } else if (mode === 'edit') {
+      return (<div><input type="text" id={id} className="" value={text} onChange={this.sendText}/></div>);
     } else if (mode === 'results') {
-      return (<div>{this.props.order}. {this.props.text} : {this.props.value}</div>);
+      return (<div>{order}. {text} : {value}</div>);
     } // end if
   } // end render
+
+  componentDidMount() {
+    let resp = fetch('/response/' + this.props.id + '/data.json').then(data => data.json());
+
+    resp.then( data => this.setState({ text: data.text }));
+    resp.then( data => this.setState({ order: data.order }));
+    resp.then( data => this.setState({ value: data.value }));
+    resp.then( data => this.setState({ isVisible: data.is_visible }));
+  
+  } // end componentDidMount
 
 }
 
@@ -29,11 +57,10 @@ class Poll extends React.Component {
                   prompt : null,
                   responseData: [],
                   chart : 'text',
-                  mode : 'respond'
+                  mode : 'results'
                   };
 
     this.setChart = this.setChart.bind(this);
-    //this.showResults = this.showResults.bind(this);
 
     onNewResult(this.props.id, 
       (err, data) => {
@@ -92,6 +119,7 @@ class Poll extends React.Component {
 
 
   render() {
+    
     let responses = this.state.responseData;
     responses = responses.sort((a, b) => a.order - b.order );
     let mode = this.state.mode
@@ -105,9 +133,7 @@ class Poll extends React.Component {
           {responses.map(function(response){
             return <Response 
                       key={ response.response_id } 
-                      order={ response.order }
-                      text={ response.text } 
-                      value={ response.value }
+                      id={ response.response_id } 
                       mode={ mode } />;
           })}
         

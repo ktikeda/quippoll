@@ -578,6 +578,23 @@ def chart_results(short_code):
     return jsonify({"poll_id" : poll.poll_id, "prompt" : poll.prompt, "responses" : responses})
 
 
+@app.route('/response/<int:response_id>/data.json')
+def get_response_data(response_id):
+    """Return data for results page."""
+    response = Response.query.get(int(response_id))
+
+    response_data = {'response_id' : response.response_id, 
+                     'order' : response.order, 
+                     'text' : response.text,
+                     'value' : response.value(),
+                     'is_visible': response.is_visible}
+
+    print response_data
+
+    #return 'apple'
+    return jsonify(response_data)
+
+
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
