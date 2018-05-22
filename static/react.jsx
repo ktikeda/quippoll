@@ -24,8 +24,26 @@ class Response extends React.Component {
   sendText(evt) {
     console.log(this.props.id);
     console.log(this.state.text);
+
+    console.log(data);
+
+    let data = {'order' : this.state.order, 
+                'text' : this.state.text,
+                'value' : this.state.value,
+                'is_visible': this.state.isVisible};
+
+    console.log(data);
+
+    $.post('/response/' + this.props.id + '/data.json',
+      data,
+      () => console.log('Saved'));
+
     
-  } // sendText
+  } // end sendText
+
+  showSaved() {
+
+  } // end showSaved
 
   render() {
     let mode = this.props.mode;

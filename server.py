@@ -563,7 +563,7 @@ def doughnut_results(short_code):
 
 @app.route('/<short_code>/r/data.json')
 def chart_results(short_code):
-    """Return data for results page."""
+    """"""
     poll = Poll.get_from_code(short_code)
 
     responses = [{'response_id' : response.response_id, 
@@ -580,7 +580,7 @@ def chart_results(short_code):
 
 @app.route('/response/<int:response_id>/data.json')
 def get_response_data(response_id):
-    """Return data for results page."""
+    """"""
     response = Response.query.get(int(response_id))
 
     response_data = {'response_id' : response.response_id, 
@@ -593,6 +593,24 @@ def get_response_data(response_id):
 
     #return 'apple'
     return jsonify(response_data)
+
+@app.route('/response/<int:response_id>/data.json', methods=['POST'])
+def save_response_data(response_id):
+    """"""
+    response = Response.query.get(int(response_id))
+
+    data = request.form.to_dict()
+
+    for attr, val in data.iteritems():
+
+        setattr(response, attr, val)
+        response.updated_at = datetime.now()
+        db.session.add(response)
+        db.session.commit()
+
+    status = 'Saved'
+    return status
+
 
 
 if __name__ == "__main__":
