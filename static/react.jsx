@@ -77,14 +77,16 @@ class Response extends React.Component {
 class Poll extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {id : null,
-                  prompt : null,
+    this.state = {
+                  prompt : "",
                   responseData: [],
                   chart : 'text',
                   mode : 'edit'
                   };
 
     this.setChart = this.setChart.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.sendPrompt = this.sendPrompt.bind(this);
 
     onNewResult(this.props.id, 
       (err, data) => {
@@ -98,7 +100,24 @@ class Poll extends React.Component {
     let type = evt.target.id;
     console.log(type);
     this.setState({chart : type});
-  }
+  } // end setChart
+
+  handleChange(evt) {
+    this.setState({ prompt : evt.target.value });
+  } // end handleChange
+
+  sendPrompt(evt) {
+
+    let data = {'prompt' : this.state.prompt};
+
+    console.log(data);
+
+    $.post('/poll/' + this.props.id + '/settings',
+      data,
+      () => console.log('Saved'));
+
+    
+  } // end sendText
 
   showNav() {
     if (this.state.mode === 'results') {
@@ -139,6 +158,20 @@ class Poll extends React.Component {
     } // end if
   } // end showResults
 
+  showPrompt() {
+    
+    let id = this.props.id;
+    let prompt = this.state.prompt;
+
+    if (this.state.mode === 'edit') {
+      return (<div><input type="text" id={id} className="" value={prompt} onChange={this.handleChange} onBlur={this.sendPrompt} /></div>);
+      
+    } else {
+      return (<h1>{prompt}</h1>);
+    } // end if
+
+  } // end showPrompt
+
 
   render() {
     
@@ -150,7 +183,7 @@ class Poll extends React.Component {
       <div> 
         { this.showNav() }
 
-        <h1>{this.state.prompt}</h1>
+        { this.showPrompt() }
             
           {responses.map(function(response){
             return <Response 
