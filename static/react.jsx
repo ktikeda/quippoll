@@ -48,7 +48,7 @@ class Response extends React.Component {
                 'value' : this.state.value,
                 'is_visible': this.state.isVisible};
 
-    $.post('/response/' + this.props.id + '/data.json',
+    $.post('/api/responses/' + this.props.id,
       data,
       (resp) => console.log(resp));
 
@@ -70,14 +70,16 @@ class Response extends React.Component {
     if (mode === 'respond') {
       return (<div><label></label><button className="response-option btn btn-primary btn-lg btn-block">{order}. {text}</button><br/></div>);
     } else if (mode === 'edit') {
-      return (<div><label>{order}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} /></div>);
+      return (<div><label>{order}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />
+              <button className="" type="button" onClick={this.handleOptionDelete}>Delete</button>
+              </div>);
     } else if (mode === 'results') {
       return (<div>{text} : {value}</div>);
     } // end if
   } // end render
 
   componentDidMount() {
-    let resp = fetch('/response/' + this.props.id + '/data.json').then(data => data.json());
+    let resp = fetch('/api/responses/' + this.props.id).then(data => data.json());
 
     resp.then( data => this.setState({ text: data.text }));
     resp.then( data => this.setState({ value: data.value }));
@@ -102,6 +104,8 @@ class Poll extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.sendPrompt = this.sendPrompt.bind(this);
     this.handleOptionAdd = this.handleOptionAdd.bind(this);
+    this.retrieveDeletion = this.retrieveDeletion.bind(this);
+    this.retrieveUpdate = this.retrieveUpdate.bind(this);
 
     onNewResult(this.props.id, 
       (err, data) => {
@@ -130,11 +134,22 @@ class Poll extends React.Component {
    
   } // end sendPrompt
 
+  retrieveDeletion(data) {
+    /* get response send response to be deleted to server
+       server send back new responseData
+       change responseData on state */
+  } // end retrieveDeletion
+
+  retrieveUpdate(data) {
+    /* get updated response, send to server
+       server send back new responseData
+       change responseData on state */
+
+  } // end retrieveUpdate
+
   handleOptionAdd(evt) {
     //update poll options and reset options to an empty string
     let _data = {responseData : [{'text' : '',
-                               'order' : this.state.responseData.length + 1},
-                               {'text' : '',
                                'order' : this.state.responseData.length + 1}]};
 
     $.ajax({ url: '/api/polls/' + this.props.id + '/responses',
@@ -142,12 +157,13 @@ class Poll extends React.Component {
       contentType : 'application/json',
       type: 'post',
       data: JSON.stringify(_data),
-      success: (resp) => console.log(resp)});
+      success: (resp) => {
+        console.log(resp);
+        this.setState({responseData: this.state.responseData.concat(resp.response_data)});
+      }
+    });
     
-
-    // this.setState({
-    // responseData: this.state.responseData.concat({name: this.state.option})
-    // });
+    
   }
 
 
@@ -247,7 +263,7 @@ class Poll extends React.Component {
 
     for (let response of responses) {
 
-      $.post('/response/' + response.response_id + '/data.json',
+      $.post('/api/responses/' + response.response_id,
         response,
         (resp) => console.log(resp));
     } // end for

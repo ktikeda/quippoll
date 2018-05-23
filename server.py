@@ -603,10 +603,12 @@ def add_response_data(poll_id):
                               'is_visible' : new_response.is_visible})
 
     data = {'response_data' : response_data}
+    print data
+
     return jsonify(data)
 
 
-@app.route('/response/<int:response_id>/data.json')
+@app.route('/api/responses/<int:response_id>')
 def get_response_data(response_id):
     """"""
     response = Response.query.get(int(response_id))
@@ -618,12 +620,10 @@ def get_response_data(response_id):
                      'value' : response.value(),
                      'is_visible': response.is_visible}
 
-    print response_data
-
-    #return 'apple'
     return jsonify(response_data)
 
-@app.route('/response/<int:response_id>/data.json', methods=['POST'])
+
+@app.route('/api/responses/<int:response_id>', methods=['POST'])
 def save_response_data(response_id):
     """"""
     response = Response.query.get(int(response_id))
