@@ -8,7 +8,8 @@ const arrayMove = SortableHOC.arrayMove;
 const SortableItem = SortableElement(({value}) =>
   <li><Response 
         key={ value.response_id } 
-        id={ value.response_id } 
+        id={ value.response_id }
+        order={ value.order } 
         mode='edit' />
   </li>
 ); // end SortableItem
@@ -67,6 +68,7 @@ class Response extends React.Component {
   render() {
     let mode = this.props.mode;
     let id = "response-opt-" + this.props.id;
+    let order = this.props.order
     let text = this.state.text;
     let value = this.state.value;
     let isVisible = this.state.isVisible;
@@ -74,7 +76,7 @@ class Response extends React.Component {
     if (mode === 'respond') {
       return (<div><button className="response-option btn btn-primary btn-lg btn-block">{text}</button><br/></div>);
     } else if (mode === 'edit') {
-      return (<input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />);
+      return (<div><label>{order}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} /></div>);
     } else if (mode === 'results') {
       return (<div>{text} : {value}</div>);
     } // end if
@@ -209,19 +211,21 @@ class Poll extends React.Component {
     // send new index to server, server return json with response order data
     console.log(oldIndex);
     console.log(newIndex);
-    console.log(evt);
+
+    function assignOrder(array) {
+      // take an array of objects and assigns object.order based on the object's position in the array.
+      for (let obj of array) {
+        obj.order = array.indexOf(obj) + 1;
+      }
+
+      return array;
+
+    } // end assignOrder
 
     this.setState({
-      responseData: arrayMove(this.state.responseData, oldIndex, newIndex),
+      responseData: assignOrder(arrayMove(this.state.responseData, oldIndex, newIndex)),
     });
 
-    console.log(this.state.responseData);
-    // get data of response moved. How can I grab this. Can I look it up by index???
-
-    // let resp = fetch(window.location.href + '/data.json').then(resp => resp.json());
-    // resp.then( data => this.setState({ responseData: data.responses }));
-    // resp.then( data => this.setState({ items: data.responses }));
-    // });
   };  
 
 
