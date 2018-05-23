@@ -226,13 +226,22 @@ class Poll extends React.Component {
       responseData: assignOrder(arrayMove(this.state.responseData, oldIndex, newIndex)),
     });
 
-  };  
+    let responses = this.state.responseData;
+
+    for (let response of responses) {
+
+      $.post('/response/' + response.response_id + '/data.json',
+        response,
+        (resp) => console.log(resp));
+    } // end for
+
+  }; // end onSortEnd
 
 
   render() {
     
     let responses = this.state.responseData;
-    //responses = responses.sort((a, b) => a.order - b.order );
+    responses = responses.sort((a, b) => a.order - b.order );
     console.log(responses);
     let mode = this.state.mode
 

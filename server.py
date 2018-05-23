@@ -602,11 +602,11 @@ def save_response_data(response_id):
     data = request.form.to_dict()
 
     for attr, val in data.iteritems():
-
-        setattr(response, attr, val)
-        response.updated_at = datetime.now()
-        db.session.add(response)
-        db.session.commit()
+        if attr != 'response_id':
+            setattr(response, attr, val)
+            response.updated_at = datetime.now()
+            db.session.add(response)
+            db.session.commit()
 
     status = 'Saved'
     return status
