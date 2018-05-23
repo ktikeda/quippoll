@@ -11,7 +11,7 @@ const SortableItem = SortableElement(({value}) =>
         id={ value.response_id } 
         mode='edit' />
   </li>
-);
+); // end SortableItem
 
 const SortableList = SortableContainer(({items}) => {
   return (
@@ -21,7 +21,7 @@ const SortableList = SortableContainer(({items}) => {
       ))}
     </ul>
   );
-});
+}); // end SortableList
 
 class Response extends React.Component {
   constructor(props) {
@@ -63,7 +63,7 @@ class Response extends React.Component {
   } // end sendText
 
   showSaved() {
-
+    // implement save badge
   } // end showSaved
 
   render() {
@@ -102,7 +102,7 @@ class Poll extends React.Component {
                   prompt : "",
                   responseData: [],
                   chart : 'text',
-                  mode : 'edit',
+                  mode : 'results',
                   items : ""
                   };
 
@@ -136,8 +136,7 @@ class Poll extends React.Component {
     $.post('/poll/' + this.props.id + '/settings',
       data,
       (resp) => console.log(resp));
-
-    
+   
   } // end sendPrompt
 
   showNav() {
@@ -203,22 +202,24 @@ class Poll extends React.Component {
             return <Response 
                       key={ response.response_id } 
                       id={ response.response_id } 
-                      mode={ mode } />;
+                      mode='results' />;
           })}</div>);
     } // end if
 
   } // end showResponses
 
 
-  onSortEnd = ({oldIndex, newIndex}) => {
-    // send new index to server, server return json with response order data
-    console.log(oldIndex);
-    console.log(newIndex);
-    let resp = fetch(window.location.href + '/data.json').then(resp => resp.json());
-    resp.then( data => this.setState({ responseData: data.responses }));
-    resp.then( data => this.setState({ items: data.responses }));
-    });
-  };  
+  // onSortEnd = ({oldIndex, newIndex}) => {
+  //   // send new index to server, server return json with response order data
+  //   console.log(oldIndex);
+  //   console.log(newIndex);
+  //   // get data of response moved. How can I grab this. Can I look it up by index???
+
+  //   let resp = fetch(window.location.href + '/data.json').then(resp => resp.json());
+  //   resp.then( data => this.setState({ responseData: data.responses }));
+  //   resp.then( data => this.setState({ items: data.responses }));
+  //   });
+  // };  
 
 
   render() {
@@ -227,8 +228,6 @@ class Poll extends React.Component {
     responses = responses.sort((a, b) => a.order - b.order );
     console.log(responses);
     let mode = this.state.mode
-
-
 
     return(
       <div> 
@@ -304,6 +303,7 @@ class PieChart extends React.Component {
 
 /* main-start */
 
+// add flag, document.cookie.isadmin in vanilla js
 ReactDOM.render(
     <Poll id="1" />,
     document.getElementById("root")
