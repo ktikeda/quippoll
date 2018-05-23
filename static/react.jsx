@@ -28,7 +28,6 @@ class Response extends React.Component {
     super(props);
 
     this.state = {text : "",
-                  order: "",
                   value : "",
                   isVisible : "",
                   };
@@ -48,8 +47,7 @@ class Response extends React.Component {
 
     console.log(data);
 
-    let data = {'order' : this.state.order, 
-                'text' : this.state.text,
+    let data = {'text' : this.state.text,
                 'value' : this.state.value,
                 'is_visible': this.state.isVisible};
 
@@ -70,16 +68,15 @@ class Response extends React.Component {
     let mode = this.props.mode;
     let id = "response-opt-" + this.props.id;
     let text = this.state.text;
-    let order = this.state.order;
     let value = this.state.value;
     let isVisible = this.state.isVisible;
 
     if (mode === 'respond') {
       return (<div><button className="response-option btn btn-primary btn-lg btn-block">{text}</button><br/></div>);
     } else if (mode === 'edit') {
-      return (<div><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} /></div>);
+      return (<input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />);
     } else if (mode === 'results') {
-      return (<div>{order}. {text} : {value}</div>);
+      return (<div>{text} : {value}</div>);
     } // end if
   } // end render
 
@@ -87,7 +84,6 @@ class Response extends React.Component {
     let resp = fetch('/response/' + this.props.id + '/data.json').then(data => data.json());
 
     resp.then( data => this.setState({ text: data.text }));
-    resp.then( data => this.setState({ order: data.order }));
     resp.then( data => this.setState({ value: data.value }));
     resp.then( data => this.setState({ isVisible: data.is_visible }));
   
@@ -102,7 +98,7 @@ class Poll extends React.Component {
                   prompt : "",
                   responseData: [],
                   chart : 'text',
-                  mode : 'results',
+                  mode : 'edit',
                   items : ""
                   };
 
@@ -209,23 +205,30 @@ class Poll extends React.Component {
   } // end showResponses
 
 
-  // onSortEnd = ({oldIndex, newIndex}) => {
-  //   // send new index to server, server return json with response order data
-  //   console.log(oldIndex);
-  //   console.log(newIndex);
-  //   // get data of response moved. How can I grab this. Can I look it up by index???
+  onSortEnd = ({oldIndex, newIndex}, evt) => {
+    // send new index to server, server return json with response order data
+    console.log(oldIndex);
+    console.log(newIndex);
+    console.log(evt);
 
-  //   let resp = fetch(window.location.href + '/data.json').then(resp => resp.json());
-  //   resp.then( data => this.setState({ responseData: data.responses }));
-  //   resp.then( data => this.setState({ items: data.responses }));
-  //   });
-  // };  
+    this.setState({
+      responseData: arrayMove(this.state.responseData, oldIndex, newIndex),
+    });
+
+    console.log(this.state.responseData);
+    // get data of response moved. How can I grab this. Can I look it up by index???
+
+    // let resp = fetch(window.location.href + '/data.json').then(resp => resp.json());
+    // resp.then( data => this.setState({ responseData: data.responses }));
+    // resp.then( data => this.setState({ items: data.responses }));
+    // });
+  };  
 
 
   render() {
     
     let responses = this.state.responseData;
-    responses = responses.sort((a, b) => a.order - b.order );
+    //responses = responses.sort((a, b) => a.order - b.order );
     console.log(responses);
     let mode = this.state.mode
 
