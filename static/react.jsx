@@ -43,16 +43,10 @@ class Response extends React.Component {
   } // sendText
 
   sendText(evt) {
-    console.log(this.props.id);
-    console.log(this.state.text);
-
-    console.log(data);
 
     let data = {'text' : this.state.text,
                 'value' : this.state.value,
                 'is_visible': this.state.isVisible};
-
-    console.log(data);
 
     $.post('/response/' + this.props.id + '/data.json',
       data,
@@ -74,7 +68,7 @@ class Response extends React.Component {
     let isVisible = this.state.isVisible;
 
     if (mode === 'respond') {
-      return (<div><button className="response-option btn btn-primary btn-lg btn-block">{text}</button><br/></div>);
+      return (<div><label></label><button className="response-option btn btn-primary btn-lg btn-block">{order}. {text}</button><br/></div>);
     } else if (mode === 'edit') {
       return (<div><label>{order}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} /></div>);
     } else if (mode === 'results') {
@@ -129,8 +123,6 @@ class Poll extends React.Component {
 
     let data = {'prompt' : this.state.prompt};
 
-    console.log(data);
-
     $.post('/poll/' + this.props.id + '/settings',
       data,
       (resp) => console.log(resp));
@@ -153,8 +145,6 @@ class Poll extends React.Component {
   showResults(responses) {
     
     let chart = this.state.chart;
-    console.log(responses);
-    console.log(chart);
     
     if (this.state.mode === 'results') {
 
@@ -192,6 +182,8 @@ class Poll extends React.Component {
 
   showResponses(responses) {
 
+    let mode = this.state.mode;
+
     if (this.state.mode === 'edit') {
       return (<SortableList items={responses} onSortEnd={this.onSortEnd} />);
       
@@ -200,7 +192,8 @@ class Poll extends React.Component {
             return <Response 
                       key={ response.response_id } 
                       id={ response.response_id } 
-                      mode='results' />;
+                      mode={ mode } 
+                      order={ response.order } />;
           })}</div>);
     } // end if
 
@@ -209,8 +202,6 @@ class Poll extends React.Component {
 
   onSortEnd = ({oldIndex, newIndex}, evt) => {
     // send new index to server, server return json with response order data
-    console.log(oldIndex);
-    console.log(newIndex);
 
     function assignOrder(array) {
       // take an array of objects and assigns object.order based on the object's position in the array.
@@ -242,7 +233,6 @@ class Poll extends React.Component {
     
     let responses = this.state.responseData;
     responses = responses.sort((a, b) => a.order - b.order );
-    console.log(responses);
     let mode = this.state.mode
 
     return(
