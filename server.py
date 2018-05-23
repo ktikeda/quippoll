@@ -577,6 +577,34 @@ def update_poll_settings(poll_id):
     status = 'Saved'
     return status
 
+@app.route('/api/polls/<int:poll_id>/responses', methods=["POST"])
+def add_response_data(poll_id):
+    """Add response data to db"""
+
+    poll = Poll.query.get(poll_id)
+    user = User.get_user()
+    responses = request.json['responseData']
+
+    response_data = []
+
+    for response in responses:
+        new_response = Response(poll_id=poll.poll_id,
+                            user_id=user.user_id,
+                            text=response['text'],
+                            order=int(response['order']))
+        db.session.add(new_response)
+        db.session.commit()
+
+        response_data.append({'response_id' : new_response.response_id,
+                              'user_id' : new_response.user_id,
+                              'text' : new_response.text,
+                              'order' : new_response.order,
+                              'value' : 0,
+                              'is_visible' : new_response.is_visible})
+
+    data = {'response_data' : response_data}
+    return jsonify(data)
+
 
 @app.route('/response/<int:response_id>/data.json')
 def get_response_data(response_id):
@@ -584,6 +612,7 @@ def get_response_data(response_id):
     response = Response.query.get(int(response_id))
 
     response_data = {'response_id' : response.response_id, 
+                     'user_id' : response.user_id,
                      'order' : response.order, 
                      'text' : response.text,
                      'value' : response.value(),

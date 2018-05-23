@@ -101,6 +101,7 @@ class Poll extends React.Component {
     this.setChart = this.setChart.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.sendPrompt = this.sendPrompt.bind(this);
+    this.handleOptionAdd = this.handleOptionAdd.bind(this);
 
     onNewResult(this.props.id, 
       (err, data) => {
@@ -128,6 +129,27 @@ class Poll extends React.Component {
       (resp) => console.log(resp));
    
   } // end sendPrompt
+
+  handleOptionAdd(evt) {
+    //update poll options and reset options to an empty string
+    let _data = {responseData : [{'text' : '',
+                               'order' : this.state.responseData.length + 1},
+                               {'text' : '',
+                               'order' : this.state.responseData.length + 1}]};
+
+    $.ajax({ url: '/api/polls/' + this.props.id + '/responses',
+      dataType: 'json',
+      contentType : 'application/json',
+      type: 'post',
+      data: JSON.stringify(_data),
+      success: (resp) => console.log(resp)});
+    
+
+    // this.setState({
+    // responseData: this.state.responseData.concat({name: this.state.option})
+    // });
+  }
+
 
   showNav() {
     if (this.state.mode === 'results') {
@@ -185,7 +207,11 @@ class Poll extends React.Component {
     let mode = this.state.mode;
 
     if (this.state.mode === 'edit') {
-      return (<SortableList items={responses} onSortEnd={this.onSortEnd} />);
+      return (
+        <div>
+          <SortableList items={responses} onSortEnd={this.onSortEnd} />
+          <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.handleOptionAdd}>Add option</button>
+        </div>);
       
     } else {
       return (<div> {responses.map(function(response){
