@@ -1,7 +1,27 @@
 // "use strict";
 /* class-start*/
 const { OrdinalFrame } = Semiotic;
-import {SortableContainer, SortableElement} from 'react-sortable-hoc';
+const SortableContainer = SortableHOC.SortableContainer;
+const SortableElement = SortableHOC.SortableElement;
+const arrayMove = SortableHOC.arrayMove;
+
+const SortableItem = SortableElement(({value}) =>
+  <li><Response 
+        key={ value.response_id } 
+        id={ value.response_id } 
+        mode='edit' />
+  </li>
+);
+
+const SortableList = SortableContainer(({items}) => {
+  return (
+    <ul>
+      {items.map((value, index) => (
+        <SortableItem key={`item-${index}`} index={index} value={value} />
+      ))}
+    </ul>
+  );
+});
 
 class Response extends React.Component {
   constructor(props) {
@@ -82,7 +102,8 @@ class Poll extends React.Component {
                   prompt : "",
                   responseData: [],
                   chart : 'text',
-                  mode : 'edit'
+                  mode : 'edit',
+                  items : ""
                   };
 
     this.setChart = this.setChart.bind(this);
@@ -99,7 +120,6 @@ class Poll extends React.Component {
 
   setChart(evt) {
     let type = evt.target.id;
-    console.log(type);
     this.setState({chart : type});
   } // end setChart
 
@@ -173,41 +193,50 @@ class Poll extends React.Component {
 
   } // end showPrompt
 
+  showResponses(responses) {
 
+    if (this.state.mode === 'edit') {
+      return (<SortableList items={responses} onSortEnd={this.onSortEnd} />);
+      
+    } else {
+      return (<div> {responses.map(function(response){
+            return <Response 
+                      key={ response.response_id } 
+                      id={ response.response_id } 
+                      mode={ mode } />;
+          })}</div>);
+    } // end if
+
+  } // end showResponses
+
+
+  onSortEnd = ({oldIndex, newIndex}) => {
+    // send new index to server, server return json with response order data
+    console.log(oldIndex);
+    console.log(newIndex);
+    let resp = fetch(window.location.href + '/data.json').then(resp => resp.json());
+    resp.then( data => this.setState({ responseData: data.responses }));
+    resp.then( data => this.setState({ items: data.responses }));
+    });
+  };  
 
 
   render() {
     
     let responses = this.state.responseData;
     responses = responses.sort((a, b) => a.order - b.order );
+    console.log(responses);
     let mode = this.state.mode
 
 
-    const SortableItem = SortableElement(({response}) =>
-      <li><Response 
-            key={ response.response_id } 
-            id={ response.response_id } 
-            mode={ mode } />;
-      </li>
-    );
 
-    const SortableList = SortableContainer(({responses}) => {
-      return (
-        <ul>
-          {responses.map((response, index) => (
-            <SortableItem key={`item-${index}`} index={index} value={response} />
-          ))}
-        </ul>
-      );
-    });
-      
     return(
       <div> 
         { this.showNav() }
 
         { this.showPrompt() }
             
-        { SortableList }
+        { this.showResponses(responses) }
         
         { this.showResults(responses) }
         
@@ -216,7 +245,7 @@ class Poll extends React.Component {
   } // End of render
 
   componentDidMount() {
-    let resp = fetch(window.location.href + '/data.json').then(response => response.json());
+    let resp = fetch(window.location.href + '/data.json').then(resp => resp.json());
 
     resp.then( data => this.setState({ id: data.poll_id }));
     resp.then( data => this.setState({ prompt: data.prompt }));
