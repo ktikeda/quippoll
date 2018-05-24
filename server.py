@@ -546,9 +546,15 @@ def doughnut_results(short_code):
 
 # API routes for AJAX
 
-@app.route('/api/polls/<int:poll_id>')
-def get_poll_data(poll_id):
-    """"""
+@app.route('/api/polls', methods=['POST'])
+def create_poll():
+    """Create new poll"""
+    pass
+
+
+@app.route('/api/polls/<int:poll_id>', methods=["GET"])
+def get_poll(poll_id):
+    """Get poll data for a poll id"""
     poll = Poll.query.get(poll_id)
 
     responses = [{'response_id' : response.response_id, 
@@ -564,7 +570,8 @@ def get_poll_data(poll_id):
 
 
 @app.route('/api/polls/<int:poll_id>', methods=['POST'])
-def update_poll_settings(poll_id):
+def update_poll(poll_id):
+    """Update poll data for a poll id"""
     poll = Poll.query.get(poll_id)
     data = request.form.to_dict()
 
@@ -599,8 +606,8 @@ def get_responses(poll_id):
 
 
 @app.route('/api/polls/<int:poll_id>/responses', methods=["POST"])
-def add_response_data(poll_id):
-    """Add response data to db"""
+def create_responses(poll_id):
+    """Create new responses for a poll in db"""
 
     poll = Poll.query.get(poll_id)
     user = User.get_user()
@@ -630,8 +637,8 @@ def add_response_data(poll_id):
 
 
 @app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=["GET"])
-def get_response_data(poll_id, response_id):
-    """"""
+def get_response(poll_id, response_id):
+    """Get data for response by response id"""
     response = Response.query.get(int(response_id))
 
     response_data = {'response_id' : response.response_id, 
@@ -645,8 +652,8 @@ def get_response_data(poll_id, response_id):
 
 
 @app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=['POST'])
-def post_response_data(poll_id, response_id):
-    """"""
+def update_response(poll_id, response_id):
+    """Update response data for a response id"""
     response = Response.query.get(int(response_id))
 
     data = request.form.to_dict()
@@ -662,9 +669,9 @@ def post_response_data(poll_id, response_id):
     return status
 
 
-@app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=["DELETE"])
-def delete_response_data(poll_id, response_id):
-    """Delete response from poll and update weight on remaining responses."""
+@app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=['DELETE'])
+def delete_response(poll_id, response_id):
+    """Delete response from poll"""
     print response_id
     poll = Poll.query.get(int(poll_id))
     response = Response.query.get(int(response_id))

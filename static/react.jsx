@@ -12,11 +12,11 @@ class Response extends React.Component {
     super(props);
 
     this.state = {text : "",
-                  value : "",
                   isVisible : "",
                   };
 
     //this.sendText = this.sendText.bind(this);
+    this.passChange = this.passChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.passUpdate = this.passUpdate.bind(this);
     this.passDeletion = this.passDeletion.bind(this);
@@ -25,7 +25,7 @@ class Response extends React.Component {
 
   handleChange(evt) {
     this.setState({ text : evt.target.value });
-  } // sendText
+  } // handleChange
 
   // sendText(evt) {
 
@@ -39,12 +39,18 @@ class Response extends React.Component {
 
     
   // } // end sendText
+  passChange(evt) {
+
+    let data = {'id' : this.props.id,
+                'text' : evt.target.value };
+
+    this.props.cbChange(data);
+  } 
+
 
   passUpdate(evt) {
 
-    let data = {'text' : this.state.text,
-                'value' : this.state.value,
-                'is_visible': this.state.isVisible};
+    let data = {'text' : this.state.text};
 
     this.props.cbUpdate(data);
   } 
@@ -71,7 +77,7 @@ class Response extends React.Component {
     if (mode === 'respond') {
       return (<button className="response-option btn btn-primary btn-lg btn-block">{text}</button>);
     } else if (mode === 'edit') {
-      return (<div><label>{weight}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />
+      return (<div><label>{weight}. </label><input type="text" id={id} className="" value={text} onChange={this.passChange} onBlur={this.sendText} />
               <button className="" type="button" onClick={this.passDeletion}>Delete</button>
               </div>);
     } else if (mode === 'results') {
@@ -79,14 +85,14 @@ class Response extends React.Component {
     } // end if
   } // end render
 
-  // componentDidMount() {
-  //   let resp = fetch('/api/responses/' + this.props.id).then(data => data.json());
+  componentDidMount() {
+    let resp = fetch('/api/polls/' + this.props.pollId + '/responses/' + this.props.id).then(data => data.json());
 
-  //   resp.then( data => this.setState({ text: data.text }));
+    resp.then( data => this.setState({ text: data.text }));
   //   resp.then( data => this.setState({ value: data.value }));
   //   resp.then( data => this.setState({ isVisible: data.is_visible }));
   
-  // } // end componentDidMount
+  } // end componentDidMount
 
 }
 
@@ -101,12 +107,14 @@ class Poll extends React.Component {
                   items : ""
                   };
 
+    this.setObjectByPath = this.setObjectByPath.bind(this);
     this.setChart = this.setChart.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.sendPrompt = this.sendPrompt.bind(this);
+    this.updatePrompt = this.updatePrompt.bind(this);
     this.handleOptionAdd = this.handleOptionAdd.bind(this);
     this.getDeletion = this.getDeletion.bind(this);
     this.getUpdate = this.getUpdate.bind(this);
+    this.getChange = this.getChange.bind(this);
 
     onNewResult(this.props.id, 
       (err, data) => {
@@ -115,6 +123,13 @@ class Poll extends React.Component {
     }); // end onNewResult
 
   } // end constructor
+
+  // util by https://itnext.io/updating-properties-of-an-object-in-react-state-af6260d8e9f5
+  setObjectByPath(fieldPath, value) {
+    this.setState({
+      responseData: R.set(R.lensPath(fieldPath), value, this.state.responseData)
+    })
+  }
 
   setChart(evt) {
     let type = evt.target.id;
@@ -125,15 +140,16 @@ class Poll extends React.Component {
     this.setState({ prompt : evt.target.value });
   } // end handleChange
 
-  sendPrompt(evt) {
+  updatePrompt(evt) {
 
     let data = {'prompt' : this.state.prompt};
 
     $.post('/api/polls/' + this.props.id,
       data,
-      (resp) => console.log(resp));
+      resp => console.log(resp)
+    );
    
-  } // end sendPrompt
+  } // end updatePrompt
 
   onSortEnd = ({oldIndex, newIndex}, evt) => {
     // send new index to server, server return json with response weight data
@@ -181,7 +197,7 @@ class Poll extends React.Component {
 
     for (let response of responses) {
 
-      $.post('/api/responses/' + response.response_id,
+      $.post('/api/polls/' + this.props.id + '/responses/' + response.response_id,
         response,
         (resp) => console.log(resp));
     } // end for
@@ -213,6 +229,24 @@ class Poll extends React.Component {
        change responseData on state */
 
   } // end getUpdate
+
+  getChange(data) {
+    /* update responseData state */
+    let responses = this.state.responseData;
+    console.log('getChange');
+    console.log(data)
+
+    for (let response of responses) {
+      if (response.response_id === data.id) {
+        response.text = data.text
+      }
+
+    console.log(responses);
+    this.setState({responseData : responses});
+
+    }
+
+  } // end getChange
 
   handleOptionAdd(evt) {
     //update poll options and reset options to an empty string
@@ -278,7 +312,7 @@ class Poll extends React.Component {
     let prompt = this.state.prompt;
 
     if (this.state.mode === 'edit') {
-      return (<div><input type="text" id={id} className="" value={prompt} onChange={this.handleChange} onBlur={this.sendPrompt} /></div>);
+      return (<div><input type="text" id={id} className="" value={prompt} onChange={this.handleChange} onBlur={this.updatePrompt} /></div>);
       
     } else {
       return (<h1>{prompt}</h1>);
@@ -298,8 +332,10 @@ class Poll extends React.Component {
             mode='edit' 
             text={ value.text }
             isVisible={ value.is_visible }
-            cbDelete={ this.getDeletion}
-            cbUpdate={ this.getUpdate} />
+            pollId={ this.props.id }
+            cbDelete={ this.getDeletion }
+            cbUpdate={ this.getUpdate }
+            cbChange={ this.getChange } />
       </li>
     ); // end SortableItem
 
@@ -342,7 +378,7 @@ class Poll extends React.Component {
   render() {
     
     let responses = this.state.responseData;
-    responses = responses.sort((a, b) => a.weight - b.weight );
+    //responses = responses.sort((a, b) => a.weight - b.weight );
     let mode = this.state.mode
 
     return(
