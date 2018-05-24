@@ -641,6 +641,21 @@ def save_response_data(response_id):
     return status
 
 
+@app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=["DELETE"])
+def delete_response_data(poll_id, response_id):
+    """Delete response from poll and update order on remaining responses."""
+    print response_id
+
+    response = Response.query.get(int(response_id))
+
+    Tally.query.filter(Tally.response_id == response.response_id).delete()
+    db.session.commit()
+
+    Response.query.filter(Response.response_id == response.response_id).delete()
+    db.session.commit()
+
+    return 'Deleted'
+
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

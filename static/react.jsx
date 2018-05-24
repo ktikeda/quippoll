@@ -5,24 +5,7 @@ const SortableContainer = SortableHOC.SortableContainer;
 const SortableElement = SortableHOC.SortableElement;
 const arrayMove = SortableHOC.arrayMove;
 
-const SortableItem = SortableElement(({value}) =>
-  <li><Response 
-        key={ value.response_id } 
-        id={ value.response_id }
-        order={ value.order } 
-        mode='edit' />
-  </li>
-); // end SortableItem
 
-const SortableList = SortableContainer(({items}) => {
-  return (
-    <ul>
-      {items.map((value, index) => (
-        <SortableItem key={`item-${index}`} index={index} value={value} />
-      ))}
-    </ul>
-  );
-}); // end SortableList
 
 class Response extends React.Component {
   constructor(props) {
@@ -35,6 +18,8 @@ class Response extends React.Component {
 
     this.sendText = this.sendText.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.passUpdate = this.passUpdate.bind(this);
+    this.passDeletion = this.passDeletion.bind(this);
 
   } // end constructor
 
@@ -55,6 +40,22 @@ class Response extends React.Component {
     
   } // end sendText
 
+  passUpdate(evt) {
+
+    let data = {'text' : this.state.text,
+                'value' : this.state.value,
+                'is_visible': this.state.isVisible};
+
+    this.props.cbUpdate(data);
+  } 
+
+  passDeletion(evt) {
+
+    let data = {'response_id' : this.props.id};
+    
+    this.props.cbDelete(data);
+  } 
+
   showSaved() {
     // implement save badge
   } // end showSaved
@@ -71,7 +72,7 @@ class Response extends React.Component {
       return (<div><label></label><button className="response-option btn btn-primary btn-lg btn-block">{order}. {text}</button><br/></div>);
     } else if (mode === 'edit') {
       return (<div><label>{order}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />
-              <button className="" type="button" onClick={this.handleOptionDelete}>Delete</button>
+              <button className="" type="button" onClick={this.passDeletion}>Delete</button>
               </div>);
     } else if (mode === 'results') {
       return (<div>{text} : {value}</div>);
@@ -104,8 +105,8 @@ class Poll extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.sendPrompt = this.sendPrompt.bind(this);
     this.handleOptionAdd = this.handleOptionAdd.bind(this);
-    this.retrieveDeletion = this.retrieveDeletion.bind(this);
-    this.retrieveUpdate = this.retrieveUpdate.bind(this);
+    this.getDeletion = this.getDeletion.bind(this);
+    this.getUpdate = this.getUpdate.bind(this);
 
     onNewResult(this.props.id, 
       (err, data) => {
@@ -134,18 +135,55 @@ class Poll extends React.Component {
    
   } // end sendPrompt
 
-  retrieveDeletion(data) {
+  onSortEnd = ({oldIndex, newIndex}, evt) => {
+    // send new index to server, server return json with response order data
+
+    function assignOrder(array) {
+      // take an array of objects and assigns object.order based on the object's position in the array.
+      for (let obj of array) {
+        obj.order = array.indexOf(obj) + 1;
+      }
+
+      return array;
+
+    } // end assignOrder
+
+    this.setState({
+      responseData: assignOrder(arrayMove(this.state.responseData, oldIndex, newIndex)),
+    });
+
+    let responses = this.state.responseData;
+
+    for (let response of responses) {
+
+      $.post('/api/responses/' + response.response_id,
+        response,
+        (resp) => console.log(resp));
+    } // end for
+
+  }; // end onSortEnd
+
+  getDeletion(response) {
     /* get response send response to be deleted to server
        server send back new responseData
        change responseData on state */
-  } // end retrieveDeletion
+    let url = '/api/polls/' + this.props.id + '/responses/' + response.response_id;
+    console.log(url);
 
-  retrieveUpdate(data) {
+    let d = fetch(url,
+      {method: 'delete'})
+      .then((resp) => console.log(resp.status));
+      //.then((resp) => resp.json())
+      //.then((json) => console.log(json));
+
+  } // end getDeletion
+
+  getUpdate(response) {
     /* get updated response, send to server
        server send back new responseData
        change responseData on state */
 
-  } // end retrieveUpdate
+  } // end getUpdate
 
   handleOptionAdd(evt) {
     //update poll options and reset options to an empty string
@@ -163,9 +201,9 @@ class Poll extends React.Component {
       }
     });
     
-    
-  }
+  } // end handleOptionAdd
 
+  /* Begin render elements */
 
   showNav() {
     if (this.state.mode === 'results') {
@@ -222,6 +260,29 @@ class Poll extends React.Component {
 
     let mode = this.state.mode;
 
+    const SortableItem = SortableElement(({value}) =>
+      <li><Response 
+            key={ value.response_id } 
+            id={ value.response_id }
+            order={ value.order } 
+            mode='edit' 
+            text={ value.text }
+            cbDelete={ this.getDeletion}
+            cbUpdate={ this.getUpdate} />
+      </li>
+    ); // end SortableItem
+
+    const SortableList = SortableContainer(({items}) => {
+      return (
+        <ul>
+          {items.map((value, index) => (
+            <SortableItem key={`item-${index}`} index={index} value={value} />
+          ))}
+        </ul>
+      );
+    }); // end SortableList
+
+
     if (this.state.mode === 'edit') {
       return (
         <div>
@@ -235,40 +296,15 @@ class Poll extends React.Component {
                       key={ response.response_id } 
                       id={ response.response_id } 
                       mode={ mode } 
-                      order={ response.order } />;
+                      order={ response.order }
+                      text={ response.text } />;
           })}</div>);
     } // end if
 
   } // end showResponses
 
 
-  onSortEnd = ({oldIndex, newIndex}, evt) => {
-    // send new index to server, server return json with response order data
 
-    function assignOrder(array) {
-      // take an array of objects and assigns object.order based on the object's position in the array.
-      for (let obj of array) {
-        obj.order = array.indexOf(obj) + 1;
-      }
-
-      return array;
-
-    } // end assignOrder
-
-    this.setState({
-      responseData: assignOrder(arrayMove(this.state.responseData, oldIndex, newIndex)),
-    });
-
-    let responses = this.state.responseData;
-
-    for (let response of responses) {
-
-      $.post('/api/responses/' + response.response_id,
-        response,
-        (resp) => console.log(resp));
-    } // end for
-
-  }; // end onSortEnd
 
 
   render() {
