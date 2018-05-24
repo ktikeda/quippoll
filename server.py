@@ -287,6 +287,16 @@ def locate_poll():
     return route
 
 
+@app.route('/poll/<int:poll_id>/settings')
+def show_poll_settings(poll_id):
+    poll = Poll.query.get(poll_id)
+
+    if current_user.is_authenticated and current_user.is_admin(poll):
+        return render_template('settings.html', poll=poll)
+    else:
+        return redirect('/')
+
+
 # Implementation of flask_login sourced from:
 # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-v-user-logins
 @login.user_loader
@@ -534,11 +544,12 @@ def doughnut_results(short_code):
     return jsonify(data_dict)
 # End chart.js routes
 
+# API routes for AJAX
 
-@app.route('/<short_code>/r/data.json')
-def chart_results(short_code):
+@app.route('/api/polls/<int:poll_id>')
+def get_poll_data(poll_id):
     """"""
-    poll = Poll.get_from_code(short_code)
+    poll = Poll.query.get(poll_id)
 
     responses = [{'response_id' : response.response_id, 
                   'weight' : response.weight, 
@@ -552,17 +563,7 @@ def chart_results(short_code):
     return jsonify({"poll_id" : poll.poll_id, "prompt" : poll.prompt, "responses" : responses})
 
 
-@app.route('/poll/<int:poll_id>/settings')
-def show_poll_settings(poll_id):
-    poll = Poll.query.get(poll_id)
-
-    if current_user.is_authenticated and current_user.is_admin(poll):
-        return render_template('settings.html', poll=poll)
-    else:
-        return redirect('/')
-
-
-@app.route('/poll/<int:poll_id>/settings', methods=['POST'])
+@app.route('/api/polls/<int:poll_id>', methods=['POST'])
 def update_poll_settings(poll_id):
     poll = Poll.query.get(poll_id)
     data = request.form.to_dict()
@@ -581,7 +582,7 @@ def update_poll_settings(poll_id):
     return status
 
 
-@app.route('/api/polls/<int:poll_id>/responses')
+@app.route('/api/polls/<int:poll_id>/responses', methods=["GET"])
 def get_responses(poll_id):
     """Gets all responses associated with poll id"""
     poll = Poll.query.get(poll_id)
@@ -628,8 +629,8 @@ def add_response_data(poll_id):
     return jsonify(data)
 
 
-@app.route('/api/responses/<int:response_id>')
-def get_response_data(response_id):
+@app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=["GET"])
+def get_response_data(poll_id, response_id):
     """"""
     response = Response.query.get(int(response_id))
 
@@ -643,8 +644,8 @@ def get_response_data(response_id):
     return jsonify(response_data)
 
 
-@app.route('/api/responses/<int:response_id>', methods=['POST'])
-def save_response_data(response_id):
+@app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=['POST'])
+def post_response_data(poll_id, response_id):
     """"""
     response = Response.query.get(int(response_id))
 

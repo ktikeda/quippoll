@@ -16,7 +16,7 @@ class Response extends React.Component {
                   isVisible : "",
                   };
 
-    this.sendText = this.sendText.bind(this);
+    //this.sendText = this.sendText.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.passUpdate = this.passUpdate.bind(this);
     this.passDeletion = this.passDeletion.bind(this);
@@ -27,18 +27,18 @@ class Response extends React.Component {
     this.setState({ text : evt.target.value });
   } // sendText
 
-  sendText(evt) {
+  // sendText(evt) {
 
-    let data = {'text' : this.state.text,
-                'value' : this.state.value,
-                'is_visible': this.state.isVisible};
+  //   let data = {'text' : this.state.text,
+  //               'value' : this.state.value,
+  //               'is_visible': this.state.isVisible};
 
-    $.post('/api/responses/' + this.props.id,
-      data,
-      (resp) => console.log(resp));
+  //   $.post('/api/responses/' + this.props.id,
+  //     data,
+  //     (resp) => console.log(resp));
 
     
-  } // end sendText
+  // } // end sendText
 
   passUpdate(evt) {
 
@@ -64,9 +64,9 @@ class Response extends React.Component {
     let mode = this.props.mode;
     let id = "response-opt-" + this.props.id;
     let weight = this.props.weight
-    let text = this.state.text;
-    let value = this.state.value;
-    let isVisible = this.state.isVisible;
+    let text = this.props.text;
+    let value = this.props.value;
+    let isVisible = this.props.isVisible;
 
     if (mode === 'respond') {
       return (<button className="response-option btn btn-primary btn-lg btn-block">{text}</button>);
@@ -79,14 +79,14 @@ class Response extends React.Component {
     } // end if
   } // end render
 
-  componentDidMount() {
-    let resp = fetch('/api/responses/' + this.props.id).then(data => data.json());
+  // componentDidMount() {
+  //   let resp = fetch('/api/responses/' + this.props.id).then(data => data.json());
 
-    resp.then( data => this.setState({ text: data.text }));
-    resp.then( data => this.setState({ value: data.value }));
-    resp.then( data => this.setState({ isVisible: data.is_visible }));
+  //   resp.then( data => this.setState({ text: data.text }));
+  //   resp.then( data => this.setState({ value: data.value }));
+  //   resp.then( data => this.setState({ isVisible: data.is_visible }));
   
-  } // end componentDidMount
+  // } // end componentDidMount
 
 }
 
@@ -129,7 +129,7 @@ class Poll extends React.Component {
 
     let data = {'prompt' : this.state.prompt};
 
-    $.post('/poll/' + this.props.id + '/settings',
+    $.post('/api/polls/' + this.props.id,
       data,
       (resp) => console.log(resp));
    
@@ -297,6 +297,7 @@ class Poll extends React.Component {
             weight={ value.weight } 
             mode='edit' 
             text={ value.text }
+            isVisible={ value.is_visible }
             cbDelete={ this.getDeletion}
             cbUpdate={ this.getUpdate} />
       </li>
@@ -327,7 +328,8 @@ class Poll extends React.Component {
                       id={ response.response_id } 
                       mode={ mode } 
                       weight={ response.weight }
-                      text={ response.text } /></li>;
+                      text={ response.text }
+                      value={ response.value } /></li>;
           })}</ol></div>);
     } // end if
 
@@ -358,7 +360,7 @@ class Poll extends React.Component {
   } // End of render
 
   componentDidMount() {
-    let resp = fetch(window.location.href + '/data.json').then(resp => resp.json());
+    let resp = fetch('/api/polls/' + this.props.id).then(resp => resp.json());
 
     resp.then( data => this.setState({ id: data.poll_id }));
     resp.then( data => this.setState({ prompt: data.prompt }));
