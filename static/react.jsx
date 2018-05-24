@@ -69,7 +69,7 @@ class Response extends React.Component {
     let isVisible = this.state.isVisible;
 
     if (mode === 'respond') {
-      return (<div><label></label><button className="response-option btn btn-primary btn-lg btn-block">{weight}. {text}</button><br/></div>);
+      return (<button className="response-option btn btn-primary btn-lg btn-block">{text}</button>);
     } else if (mode === 'edit') {
       return (<div><label>{weight}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />
               <button className="" type="button" onClick={this.passDeletion}>Delete</button>
@@ -174,7 +174,7 @@ class Poll extends React.Component {
     } // end assignweight
 
     this.setState({
-      responseData: assignWeight(arrayMove(this.state.responseData, oldIndex, newIndex), newIndex),
+      responseData: arrayMove(this.state.responseData, oldIndex, newIndex),
     });
 
     let responses = this.state.responseData;
@@ -190,16 +190,20 @@ class Poll extends React.Component {
 
   getDeletion(response) {
     /* get response send response to be deleted to server
-       server send back new responseData
        change responseData on state */
     let url = '/api/polls/' + this.props.id + '/responses/' + response.response_id;
     console.log(url);
 
-    let d = fetch(url,
-      {method: 'delete'})
-      .then((resp) => console.log(resp.status));
-      //.then((resp) => resp.json())
-      //.then((json) => console.log(json));
+    $.ajax({
+      url: '/api/polls/' + this.props.id + '/responses/' + response.response_id,
+      type: 'delete',
+      success: (resp) => {
+        console.log(resp.status);
+        fetch('/api/polls/' + this.props.id + '/responses')
+        .then(resp => resp.json())
+        .then(data => this.setState({responseData: data.response_data}));
+      }
+    }); // end $.ajax
 
   } // end getDeletion
 
@@ -215,7 +219,8 @@ class Poll extends React.Component {
     let _data = {responseData : [{'text' : '',
                                'weight' : this.state.responseData.length + 1}]};
 
-    $.ajax({ url: '/api/polls/' + this.props.id + '/responses',
+    $.ajax({ 
+      url: '/api/polls/' + this.props.id + '/responses',
       dataType: 'json',
       contentType : 'application/json',
       type: 'post',
@@ -299,11 +304,11 @@ class Poll extends React.Component {
 
     const SortableList = SortableContainer(({items}) => {
       return (
-        <ul>
+        <ol>
           {items.map((value, index) => (
             <SortableItem key={`item-${index}`} index={index} value={value} />
           ))}
-        </ul>
+        </ol>
       );
     }); // end SortableList
 
@@ -316,14 +321,14 @@ class Poll extends React.Component {
         </div>);
       
     } else {
-      return (<div> {responses.map(function(response){
-            return <Response 
+      return (<div><ol> {responses.map(function(response){
+            return <li><Response 
                       key={ response.response_id } 
                       id={ response.response_id } 
                       mode={ mode } 
                       weight={ response.weight }
-                      text={ response.text } />;
-          })}</div>);
+                      text={ response.text } /></li>;
+          })}</ol></div>);
     } // end if
 
   } // end showResponses

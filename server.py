@@ -580,6 +580,23 @@ def update_poll_settings(poll_id):
     status = 'Saved'
     return status
 
+
+@app.route('/api/polls/<int:poll_id>/responses')
+def get_responses(poll_id):
+    """Gets all responses associated with poll id"""
+    poll = Poll.query.get(poll_id)
+
+    responses = [{'response_id' : response.response_id, 
+                  'weight' : response.weight, 
+                  'text' : response.text,
+                  'value' : response.value(),
+                  'is_visible': response.is_visible} for response in poll.responses]
+
+    print responses
+
+    return jsonify({"response_data" : responses})
+
+
 @app.route('/api/polls/<int:poll_id>/responses', methods=["POST"])
 def add_response_data(poll_id):
     """Add response data to db"""
@@ -651,15 +668,11 @@ def delete_response_data(poll_id, response_id):
     poll = Poll.query.get(int(poll_id))
     response = Response.query.get(int(response_id))
 
-    weight = response.weight
-
     Tally.query.filter(Tally.response_id == response.response_id).delete()
     db.session.commit()
 
     Response.query.filter(Response.response_id == response.response_id).delete()
     db.session.commit()
-
-    # reweight remaining responses
 
     return 'Deleted'
 
