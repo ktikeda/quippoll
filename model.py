@@ -72,7 +72,7 @@ class Poll(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
 
-    responses = db.relationship('Response')  # returns a list of Response objects
+    responses = db.relationship('Response', order_by='Response.weight')  # returns a list of Response objects
     poll_type = db.relationship('PollType', lazy='joined')  # returns PollType object
     users_from_response = db.relationship('User', secondary='responses')  #returns list of User objects who have created Response objects
 

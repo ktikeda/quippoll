@@ -63,15 +63,15 @@ class Response extends React.Component {
   render() {
     let mode = this.props.mode;
     let id = "response-opt-" + this.props.id;
-    let order = this.props.order
+    let weight = this.props.weight
     let text = this.state.text;
     let value = this.state.value;
     let isVisible = this.state.isVisible;
 
     if (mode === 'respond') {
-      return (<div><label></label><button className="response-option btn btn-primary btn-lg btn-block">{order}. {text}</button><br/></div>);
+      return (<div><label></label><button className="response-option btn btn-primary btn-lg btn-block">{weight}. {text}</button><br/></div>);
     } else if (mode === 'edit') {
-      return (<div><label>{order}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />
+      return (<div><label>{weight}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />
               <button className="" type="button" onClick={this.passDeletion}>Delete</button>
               </div>);
     } else if (mode === 'results') {
@@ -136,20 +136,45 @@ class Poll extends React.Component {
   } // end sendPrompt
 
   onSortEnd = ({oldIndex, newIndex}, evt) => {
-    // send new index to server, server return json with response order data
+    // send new index to server, server return json with response weight data
 
-    function assignOrder(array) {
-      // take an array of objects and assigns object.order based on the object's position in the array.
-      for (let obj of array) {
-        obj.order = array.indexOf(obj) + 1;
+    function assignWeight(array, index) {
+      // take an array of objects and assigns object.weight based on the object's position in the array.
+      let prevWeight = 0;
+      let nextWeight = 0;
+      let length = array.length;
+
+      if (length === 1) {
+        
+        return array;
+
+      } else if (index === 0) {
+        
+        nextWeight = array[index+1].weight;
+
+      } else if (index === length-1) {
+        
+        // weight should be greater than prevWeight
+        prevWeight = array[index-1].weight;
+        
+
+      } else {
+        prevWeight = array[index-1].weight;
+        nextWeight = array[index+1].weight;
+
+        
+
       }
+      let weight = (prevWeight + nextWeight) / 2.0;
+
+      array[index].weight = weight;
 
       return array;
 
-    } // end assignOrder
+    } // end assignweight
 
     this.setState({
-      responseData: assignOrder(arrayMove(this.state.responseData, oldIndex, newIndex)),
+      responseData: assignWeight(arrayMove(this.state.responseData, oldIndex, newIndex), newIndex),
     });
 
     let responses = this.state.responseData;
@@ -188,7 +213,7 @@ class Poll extends React.Component {
   handleOptionAdd(evt) {
     //update poll options and reset options to an empty string
     let _data = {responseData : [{'text' : '',
-                               'order' : this.state.responseData.length + 1}]};
+                               'weight' : this.state.responseData.length + 1}]};
 
     $.ajax({ url: '/api/polls/' + this.props.id + '/responses',
       dataType: 'json',
@@ -264,7 +289,7 @@ class Poll extends React.Component {
       <li><Response 
             key={ value.response_id } 
             id={ value.response_id }
-            order={ value.order } 
+            weight={ value.weight } 
             mode='edit' 
             text={ value.text }
             cbDelete={ this.getDeletion}
@@ -296,7 +321,7 @@ class Poll extends React.Component {
                       key={ response.response_id } 
                       id={ response.response_id } 
                       mode={ mode } 
-                      order={ response.order }
+                      weight={ response.weight }
                       text={ response.text } />;
           })}</div>);
     } // end if
@@ -310,7 +335,7 @@ class Poll extends React.Component {
   render() {
     
     let responses = this.state.responseData;
-    responses = responses.sort((a, b) => a.order - b.order );
+    responses = responses.sort((a, b) => a.weight - b.weight );
     let mode = this.state.mode
 
     return(

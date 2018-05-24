@@ -159,10 +159,12 @@ def add_response_to_db(short_code):
 
     text = request.form.get('response')
 
+    weight = Response.query.filter(Response.poll_id == poll.poll_id).count()
+
     response = Response(poll_id=poll.poll_id,
                         user_id=user.user_id,
                         text=text,
-                        weight=1)
+                        weight=weight)
     db.session.add(response)
     db.session.commit()
 
@@ -435,11 +437,11 @@ def sms_add_input(short_code):
 
     # Handle responses
     if poll.poll_type.collect_response:
-
+        weight = Response.query.filter(Response.poll_id == poll.poll_id).count()
         response = Response(poll_id=poll.poll_id,
                             user_id=user.user_id,
                             text=sms,
-                            weight=1)
+                            weight=weight)
         db.session.add(response)
         db.session.commit()
 
@@ -450,8 +452,9 @@ def sms_add_input(short_code):
     else:
         # Check that sms is a number
         try:
-            weight = int(sms)
-            response = poll.get_response_by(weight=weight)
+            index = int(sms)
+            responses = poll.responses
+            response = responses[index-1]
 
             # Check that response option exists
             if response:
