@@ -645,14 +645,18 @@ def save_response_data(response_id):
 def delete_response_data(poll_id, response_id):
     """Delete response from poll and update order on remaining responses."""
     print response_id
-
+    poll = Poll.query.get(int(poll_id))
     response = Response.query.get(int(response_id))
+
+    order = response.order
 
     Tally.query.filter(Tally.response_id == response.response_id).delete()
     db.session.commit()
 
     Response.query.filter(Response.response_id == response.response_id).delete()
     db.session.commit()
+
+    # reorder remaining responses
 
     return 'Deleted'
 
