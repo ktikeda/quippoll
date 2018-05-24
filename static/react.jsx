@@ -12,10 +12,10 @@ class Response extends React.Component {
     super(props);
 
     this.state = {text : "",
-                  isVisible : "",
+                  isVisible : true,
                   };
 
-    //this.sendText = this.sendText.bind(this);
+    this.sendText = this.sendText.bind(this);
     this.passChange = this.passChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.passUpdate = this.passUpdate.bind(this);
@@ -27,18 +27,18 @@ class Response extends React.Component {
     this.setState({ text : evt.target.value });
   } // handleChange
 
-  // sendText(evt) {
+  sendText(evt) {
 
-  //   let data = {'text' : this.state.text,
-  //               'value' : this.state.value,
-  //               'is_visible': this.state.isVisible};
+    let data = {'text' : this.state.text,
+                'value' : this.state.value,
+                'is_visible': this.state.isVisible};
 
-  //   $.post('/api/responses/' + this.props.id,
-  //     data,
-  //     (resp) => console.log(resp));
+    $.post('/api/polls/' + this.props.pollId + '/responses/' + this.props.id,
+      data,
+      (resp) => console.log(resp));
 
     
-  // } // end sendText
+  } // end sendText
   passChange(evt) {
 
     let data = {'id' : this.props.id,
@@ -70,14 +70,14 @@ class Response extends React.Component {
     let mode = this.props.mode;
     let id = "response-opt-" + this.props.id;
     let weight = this.props.weight
-    let text = this.props.text;
+    let text = this.state.text;
     let value = this.props.value;
     let isVisible = this.props.isVisible;
 
     if (mode === 'respond') {
       return (<button className="response-option btn btn-primary btn-lg btn-block">{text}</button>);
     } else if (mode === 'edit') {
-      return (<div><label>{weight}. </label><input type="text" id={id} className="" value={text} onChange={this.passChange} onBlur={this.sendText} />
+      return (<div><label>{weight}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />
               <button className="" type="button" onClick={this.passDeletion}>Delete</button>
               </div>);
     } else if (mode === 'results') {
@@ -114,7 +114,6 @@ class Poll extends React.Component {
     this.handleOptionAdd = this.handleOptionAdd.bind(this);
     this.getDeletion = this.getDeletion.bind(this);
     this.getUpdate = this.getUpdate.bind(this);
-    this.getChange = this.getChange.bind(this);
 
     onNewResult(this.props.id, 
       (err, data) => {
@@ -230,23 +229,23 @@ class Poll extends React.Component {
 
   } // end getUpdate
 
-  getChange(data) {
-    /* update responseData state */
-    let responses = this.state.responseData;
-    console.log('getChange');
-    console.log(data)
+  // getChange(data) {
+  //   /* update responseData state */
+  //   let responses = this.state.responseData;
+  //   console.log('getChange');
+  //   console.log(data)
 
-    for (let response of responses) {
-      if (response.response_id === data.id) {
-        response.text = data.text
-      }
+  //   for (let response of responses) {
+  //     if (response.response_id === data.id) {
+  //       response.text = data.text
+  //     }
 
-    console.log(responses);
-    this.setState({responseData : responses});
+  //   console.log(responses);
+  //   this.setState({responseData : responses});
 
-    }
+  //   }
 
-  } // end getChange
+  // } // end getChange
 
   handleOptionAdd(evt) {
     //update poll options and reset options to an empty string
@@ -330,7 +329,6 @@ class Poll extends React.Component {
             id={ value.response_id }
             weight={ value.weight } 
             mode='edit' 
-            text={ value.text }
             isVisible={ value.is_visible }
             pollId={ this.props.id }
             cbDelete={ this.getDeletion }
