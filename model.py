@@ -262,7 +262,7 @@ class Response(db.Model):
     poll_id = db.Column(db.Integer, db.ForeignKey('polls.poll_id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     text = db.Column(db.String(256), nullable=False)
-    order = db.Column(db.Integer, nullable=False)
+    weight = db.Column(db.Float, nullable=False)
     is_visible = db.Column(db.Boolean, nullable=False, default=True)  # Only use if Poll.is_moderated = True
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -274,14 +274,14 @@ class Response(db.Model):
     def __repr__(self):
         return "<Response id={} poll_id={} text={}>".format(self.response_id, self.poll_id, self.text)
 
-    def __init__(self, poll_id, user_id, text, order, **kwargs):
-        """Create Response from poll_id, user_id, text, and order
+    def __init__(self, poll_id, user_id, text, weight, **kwargs):
+        """Create Response from poll_id, user_id, text, and weight
         and add to db."""
 
         self.poll_id = poll_id
         self.user_id = user_id
         self.text = text
-        self.order = order
+        self.weight = weight
 
         if kwargs is not None:
             for attr, val in kwargs.iteritems():
@@ -439,16 +439,16 @@ def example_data():
     db.session.commit
 
     # Create responses
-    mc_r1 = Response(poll_id=mc_poll.poll_id, user_id=admin.user_id, text='Red', order=1)
-    mc_r2 = Response(poll_id=mc_poll.poll_id, user_id=admin.user_id, text='Blue', order=2)
-    mc_r3 = Response(poll_id=mc_poll.poll_id, user_id=admin.user_id, text='Yellow', order=3)
+    mc_r1 = Response(poll_id=mc_poll.poll_id, user_id=admin.user_id, text='Red', weight=1)
+    mc_r2 = Response(poll_id=mc_poll.poll_id, user_id=admin.user_id, text='Blue', weight=2)
+    mc_r3 = Response(poll_id=mc_poll.poll_id, user_id=admin.user_id, text='Yellow', weight=3)
 
-    sa_r1 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Cyan', order=1)
-    sa_r2 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Magenta', order=2)
-    sa_r3 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Yellow', order=3)
+    sa_r1 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Cyan', weight=1)
+    sa_r2 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Magenta', weight=2)
+    sa_r3 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Yellow', weight=3)
 
-    oe_r1 = Response(poll_id=oe_poll.poll_id, user_id=user_responded.user_id, text='Red', order=1)
-    oe_r2 = Response(poll_id=oe_poll.poll_id, user_id=anon_user_responded.user_id, text='Blue', order=1)
+    oe_r1 = Response(poll_id=oe_poll.poll_id, user_id=user_responded.user_id, text='Red', weight=1)
+    oe_r2 = Response(poll_id=oe_poll.poll_id, user_id=anon_user_responded.user_id, text='Blue', weight=1)
 
     db.session.add_all([mc_r1, mc_r2, mc_r3, sa_r1, sa_r2, sa_r3, oe_r1, oe_r2])
     db.session.commit()

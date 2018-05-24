@@ -34,7 +34,7 @@ def emit_new_result_id(poll):
     print "Server emitted"
 
     responses = [{'response_id' : response.response_id, 
-                  'order' : response.order, 
+                  'weight' : response.weight, 
                   'text' : response.text,
                   'value' : response.value(),
                   'is_visible': response.is_visible} for response in poll.responses]
@@ -108,7 +108,7 @@ def add_poll_to_db():
             response = Response(poll_id=poll.poll_id,
                                 user_id=user.user_id,
                                 text=response.strip(),
-                                order=responses.index(response) + 1)
+                                weight=responses.index(response) + 1)
             db.session.add(response)
         db.session.commit()  # only commit once all Responses are added
 
@@ -162,7 +162,7 @@ def add_response_to_db(short_code):
     response = Response(poll_id=poll.poll_id,
                         user_id=user.user_id,
                         text=text,
-                        order=1)
+                        weight=1)
     db.session.add(response)
     db.session.commit()
 
@@ -439,7 +439,7 @@ def sms_add_input(short_code):
         response = Response(poll_id=poll.poll_id,
                             user_id=user.user_id,
                             text=sms,
-                            order=1)
+                            weight=1)
         db.session.add(response)
         db.session.commit()
 
@@ -450,8 +450,8 @@ def sms_add_input(short_code):
     else:
         # Check that sms is a number
         try:
-            order = int(sms)
-            response = poll.get_response_by(order=order)
+            weight = int(sms)
+            response = poll.get_response_by(weight=weight)
 
             # Check that response option exists
             if response:
@@ -538,7 +538,7 @@ def chart_results(short_code):
     poll = Poll.get_from_code(short_code)
 
     responses = [{'response_id' : response.response_id, 
-                  'order' : response.order, 
+                  'weight' : response.weight, 
                   'text' : response.text,
                   'value' : response.value(),
                   'is_visible': response.is_visible} for response in poll.responses]
@@ -591,14 +591,14 @@ def add_response_data(poll_id):
         new_response = Response(poll_id=poll.poll_id,
                             user_id=user.user_id,
                             text=response['text'],
-                            order=int(response['order']))
+                            weight=int(response['weight']))
         db.session.add(new_response)
         db.session.commit()
 
         response_data.append({'response_id' : new_response.response_id,
                               'user_id' : new_response.user_id,
                               'text' : new_response.text,
-                              'order' : new_response.order,
+                              'weight' : new_response.weight,
                               'value' : 0,
                               'is_visible' : new_response.is_visible})
 
@@ -615,7 +615,7 @@ def get_response_data(response_id):
 
     response_data = {'response_id' : response.response_id, 
                      'user_id' : response.user_id,
-                     'order' : response.order, 
+                     'weight' : response.weight, 
                      'text' : response.text,
                      'value' : response.value(),
                      'is_visible': response.is_visible}
@@ -643,12 +643,12 @@ def save_response_data(response_id):
 
 @app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=["DELETE"])
 def delete_response_data(poll_id, response_id):
-    """Delete response from poll and update order on remaining responses."""
+    """Delete response from poll and update weight on remaining responses."""
     print response_id
     poll = Poll.query.get(int(poll_id))
     response = Response.query.get(int(response_id))
 
-    order = response.order
+    weight = response.weight
 
     Tally.query.filter(Tally.response_id == response.response_id).delete()
     db.session.commit()
@@ -656,7 +656,7 @@ def delete_response_data(poll_id, response_id):
     Response.query.filter(Response.response_id == response.response_id).delete()
     db.session.commit()
 
-    # reorder remaining responses
+    # reweight remaining responses
 
     return 'Deleted'
 
