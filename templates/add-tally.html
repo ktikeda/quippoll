@@ -8,7 +8,7 @@
     
 
       {% for response in poll.responses %}
-          <button type="button" class="responseOption btn btn-primary btn-lg btn-block" id="responseOption{{ response.response_id }}" name="responseOption{{ response.response_id }}" value="{{ response.text }}">{{ response.order }}. {{ response.text }}</button><br>
+          <button type="button" class="responseOption btn btn-primary btn-lg btn-block" id="responseOption{{ response.response_id }}" name="responseOption{{ response.response_id }}" value="{{ response.text }}">{{ response.weight }}. {{ response.text }}</button><br>
 
       {% endfor %}
       <input type="hidden" id="multi_select" name="multi_select" value="{{ poll.poll_type.multi_select }}">
