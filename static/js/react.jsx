@@ -1,11 +1,15 @@
 // "use strict";
 /* class-start*/
-const { OrdinalFrame } = Semiotic;
-const SortableContainer = SortableHOC.SortableContainer;
-const SortableElement = SortableHOC.SortableElement;
-const arrayMove = SortableHOC.arrayMove;
+//const { OrdinalFrame } = Semiotic;
+import { OrdinalFrame } from "semiotic";
 
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+// const SortableContainer = SortableHOC.SortableContainer;
+// const SortableElement = SortableHOC.SortableElement;
+// const arrayMove = SortableHOC.arrayMove;
+
+import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
+
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import React from "react";
 import ReactDOM from "react-dom";
@@ -133,7 +137,7 @@ class Poll extends React.Component {
    
   } // end updatePrompt
 
-  onSortEnd = ({oldIndex, newIndex}, evt) => {
+  onSortEnd({oldIndex, newIndex}, evt) {
     // send new index to server, server return json with response weight data
 
     function assignWeight(array, index) {
@@ -429,9 +433,9 @@ class PieChart extends React.Component {
 
 // add flag, document.cookie.isadmin in vanilla js
 ReactDOM.render(
-  <BrowserRouter>
+  <Router>
     <Poll id="1" />
-  </BrowserRouter>,
+  </Router>,
     document.getElementById("root")
 );
 /* main-end */

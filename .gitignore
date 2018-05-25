@@ -4,3 +4,7 @@ env/
 secrets.sh
 htmlcov/
 .coverage
+static/dist/
+static/node_modules/
+static/npm-debug.log
+
