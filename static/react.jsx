@@ -1,11 +1,13 @@
 // "use strict";
 /* class-start*/
-const { OrdinalFrame } = Semiotic;
-const SortableContainer = SortableHOC.SortableContainer;
-const SortableElement = SortableHOC.SortableElement;
-const arrayMove = SortableHOC.arrayMove;
+// const { OrdinalFrame } = Semiotic;
+// const SortableContainer = SortableHOC.SortableContainer;
+// const SortableElement = SortableHOC.SortableElement;
+// const arrayMove = SortableHOC.arrayMove;
+import { Ordinal } from "semiotic";
+import {SortableContainer, SortableElement, arrayMove } from 'react-sortable-hoc';
 
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import React from "react";
 import ReactDOM from "react-dom";

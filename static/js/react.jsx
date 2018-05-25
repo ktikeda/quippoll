@@ -108,6 +108,7 @@ class Poll extends React.Component {
     this.handleOptionAdd = this.handleOptionAdd.bind(this);
     this.getDeletion = this.getDeletion.bind(this);
     this.getUpdate = this.getUpdate.bind(this);
+    this.onSortEnd = this.onSortEnd.bind(this);
 
     onNewResult(this.props.id, 
       (err, data) => {
