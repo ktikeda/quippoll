@@ -9,7 +9,7 @@ import { OrdinalFrame } from "semiotic";
 
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
 
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
 
 import React from "react";
 import ReactDOM from "react-dom";
@@ -98,7 +98,6 @@ class Poll extends React.Component {
                   prompt : "",
                   responseData: [],
                   chart : 'text',
-                  mode : 'edit',
                   items : ""
                   };
 
@@ -250,7 +249,8 @@ class Poll extends React.Component {
   /* Begin render elements */
 
   showNav() {
-    if (this.state.mode === 'results') {
+    let mode = this.props.mode
+    if (mode === 'results') {
 
       return (
         <div>
@@ -265,8 +265,9 @@ class Poll extends React.Component {
   showResults(responses) {
     
     let chart = this.state.chart;
+    let mode = this.props.mode
     
-    if (this.state.mode === 'results') {
+    if (mode === 'results') {
 
       return (
         <div>
@@ -281,7 +282,7 @@ class Poll extends React.Component {
       ) // end of return
     } else {
 
-      return(<p>{this.state.mode}</p>);
+      return(<p>{mode}</p>);
 
     } // end if
   } // end showResults
@@ -290,8 +291,9 @@ class Poll extends React.Component {
     
     let id = this.props.id;
     let prompt = this.state.prompt;
+    let mode = this.props.mode;
 
-    if (this.state.mode === 'edit') {
+    if (mode === 'edit') {
       return (<div><input type="text" id={id} className="" value={prompt} onChange={this.handleChange} onBlur={this.updatePrompt} /></div>);
       
     } else {
@@ -302,7 +304,8 @@ class Poll extends React.Component {
 
   showResponses(responses) {
 
-    let mode = this.state.mode;
+    let mode = this.props.mode;
+    let pollId = this.props.id;
 
     const SortableItem = SortableElement(({value}) =>
       <li><Response 
@@ -328,7 +331,7 @@ class Poll extends React.Component {
     }); // end SortableList
 
 
-    if (this.state.mode === 'edit') {
+    if (mode === 'edit') {
       return (
         <div>
           <SortableList items={responses} onSortEnd={this.onSortEnd} />
@@ -340,7 +343,9 @@ class Poll extends React.Component {
             return <li><Response 
                       key={ response.response_id } 
                       id={ response.response_id } 
-                      mode={ mode } 
+                      mode={ mode }
+                      pollId={ pollId }
+                      text={ response.text }
                       weight={ response.weight }
                       value={ response.value } /></li>;
           })}</ol></div>);
@@ -356,7 +361,8 @@ class Poll extends React.Component {
     
     let responses = this.state.responseData;
     //responses = responses.sort((a, b) => a.weight - b.weight );
-    let mode = this.state.mode
+    let mode = this.props.mode
+    console.log(this.props.id);
 
     return(
       <div> 
@@ -427,15 +433,52 @@ class PieChart extends React.Component {
 
 } // End of PieChart
 
-
 /* class-end */
+
+/* routes-start */
+
+const Main = ({match}) => (
+  <main>
+    <Switch>
+      <Route exact path={match.url} 
+        component={(props) => <Poll id="1" mode="respond" {...props}/>}/>
+      <Route path={ match.url + '/edit' } 
+        component={(props) => <Poll id="1" mode="edit" {...props}/>}/>
+      <Route path={ match.url + '/results' }
+        component={(props) => <Poll id="1" mode="results" {...props}/>}/>
+    </Switch>
+  </main>
+) // end main
+
+// The Header creates links that can be used to navigate
+// between routes.
+const Header = ({match}) => (
+  <header>
+    <nav>
+      <ul>
+        <li><Link to={ match.url } >Respond</Link></li>
+        <li><Link to={ match.url + '/edit' }  >Edit</Link></li>
+        <li><Link to={ match.url + '/results' }>Results</Link></li>
+      </ul>
+    </nav>
+  </header>
+)
+
+const App = () => (
+  <div>
+    
+    <Route path="/multi/r" component={Header} />
+    <Route path="/multi/r" component={Main} />
+  </div>
+)
+/* routes-end */
 
 /* main-start */
 
 // add flag, document.cookie.isadmin in vanilla js
 ReactDOM.render(
   <Router>
-    <Poll id="1" />
+    <App />
   </Router>,
     document.getElementById("root")
 );
