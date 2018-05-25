@@ -15,10 +15,8 @@ class Response extends React.Component {
                   isVisible : true,
                   };
 
-    this.sendText = this.sendText.bind(this);
-    this.passChange = this.passChange.bind(this);
+    this.updateResponse = this.updateResponse.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.passUpdate = this.passUpdate.bind(this);
     this.passDeletion = this.passDeletion.bind(this);
 
   } // end constructor
@@ -27,9 +25,10 @@ class Response extends React.Component {
     this.setState({ text : evt.target.value });
   } // handleChange
 
-  sendText(evt) {
+  updateResponse(evt) {
 
-    let data = {'text' : this.state.text,
+    let data = {'response_id' : this.props.id,
+                'text' : this.state.text,
                 'value' : this.state.value,
                 'is_visible': this.state.isVisible};
 
@@ -37,23 +36,10 @@ class Response extends React.Component {
       data,
       (resp) => console.log(resp));
 
-    
-  } // end sendText
-  passChange(evt) {
-
-    let data = {'id' : this.props.id,
-                'text' : evt.target.value };
-
-    this.props.cbChange(data);
-  } 
-
-
-  passUpdate(evt) {
-
-    let data = {'text' : this.state.text};
-
     this.props.cbUpdate(data);
-  } 
+
+    
+  } // end updateResponse
 
   passDeletion(evt) {
 
@@ -77,7 +63,7 @@ class Response extends React.Component {
     if (mode === 'respond') {
       return (<button className="response-option btn btn-primary btn-lg btn-block">{text}</button>);
     } else if (mode === 'edit') {
-      return (<div><label>{weight}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.sendText} />
+      return (<div><label>{weight}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.updateResponse} />
               <button className="" type="button" onClick={this.passDeletion}>Delete</button>
               </div>);
     } else if (mode === 'results') {
@@ -156,8 +142,9 @@ class Poll extends React.Component {
     function assignWeight(array, index) {
       // take an array of objects and assigns object.weight based on the object's position in the array.
       let prevWeight = 0;
-      let nextWeight = 0;
+      let nextWeight;
       let length = array.length;
+      let weight
 
       if (length === 1) {
         
@@ -171,37 +158,50 @@ class Poll extends React.Component {
         
         // weight should be greater than prevWeight
         prevWeight = array[index-1].weight;
-        
+        weight = prevWeight + 1;
+        array[index].weight = weight;
+        return array
 
       } else {
         prevWeight = array[index-1].weight;
-        nextWeight = array[index+1].weight;
-
-        
+        nextWeight = array[index+1].weight; 
 
       }
-      let weight = (prevWeight + nextWeight) / 2.0;
+      
+      weight = (prevWeight + nextWeight) / 2.0;
 
       array[index].weight = weight;
 
       return array;
 
-    } // end assignweight
+    } // end assignWeight
+
+    console.log(evt);
 
     this.setState({
-      responseData: arrayMove(this.state.responseData, oldIndex, newIndex),
+      responseData: assignWeight(arrayMove(this.state.responseData, oldIndex, newIndex), newIndex)
     });
 
+    let response = this.state.responseData[newIndex];
+
+    $.post('/api/polls/' + this.props.id + '/responses/' + response.response_id,
+      response,
+      (resp) => console.log(resp));
+
+  }; // end onSortEnd
+
+  getUpdate(data) {
     let responses = this.state.responseData;
 
     for (let response of responses) {
+      if (response.response_id === data.response_id) {
+        response.text = data.text;
+      }
+    }
 
-      $.post('/api/polls/' + this.props.id + '/responses/' + response.response_id,
-        response,
-        (resp) => console.log(resp));
-    } // end for
+    this.setState({responseData : responses});
 
-  }; // end onSortEnd
+  }
 
   getDeletion(response) {
     /* get response send response to be deleted to server
@@ -222,35 +222,12 @@ class Poll extends React.Component {
 
   } // end getDeletion
 
-  getUpdate(response) {
-    /* get updated response, send to server
-       server send back new responseData
-       change responseData on state */
-
-  } // end getUpdate
-
-  // getChange(data) {
-  //   /* update responseData state */
-  //   let responses = this.state.responseData;
-  //   console.log('getChange');
-  //   console.log(data)
-
-  //   for (let response of responses) {
-  //     if (response.response_id === data.id) {
-  //       response.text = data.text
-  //     }
-
-  //   console.log(responses);
-  //   this.setState({responseData : responses});
-
-  //   }
-
-  // } // end getChange
-
   handleOptionAdd(evt) {
     //update poll options and reset options to an empty string
+    let responses = this.state.responseData;
+
     let _data = {responseData : [{'text' : '',
-                               'weight' : this.state.responseData.length + 1}]};
+                                  'weight' : responses[responses.length-1].weight + 1}]};
 
     $.ajax({ 
       url: '/api/polls/' + this.props.id + '/responses',
@@ -332,8 +309,7 @@ class Poll extends React.Component {
             isVisible={ value.is_visible }
             pollId={ this.props.id }
             cbDelete={ this.getDeletion }
-            cbUpdate={ this.getUpdate }
-            cbChange={ this.getChange } />
+            cbUpdate={ this.getUpdate } />
       </li>
     ); // end SortableItem
 
@@ -362,7 +338,6 @@ class Poll extends React.Component {
                       id={ response.response_id } 
                       mode={ mode } 
                       weight={ response.weight }
-                      text={ response.text }
                       value={ response.value } /></li>;
           })}</ol></div>);
     } // end if

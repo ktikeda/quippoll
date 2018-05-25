@@ -594,9 +594,9 @@ def get_responses(poll_id):
     """Gets all responses associated with poll id"""
     poll = Poll.query.get(poll_id)
 
-    responses = [{'response_id' : response.response_id, 
-                  'weight' : response.weight, 
+    responses = [{'response_id' : response.response_id,
                   'text' : response.text,
+                  'weight' : response.weight, 
                   'value' : response.value(),
                   'is_visible': response.is_visible} for response in poll.responses]
 
@@ -619,7 +619,7 @@ def create_responses(poll_id):
         new_response = Response(poll_id=poll.poll_id,
                             user_id=user.user_id,
                             text=response['text'],
-                            weight=int(response['weight']))
+                            weight=float(response['weight']))
         db.session.add(new_response)
         db.session.commit()
 
