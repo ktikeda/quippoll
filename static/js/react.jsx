@@ -65,14 +65,14 @@ class Response extends React.Component {
     let mode = this.props.mode;
     let id = "response-opt-" + this.props.id;
     let weight = this.props.weight
-    let text = this.state.text;
+    let text = this.props.text;
     let value = this.props.value;
     let isVisible = this.props.isVisible;
 
     if (mode === 'respond') {
       return (<button className="response-option btn btn-primary btn-lg btn-block">{text}</button>);
     } else if (mode === 'edit') {
-      return (<div><label>{weight}. </label><input type="text" id={id} className="" value={text} onChange={this.handleChange} onBlur={this.updateResponse} />
+      return (<div><label>{weight}. </label><input type="text" id={id} className="" defaultValue={text} onChange={this.handleChange} onBlur={this.updateResponse} />
               <button className="" type="button" onClick={this.passDeletion}>Delete</button>
               </div>);
     } else if (mode === 'results') {
@@ -177,7 +177,7 @@ class Poll extends React.Component {
 
     } // end assignWeight
 
-    console.log(evt);
+    // console.log(evt);
 
     this.setState({
       responseData: assignWeight(arrayMove(this.state.responseData, oldIndex, newIndex), newIndex)
@@ -308,9 +308,10 @@ class Poll extends React.Component {
     let pollId = this.props.id;
 
     const SortableItem = SortableElement(({value}) =>
-      <li><Response 
+      <li key={ value.response_id }><Response 
             key={ value.response_id } 
             id={ value.response_id }
+            text={ value.text }
             weight={ value.weight } 
             mode='edit' 
             isVisible={ value.is_visible }
@@ -441,11 +442,11 @@ const Main = ({match}) => (
   <main>
     <Switch>
       <Route exact path={match.url} 
-        component={(props) => <Poll id="1" mode="respond" {...props}/>}/>
+        component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
       <Route path={ match.url + '/edit' } 
-        component={(props) => <Poll id="1" mode="edit" {...props}/>}/>
+        component={(props) => <Poll id={pollId} mode="edit" {...props}/>}/>
       <Route path={ match.url + '/results' }
-        component={(props) => <Poll id="1" mode="results" {...props}/>}/>
+        component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
     </Switch>
   </main>
 ) // end main
@@ -466,14 +467,18 @@ const Header = ({match}) => (
 
 const App = () => (
   <div>
-    
-    <Route path="/multi/r" component={Header} />
-    <Route path="/multi/r" component={Main} />
+    <Route path={ '/' + pollCode } component={Header} />
+    <Route path={ '/' + pollCode } component={Main} />
   </div>
 )
 /* routes-end */
 
 /* main-start */
+
+const content = document.getElementById('root');
+const pollId = content.dataset.poll;
+const pollCode = content.dataset.code;
+console.log(pollCode);
 
 // add flag, document.cookie.isadmin in vanilla js
 ReactDOM.render(
