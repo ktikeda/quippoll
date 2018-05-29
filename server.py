@@ -595,10 +595,16 @@ def get_poll(poll_id):
                   'value' : response.value(),
                   'is_visible': response.is_visible} for response in poll.responses]
 
-    print responses
-
-    #return 'apple'
-    return jsonify({"poll_id" : poll.poll_id, "prompt" : poll.prompt, "responses" : responses})
+    return jsonify({"poll_id" : poll.poll_id, 
+                    "collect_response" : poll.poll_type.collect_response,
+                    "collect_tally" : poll.poll_type.collect_tally,
+                    "multi_select" : poll.poll_type.multi_select,
+                    "title" : poll.title,
+                    "prompt" : poll.prompt, 
+                    "short_code" : poll.short_code,
+                    "is_results_visible" : poll.is_results_visible,
+                    "is_open" : poll.is_open,
+                    "responses" : responses})
 
 
 @app.route('/api/polls/<int:poll_id>', methods=['POST'])

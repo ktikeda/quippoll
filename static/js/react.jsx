@@ -430,6 +430,7 @@ class PieChart extends React.Component {
 
 /* routes-start */
 const fakeAuth = {
+  isAdmin: false,
   isAuthenticated: false,
   hasResponded: true,
   authenticate(cb) {
@@ -445,7 +446,7 @@ const fakeAuth = {
 // source: https://tylermcginnis.com/react-router-protected-routes-authentication/
 const AdminRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) => (
-    fakeAuth.isAuthenticated === true
+    fakeAuth.isAdmin === true
       ? <Component {...props} />
       : <Redirect to={'/' + pollCode} />
   )} />
@@ -459,32 +460,47 @@ const ConditionalRoute = ({ component: Component, ...rest }) => (
   )} />
 )
 
-const Main = ({match}) => (
-  <main>
-    <Switch>
-      <ConditionalRoute exact path={match.url} 
-        component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
-      <AdminRoute path={ match.url + '/edit' } 
-        component={(props) => <Poll id={pollId} mode="edit" {...props}/>}/>
-      <Route path={ match.url + '/results' }
-        component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
-    </Switch>
-  </main>
-) // end main
+const Main = ({match}) => {
+  if (fakeAuth.isAdmin === true) {
+    return(
+      <main>
+        <Switch>
+          <Route exact path={match.url} 
+            component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
+          <AdminRoute exact path={ match.url + '/edit' } 
+            component={(props) => <Poll id={pollId} mode="edit" {...props}/>}/>
+          <Route exact path={ match.url + '/results' }
+            component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
+        </Switch>
+      </main>)} else {
+    return(
+      <main>
+        <Switch>
+          <ConditionalRoute exact path={match.url} 
+            component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
+          <Route exact path={ match.url + '/results' }
+            component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
+        </Switch>
+      </main>
+      )}
+} // end main
 
 // The Header creates links that can be used to navigate
 // between routes.
-const Header = ({match}) => (
-  <header>
-    <nav>
-      <ul>
-        <li><Link to={ match.url } >Respond</Link></li>
-        <li><Link to={ match.url + '/edit' } >Edit</Link></li>
-        <li><Link to={ match.url + '/results' }>Results</Link></li>
-      </ul>
-    </nav>
-  </header>
-)
+const Header = ({match}) => {
+  if (fakeAuth.isAdmin === true) {
+    return(
+      <header>
+        <nav>
+          <ul>
+            <li><Link to={ match.url } >Respond</Link></li>
+            <li><Link to={ match.url + '/edit' } >Edit</Link></li>
+            <li><Link to={ match.url + '/results' }>Results</Link></li>
+          </ul>
+        </nav>
+      </header>)} else {
+    return(<header />)
+}} // end Header
 
 const App = () => (
   <div>
