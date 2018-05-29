@@ -349,9 +349,6 @@ class Poll extends React.Component {
   } // end showResponses
 
 
-
-
-
   render() {
     
     let responses = this.state.responseData;
@@ -430,7 +427,7 @@ class PieChart extends React.Component {
 
 /* routes-start */
 const fakeAuth = {
-  isAdmin: false,
+  isAdmin: true,
   isAuthenticated: false,
   hasResponded: true,
   authenticate(cb) {
@@ -442,6 +439,8 @@ const fakeAuth = {
     setTimeout(cb, 100) // fake async
   }
 }
+
+
 
 // source: https://tylermcginnis.com/react-router-protected-routes-authentication/
 const AdminRoute = ({ component: Component, ...rest }) => (
@@ -472,7 +471,8 @@ const Main = ({match}) => {
           <Route exact path={ match.url + '/results' }
             component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
         </Switch>
-      </main>)} else {
+      </main>
+  )} else {
     return(
       <main>
         <Switch>
@@ -482,7 +482,7 @@ const Main = ({match}) => {
             component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
         </Switch>
       </main>
-      )}
+  )}
 } // end main
 
 // The Header creates links that can be used to navigate
@@ -498,9 +498,11 @@ const Header = ({match}) => {
             <li><Link to={ match.url + '/results' }>Results</Link></li>
           </ul>
         </nav>
-      </header>)} else {
-    return(<header />)
-}} // end Header
+      </header>
+  )} else {
+      return(<header />)
+  }
+} // end Header
 
 const App = () => (
   <div>

@@ -224,7 +224,9 @@ def render_poll(short_code):
     print session
 
     if poll is not None:  # Ensure this is a valid poll route
-        if not poll.is_open or not user.is_admin(poll):
+        if user.is_admin(poll):
+            return render_template('poll-react.html', poll=poll)
+        elif not poll.is_open:
             return render_template('poll-closed.html', poll=poll)
         elif poll.poll_type.collect_response:
             if not Response.query.filter(Response.user_id == user.user_id,
@@ -250,7 +252,7 @@ def edit_poll(short_code):
     if current_user.is_authenticated and current_user.is_admin(poll):
         return render_template('poll-react.html', poll=poll)
     else:
-        return redirect('/')
+        return redirect('/' + short_code)
 
 
 @app.route('/<short_code>/success')
