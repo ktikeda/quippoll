@@ -224,13 +224,13 @@ def render_poll(short_code):
     print session
 
     if poll is not None:  # Ensure this is a valid poll route
-        if not poll.is_open:
+        if not poll.is_open or not user.is_admin(poll):
             return render_template('poll-closed.html', poll=poll)
         elif poll.poll_type.collect_response:
             if not Response.query.filter(Response.user_id == user.user_id,
                                          Response.poll_id == poll.poll_id).first():
                 return render_template('add-response.html', poll=poll)
-        elif user not in poll.get_users_from_tally():
+        elif user not in poll.get_users_from_tally() or user.is_admin(poll):
                 return render_template('poll-react.html', poll=poll)
 
         else:

@@ -431,6 +431,7 @@ class PieChart extends React.Component {
 /* routes-start */
 const fakeAuth = {
   isAuthenticated: false,
+  hasResponded: true,
   authenticate(cb) {
     this.isAuthenticated = true
     setTimeout(cb, 100) // fake async
@@ -442,7 +443,7 @@ const fakeAuth = {
 }
 
 // source: https://tylermcginnis.com/react-router-protected-routes-authentication/
-const PrivateRoute = ({ component: Component, ...rest }) => (
+const AdminRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) => (
     fakeAuth.isAuthenticated === true
       ? <Component {...props} />
@@ -450,12 +451,20 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   )} />
 )
 
+const ConditionalRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    fakeAuth.hasResponded === false
+      ? <Component {...props} />
+      : <Redirect to={'/' + pollCode + '/results'} />
+  )} />
+)
+
 const Main = ({match}) => (
   <main>
     <Switch>
-      <Route exact path={match.url} 
+      <ConditionalRoute exact path={match.url} 
         component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
-      <PrivateRoute path={ match.url + '/edit' } 
+      <AdminRoute path={ match.url + '/edit' } 
         component={(props) => <Poll id={pollId} mode="edit" {...props}/>}/>
       <Route path={ match.url + '/results' }
         component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
