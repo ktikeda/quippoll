@@ -116,7 +116,7 @@ def add_poll_to_db():
     return redirect(route)
 
 
-@app.route('/<short_code>')
+@app.route('/polls/<short_code>')
 def add_user_input(short_code):
     """Poll response submission display"""
 
@@ -148,7 +148,7 @@ def _():
     return ''
 
 
-@app.route('/<short_code>', methods=["POST"])
+@app.route('/polls/<short_code>', methods=["POST"])
 def add_response_to_db(short_code):
     """Add response data to db"""
 
@@ -213,13 +213,32 @@ def add_tally_to_db(short_code):
     return route
 
 
-@app.route('/<short_code>/r')
+@app.route('/<short_code>')
+@app.route('/<short_code>/edit')
+@app.route('/<short_code>/results')
 def show_results(short_code):
-    """Show poll results."""
+    """Show poll in React."""
 
     poll = Poll.get_from_code(short_code)
+    user = User.get_user()
 
-    return render_template('results-react.html', poll=poll, ) #async_mode=socketio.async_mode
+    if poll is not None:  # Ensure this is a valid poll route
+        if not poll.is_open:
+            return render_template('poll-closed.html', poll=poll)
+        elif poll.poll_type.collect_response:
+            if not Response.query.filter(Response.user_id == user.user_id,
+                                         Response.poll_id == poll.poll_id).first():
+                return render_template('add-response.html', poll=poll)
+        elif user not in poll.get_users_from_tally():
+                return render_template('poll-react.html', poll=poll)
+
+        else:
+            route = '/' + short_code + '/results'
+
+    flash('Sorry, that page does not exist.')
+    route = '/'
+
+    return redirect(route)
 
 
 @app.route('/<short_code>/success')

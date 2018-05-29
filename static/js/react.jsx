@@ -426,8 +426,7 @@ class PieChart extends React.Component {
           rAccessor={() => 1}
           dynamicColumnWidth={"value"}
           style={{ fill: "#00a2ce", stroke: "white" }}
-          type={"bar"}
-          projection={"radial"}
+                  projection={"radial"}
           oLabel={true} />
     </div>);
   } // End of the render function
