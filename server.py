@@ -181,7 +181,7 @@ def add_response_to_db(short_code):
     return redirect(route)
 
 
-@app.route('/<short_code>.json', methods=["POST"])
+@app.route('/polls/<short_code>.json', methods=["POST"])
 def add_tally_to_db(short_code):
     """Add tally data to db"""
 
@@ -214,13 +214,14 @@ def add_tally_to_db(short_code):
 
 
 @app.route('/<short_code>')
-@app.route('/<short_code>/edit')
 @app.route('/<short_code>/results')
-def show_results(short_code):
+def render_poll(short_code):
     """Show poll in React."""
 
     poll = Poll.get_from_code(short_code)
     user = User.get_user()
+
+    print session
 
     if poll is not None:  # Ensure this is a valid poll route
         if not poll.is_open:
@@ -241,6 +242,17 @@ def show_results(short_code):
     return redirect(route)
 
 
+@app.route('/<short_code>/edit')
+def edit_poll(short_code):
+    """Edit poll."""
+    poll = Poll.get_from_code(short_code)
+    
+    if current_user.is_authenticated and current_user.is_admin(poll):
+        return render_template('poll-react.html', poll=poll)
+    else:
+        return redirect('/')
+
+
 @app.route('/<short_code>/success')
 def success(short_code):
     """Show success page."""
@@ -253,6 +265,7 @@ def success(short_code):
 @app.route('/profile')
 def show_profile():
     if current_user.is_authenticated:
+        print session
         return render_template('user-profile.html')
     else:
         return redirect('/')

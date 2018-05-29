@@ -1,15 +1,9 @@
 // "use strict";
 /* class-start*/
-//const { OrdinalFrame } = Semiotic;
+
 import { OrdinalFrame } from "semiotic";
-
-// const SortableContainer = SortableHOC.SortableContainer;
-// const SortableElement = SortableHOC.SortableElement;
-// const arrayMove = SortableHOC.arrayMove;
-
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
-
-import { BrowserRouter as Router, Route, Link, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect, Link, Switch } from 'react-router-dom';
 
 import React from "react";
 import ReactDOM from "react-dom";
@@ -363,7 +357,6 @@ class Poll extends React.Component {
     let responses = this.state.responseData;
     //responses = responses.sort((a, b) => a.weight - b.weight );
     let mode = this.props.mode
-    console.log(this.props.id);
 
     return(
       <div> 
@@ -436,13 +429,33 @@ class PieChart extends React.Component {
 /* class-end */
 
 /* routes-start */
+const fakeAuth = {
+  isAuthenticated: false,
+  authenticate(cb) {
+    this.isAuthenticated = true
+    setTimeout(cb, 100) // fake async
+  },
+  signout(cb) {
+    this.isAuthenticated = false
+    setTimeout(cb, 100) // fake async
+  }
+}
+
+// source: https://tylermcginnis.com/react-router-protected-routes-authentication/
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    fakeAuth.isAuthenticated === true
+      ? <Component {...props} />
+      : <Redirect to={'/' + pollCode} />
+  )} />
+)
 
 const Main = ({match}) => (
   <main>
     <Switch>
       <Route exact path={match.url} 
         component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
-      <Route path={ match.url + '/edit' } 
+      <PrivateRoute path={ match.url + '/edit' } 
         component={(props) => <Poll id={pollId} mode="edit" {...props}/>}/>
       <Route path={ match.url + '/results' }
         component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
@@ -457,7 +470,7 @@ const Header = ({match}) => (
     <nav>
       <ul>
         <li><Link to={ match.url } >Respond</Link></li>
-        <li><Link to={ match.url + '/edit' }  >Edit</Link></li>
+        <li><Link to={ match.url + '/edit' } >Edit</Link></li>
         <li><Link to={ match.url + '/results' }>Results</Link></li>
       </ul>
     </nav>
