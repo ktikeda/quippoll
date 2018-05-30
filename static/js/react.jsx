@@ -429,7 +429,7 @@ class PieChart extends React.Component {
 const fakeAuth = {
   isAdmin: true,
   isAuthenticated: false,
-  hasResponded: true,
+  mayRespond: true,
   authenticate(cb) {
     this.isAuthenticated = true
     setTimeout(cb, 100) // fake async
@@ -441,75 +441,117 @@ const fakeAuth = {
 }
 
 
-
-// source: https://tylermcginnis.com/react-router-protected-routes-authentication/
-const AdminRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={(props) => (
-    fakeAuth.isAdmin === true
-      ? <Component {...props} />
-      : <Redirect to={'/' + pollCode} />
-  )} />
-)
-
-const ConditionalRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={(props) => (
-    fakeAuth.hasResponded === false
-      ? <Component {...props} />
-      : <Redirect to={'/' + pollCode + '/results'} />
-  )} />
-)
-
-const Main = ({match}) => {
-  if (fakeAuth.isAdmin === true) {
-    return(
-      <main>
-        <Switch>
-          <Route exact path={match.url} 
-            component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
-          <AdminRoute exact path={ match.url + '/edit' } 
-            component={(props) => <Poll id={pollId} mode="edit" {...props}/>}/>
-          <Route exact path={ match.url + '/results' }
-            component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
-        </Switch>
-      </main>
-  )} else {
-    return(
-      <main>
-        <Switch>
-          <ConditionalRoute exact path={match.url} 
-            component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
-          <Route exact path={ match.url + '/results' }
-            component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
-        </Switch>
-      </main>
-  )}
-} // end main
-
-// The Header creates links that can be used to navigate
-// between routes.
-const Header = ({match}) => {
-  if (fakeAuth.isAdmin === true) {
-    return(
-      <header>
-        <nav>
-          <ul>
-            <li><Link to={ match.url } >Respond</Link></li>
-            <li><Link to={ match.url + '/edit' } >Edit</Link></li>
-            <li><Link to={ match.url + '/results' }>Results</Link></li>
-          </ul>
-        </nav>
-      </header>
-  )} else {
-      return(<header />)
+class App extends React.Component {
+  constructor(props) {
+    super(props);
   }
-} // end Header
+  
+  render() {
+    //console.log(this.state);
+    //const isAdmin = this.state.isAdmin;
+    //const mayRespond = this.state.mayRespond;
 
-const App = () => (
-  <div>
-    <Route path={ '/' + pollCode } component={Header} />
-    <Route path={ '/' + pollCode } component={Main} />
-  </div>
-)
+  // source: https://tylermcginnis.com/react-router-protected-routes-authentication/
+
+    const Main = ({match}) => {
+      console.log(this.props);
+      const AdminRoute = ({ component: Component, ...rest }) => (
+        <Route {...rest} render={(props) => (
+          this.props.isAdmin === true
+            ? <Component {...props} />
+            : <Redirect to={'/' + pollCode} />
+        )} />
+      );
+
+      const ConditionalRoute = ({ component: Component, ...rest }) => (
+        <Route {...rest} render={(props) => (
+          this.props.mayRespond === true
+            ? <Component {...props} />
+            : <Redirect to={'/' + pollCode + '/results'} />
+        )} />
+      );
+
+      if (this.props.isAdmin === true) {
+        return(
+          <main>
+            <Switch>
+              <Route exact path={match.url} 
+                component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
+              <AdminRoute exact path={ match.url + '/edit' } 
+                component={(props) => <Poll id={pollId} mode="edit" {...props}/>}/>
+              <Route exact path={ match.url + '/results' }
+                component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
+            </Switch>
+          </main>
+      )} else {
+        return(
+          <main>
+            <Switch>
+              <ConditionalRoute exact path={match.url} 
+                component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
+              <AdminRoute exact path={ match.url + '/edit' } 
+                component={(props) => <Poll id={pollId} mode="respond" {...props}/>}/>
+              <Route exact path={ match.url + '/results' }
+                component={(props) => <Poll id={pollId} mode="results" {...props}/>}/>
+            </Switch>
+          </main>
+      )}
+    } // end main
+
+    // The Header creates links that can be used to navigate
+    // between routes.
+    const Header = ({match}) => {
+      console.log(this.props);
+      if (this.props.isAdmin === true) {
+        return(
+          <header>
+            <nav>
+              <ul>
+                <li><Link to={ match.url } >Respond</Link></li>
+                <li><Link to={ match.url + '/edit' } >Edit</Link></li>
+                <li><Link to={ match.url + '/results' }>Results</Link></li>
+              </ul>
+            </nav>
+          </header>
+      )} else {
+          return(<header />)
+      }
+    } // end Header
+
+
+    return(
+      <div>
+        <Route path={ '/' + pollCode } render={ props => <Header {...props} isAdmin={true} />} />
+        <Route path={ '/' + pollCode } render={ props => <Main {...props} isAdmin={true} mayRespond={true}/>} />
+      </div>
+  )} // end render
+} //end app
+
+class PollSettings extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+                  userId : "",
+                  isAdmin: true,
+                  mayRespond : true
+                  };
+    }
+
+  componentDidMount() {
+    let resp = fetch('/api/polls/' + this.props.id + '/user').then(resp => resp.json());
+    resp.then( data => this.setState({ userId : data.user_id, 
+                                       isAdmin : data.is_admin, 
+                                       mayRespond : data.may_respond }));
+  
+  } // end componentDidMount
+
+  render() {
+    return(
+      <App userId={this.state.userId} isAdmin={this.state.isAdmin} mayRespond={this.state.mayRespond} />
+  )}
+
+} // end PollSettings
+
 /* routes-end */
 
 /* main-start */
@@ -522,7 +564,7 @@ console.log(pollCode);
 // add flag, document.cookie.isadmin in vanilla js
 ReactDOM.render(
   <Router>
-    <App />
+    <PollSettings id={pollId}/>
   </Router>,
     document.getElementById("root")
 );

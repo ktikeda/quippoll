@@ -629,6 +629,20 @@ def update_poll(poll_id):
     return status
 
 
+@app.route('/api/polls/<int:poll_id>/user', methods=["GET"])
+def get_user_data(poll_id):
+    """Get user data for a poll id"""
+    poll = Poll.query.get(poll_id)
+    user = User.get_user()
+    may_respond = True
+    data = {"user_id" : user.user_id, 
+                    "is_admin" : False, #user.is_admin(poll),
+                    "may_respond" : may_respond}
+    print data
+
+    return jsonify(data)
+
+
 @app.route('/api/polls/<int:poll_id>/responses', methods=["GET"])
 def get_responses(poll_id):
     """Gets all responses associated with poll id"""
