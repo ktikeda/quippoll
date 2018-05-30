@@ -579,14 +579,15 @@ def doughnut_results(short_code):
 # End chart.js routes
 
 # API routes for AJAX
+api = '/api'
 
-@app.route('/api/polls', methods=['POST'])
+@app.route(api + '/polls', methods=['POST'])
 def create_poll():
     """Create new poll"""
     pass
 
 
-@app.route('/api/polls/<int:poll_id>', methods=["GET"])
+@app.route(api + '/polls/<int:poll_id>', methods=["GET"])
 def get_poll(poll_id):
     """Get poll data for a poll id"""
     poll = Poll.query.get(poll_id)
@@ -609,7 +610,7 @@ def get_poll(poll_id):
                     "responses" : responses})
 
 
-@app.route('/api/polls/<int:poll_id>', methods=['POST'])
+@app.route(api + '/polls/<int:poll_id>', methods=['POST'])
 def update_poll(poll_id):
     """Update poll data for a poll id"""
     poll = Poll.query.get(poll_id)
@@ -629,21 +630,21 @@ def update_poll(poll_id):
     return status
 
 
-@app.route('/api/polls/<int:poll_id>/user', methods=["GET"])
+@app.route(api + '/polls/<int:poll_id>/user', methods=["GET"])
 def get_user_data(poll_id):
     """Get user data for a poll id"""
     poll = Poll.query.get(poll_id)
     user = User.get_user()
     may_respond = True
+
     data = {"user_id" : user.user_id, 
-                    "is_admin" : False, #user.is_admin(poll),
-                    "may_respond" : may_respond}
-    print data
+            "is_admin" : user.is_admin(poll),
+            "may_respond" : may_respond}
 
     return jsonify(data)
 
 
-@app.route('/api/polls/<int:poll_id>/responses', methods=["GET"])
+@app.route(api + '/polls/<int:poll_id>/responses', methods=["GET"])
 def get_responses(poll_id):
     """Gets all responses associated with poll id"""
     poll = Poll.query.get(poll_id)
@@ -659,7 +660,7 @@ def get_responses(poll_id):
     return jsonify({"response_data" : responses})
 
 
-@app.route('/api/polls/<int:poll_id>/responses', methods=["POST"])
+@app.route(api + '/polls/<int:poll_id>/responses', methods=["POST"])
 def create_responses(poll_id):
     """Create new responses for a poll in db"""
 
@@ -690,7 +691,7 @@ def create_responses(poll_id):
     return jsonify(data)
 
 
-@app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=["GET"])
+@app.route(api + '/polls/<int:poll_id>/responses/<int:response_id>', methods=["GET"])
 def get_response(poll_id, response_id):
     """Get data for response by response id"""
     response = Response.query.get(int(response_id))
@@ -705,7 +706,7 @@ def get_response(poll_id, response_id):
     return jsonify(response_data)
 
 
-@app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=['POST'])
+@app.route(api + '/polls/<int:poll_id>/responses/<int:response_id>', methods=['POST'])
 def update_response(poll_id, response_id):
     """Update response data for a response id"""
     response = Response.query.get(int(response_id))
@@ -719,11 +720,10 @@ def update_response(poll_id, response_id):
             db.session.add(response)
             db.session.commit()
 
-    status = 'Saved'
-    return status
+    return jsonify(response.data())
 
 
-@app.route('/api/polls/<int:poll_id>/responses/<int:response_id>', methods=['DELETE'])
+@app.route(api + '/polls/<int:poll_id>/responses/<int:response_id>', methods=['DELETE'])
 def delete_response(poll_id, response_id):
     """Delete response from poll"""
     print response_id

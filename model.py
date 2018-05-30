@@ -294,6 +294,14 @@ class Response(db.Model):
             value += tally.value
         return value
 
+    def data(self):
+        return {'response_id' : self.response_id, 
+                'user_id' : self.user_id,
+                'weight' : self.weight, 
+                'text' : self.text,
+                'value' : self.value(),
+                'is_visible': self.is_visible}
+
     @staticmethod
     def get_response(poll, user):
         return Response.query.filter(Response.user_id == user.user_id,
