@@ -281,7 +281,7 @@ class Response(db.Model):
         self.poll_id = poll_id
         self.user_id = user_id
         self.text = text
-        self.weight = weight
+        self.weight = weight 
 
         if kwargs is not None:
             for attr, val in kwargs.iteritems():
@@ -299,7 +299,7 @@ class Response(db.Model):
                 'user_id' : self.user_id,
                 'weight' : self.weight, 
                 'text' : self.text,
-                'value' : self.value(),
+                'value' : Tally.query.filter(Tally.response_id == self.response_id).count(),
                 'is_visible': self.is_visible}
 
     @staticmethod

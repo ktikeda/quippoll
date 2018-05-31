@@ -265,7 +265,6 @@ export class Poll extends React.Component {
 
   render() {
     let responses = this.state.responses;
-    //responses = responses.sort((a, b) => a.weight - b.weight );
     let mode = this.props.mode
 
     return(

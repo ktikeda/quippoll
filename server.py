@@ -666,7 +666,7 @@ def create_responses(poll_id):
 
     poll = Poll.query.get(poll_id)
     user = User.get_user()
-    responses = request.json['responseData']
+    responses = request.json['responses']
 
     response_data = []
 
