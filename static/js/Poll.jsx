@@ -11,7 +11,6 @@ export class Poll extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-                  prompt : '',
                   responseData: [],
                   chart : 'text',
                   items : ""
@@ -44,12 +43,17 @@ export class Poll extends React.Component {
 
   updatePrompt(evt) {
 
-    let data = {'prompt' : this.state.prompt};
+    const data = {prompt : evt.target.value};
 
     $.post('/api/polls/' + this.props.pollId,
       data,
       resp => console.log(resp)
     );
+
+    console.log(this.props.cbUpdate);
+
+    this.props.cbUpate(data);
+
    
   } // end updatePrompt
 
@@ -206,11 +210,11 @@ export class Poll extends React.Component {
   showPrompt() {
     
     let id = this.props.pollId;
-    let prompt = this.state.prompt;
+    let prompt = this.props.prompt;
     let mode = this.props.mode;
 
     if (mode === 'edit') {
-      return (<div><input type="text" id={id} className="" defaultValue={prompt} onChange={this.handleChange} onBlur={this.updatePrompt} /></div>);
+      return (<div><input type="text" id={id} className="" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
       
     } else {
       return (<h1>{prompt}</h1>);
@@ -272,7 +276,7 @@ export class Poll extends React.Component {
 
 
   render() {
-    let responses = this.props.responses;
+    let responses = this.state.responseData;
     //responses = responses.sort((a, b) => a.weight - b.weight );
     let mode = this.props.mode
 
@@ -291,10 +295,9 @@ export class Poll extends React.Component {
   } // End of render
 
   componentDidMount() {
-    let resp = fetch('/api/polls/' + this.props.pollId).then(resp => resp.json());
-
-    resp.then( data => this.setState({ prompt: data.prompt }));
-    resp.then( data => this.setState({ responseData: data.responses }));
+    fetch('/api/polls/' + this.props.pollId + '/responses')
+      .then( resp => resp.json())
+      .then( data => this.setState({ responseData: data.response_data }));
   
   } // end componentDidMount
 

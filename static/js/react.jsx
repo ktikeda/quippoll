@@ -23,6 +23,12 @@ class PollSettings extends React.Component {
                   };
     }
 
+  getUpdate = (data) => {
+    console.log(data);
+    this.setState(data);
+
+  }
+
   componentDidMount() {
     fetch('/api/polls/' + pollId, 
       {
@@ -65,6 +71,7 @@ class PollSettings extends React.Component {
         prompt={this.state.prompt}
         shortCode={this.state.shortCode}
         responses={this.state.responses}
+        cbUpdate={this.getUpdate}
       />
   )}
 
@@ -79,6 +86,7 @@ const Routes = (props) => (
 
 const Main = (props) => {
   const match = props.routeProps.match;
+  const cbUpdate = props.cbUpdate;
   console.log(props);
 
   const AdminRoute = ({ component: Component, ...rest }) => (
@@ -104,7 +112,7 @@ const Main = (props) => {
           <Route key="1" exact path={match.url}
             render={routeProps => <Poll  key="1" pollId={pollId} routeProps={routeProps} mode="respond" {...props}/>} />
           <Route key="2" exact path={ match.url + '/edit' }
-            render={routeProps => <Poll  key="2" pollId={pollId} routeProps={routeProps} mode="edit" {...props}/>} />
+            render={routeProps => <Poll  key="2" pollId={pollId} routeProps={routeProps} mode="edit" cbUpdate={cbUpdate} {...props}/>} />
           <Route key="3" exact path={ match.url + '/results' }
             render={routeProps => <Poll  key="3" pollId={pollId} routeProps={routeProps} mode="results" {...props}/>} />
         </Switch>
@@ -113,11 +121,11 @@ const Main = (props) => {
     return(
       <main>
         <Switch>
-          <ConditionalRoute key="1" exact path={match.url} {...props}
+          <ConditionalRoute key="1" exact path={match.url}
             render={routeProps => <Poll  key="1" pollId={pollId} routeProps={routeProps} mode="respond" {...props}/>} />
-          <Route key="2" exact path={ match.url + '/edit' } {...props}
+          <Route key="2" exact path={ match.url + '/edit' }
             render={() => <Redirect to={'/' + pollCode} />} />
-          <Route key="3" exact path={ match.url + '/results' } {...props}
+          <Route key="3" exact path={ match.url + '/results' }
             render={routeProps => <Poll  key="2" pollId={pollId} routeProps={routeProps} mode="results" {...props}/>} />
         </Switch>
       </main>
@@ -148,11 +156,7 @@ const Header = (props) => {
 
 /* main-start */
 
-const getUpdate = (data) => {
-  console.log(data);
-  this.setState(data);
-
-}
+const passUpdate = (evt, key) => {key : evt.target.value};
 
 const content = document.getElementById('root');
 const pollId = content.dataset.poll;
