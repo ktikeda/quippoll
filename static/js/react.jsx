@@ -21,6 +21,7 @@ class PollSettings extends React.Component {
                   shortCode : '',
                   responses : ''
                   };
+
     }
 
   getUpdate = (data) => {
@@ -155,8 +156,6 @@ const Header = (props) => {
 /* routes-end */
 
 /* main-start */
-
-const passUpdate = (evt, key) => {key : evt.target.value};
 
 const content = document.getElementById('root');
 const pollId = content.dataset.poll;

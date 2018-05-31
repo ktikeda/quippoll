@@ -16,15 +16,7 @@ export class Poll extends React.Component {
                   items : ""
                   };
 
-    this.setChart = this.setChart.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.updatePrompt = this.updatePrompt.bind(this);
-    this.handleOptionAdd = this.handleOptionAdd.bind(this);
-    this.getDeletion = this.getDeletion.bind(this);
-    this.getUpdate = this.getUpdate.bind(this);
-    this.onSortEnd = this.onSortEnd.bind(this);
-
-    onNewResult(this.props.pollId, 
+    onNewResult (this.props.pollId, 
       (err, data) => {
         this.setState({ responseData : data.responses })
         this.setState({ prompt : data.prompt })
@@ -32,16 +24,16 @@ export class Poll extends React.Component {
 
   } // end constructor
 
-  setChart(evt) {
+  setChart = (evt) => {
     let type = evt.target.id;
     this.setState({chart : type});
   } // end setChart
 
-  handleChange(evt) {
+  handleChange = (evt) => {
     this.setState({ prompt : evt.target.value });
   } // end handleChange
 
-  updatePrompt(evt) {
+  updatePrompt = (evt) => {
 
     const data = {prompt : evt.target.value};
 
@@ -50,14 +42,11 @@ export class Poll extends React.Component {
       resp => console.log(resp)
     );
 
-    console.log(this.props.cbUpdate);
-
-    this.props.cbUpate(data);
-
-   
+    this.props.cbUpdate(data);
+ 
   } // end updatePrompt
 
-  onSortEnd({oldIndex, newIndex}, evt) {
+  onSortEnd = ({oldIndex, newIndex}, evt) => {
     // send new index to server, server return json with response weight data
 
     function assignWeight(array, index) {
@@ -113,7 +102,7 @@ export class Poll extends React.Component {
 
   }; // end onSortEnd
 
-  getUpdate(data) {
+  getUpdate = (data) => {
     let responses = this.state.responseData;
 
     for (let response of responses) {
@@ -126,11 +115,10 @@ export class Poll extends React.Component {
 
   }
 
-  getDeletion(response) {
+  getDeletion = (response) => {
     /* get response send response to be deleted to server
        change responseData on state */
     let url = '/api/polls/' + this.props.pollId + '/responses/' + response.response_id;
-    console.log(url);
 
     $.ajax({
       url: '/api/polls/' + this.props.pollId + '/responses/' + response.response_id,
@@ -145,7 +133,7 @@ export class Poll extends React.Component {
 
   } // end getDeletion
 
-  handleOptionAdd(evt) {
+  handleOptionAdd = (evt) => {
     //update poll options and reset options to an empty string
     let responses = this.state.responseData;
 
@@ -168,7 +156,7 @@ export class Poll extends React.Component {
 
   /* Begin render elements */
 
-  showNav() {
+  showNav = () => {
     let mode = this.props.mode
     if (mode === 'results') {
 
@@ -182,7 +170,7 @@ export class Poll extends React.Component {
     } // end if
   } // showNav
 
-  showResults(responses) {
+  showResults = (responses) => {
     
     let chart = this.state.chart;
     let mode = this.props.mode
@@ -207,7 +195,7 @@ export class Poll extends React.Component {
     } // end if
   } // end showResults
 
-  showPrompt() {
+  showPrompt = () => {
     
     let id = this.props.pollId;
     let prompt = this.props.prompt;
@@ -222,7 +210,7 @@ export class Poll extends React.Component {
 
   } // end showPrompt
 
-  showResponses(responses) {
+  showResponses = (responses) => {
 
     let mode = this.props.mode;
     let pollId = this.props.pollId;

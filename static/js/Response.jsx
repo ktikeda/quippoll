@@ -5,21 +5,9 @@ export class Response extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {text : "",
-                  isVisible : true,
-                  };
-
-    this.updateResponse = this.updateResponse.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.passDeletion = this.passDeletion.bind(this);
-
   } // end constructor
 
-  handleChange(evt) {
-    this.setState({ text : evt.target.value });
-  } // handleChange
-
-  updateResponse(evt) {
+  updateResponse = (evt) => {
 
     let data = {'response_id' : this.props.id,
                 'text' : evt.target.value};
@@ -33,14 +21,14 @@ export class Response extends React.Component {
     
   } // end updateResponse
 
-  passDeletion(evt) {
+  passDeletion = (evt) => {
 
     let data = {'response_id' : this.props.id};
     
     this.props.cbDelete(data);
   } 
 
-  showSaved() {
+  showSaved = () => {
     // implement save badge
   } // end showSaved
 
@@ -62,13 +50,6 @@ export class Response extends React.Component {
       return (<div>{text} : {value}</div>);
     } // end if
   } // end render
-
-  componentDidMount() {
-    let resp = fetch('/api/polls/' + this.props.pollId + '/responses/' + this.props.id).then(data => data.json());
-
-    resp.then( data => this.setState({ text: data.text }));
-  
-  } // end componentDidMount
 
 }
 
