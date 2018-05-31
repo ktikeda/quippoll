@@ -104,15 +104,11 @@ export class Poll extends React.Component {
   }; // end onSortEnd
 
   getUpdate = (data) => {
-    let responses = this.state.responses;
+    let responses = this.state.responseMap;
 
-    for (let response of responses) {
-      if (response.response_id === data.response_id) {
-        response.text = data.text;
-      }
-    }
+    responses.get(data.response_id).text = data.text;
 
-    this.setState({responses : responses});
+    this.setState({responseMap : responses});
 
   }
 
@@ -285,15 +281,29 @@ export class Poll extends React.Component {
   componentDidMount() {
     fetch('/api/polls/' + this.props.pollId + '/responses')
       .then( resp => resp.json())
+      // .then( data => {
+      //   let order = data.response_data;
+      //   let rMap = new Map();
+
+      //   for (let response of order) {
+      //     rMap.set(response.response_id, response);
+      //   }
+
+      //   console.log(rMap);
+
+      //   this.setState({ responses: order, responseMap: rMap });
+      // });
       .then( data => {
-        let order = data.response_data;
+        let order = new Array();
         let rMap = new Map();
 
-        for (let response of order) {
+        for (let response of data.response_data) {
           rMap.set(response.response_id, response);
         }
 
-        console.log(rMap);
+        for (let datum of data.response_data) {
+          order.push(rMap.get(datum.response_id));
+        }
 
         this.setState({ responses: order, responseMap: rMap });
       });
