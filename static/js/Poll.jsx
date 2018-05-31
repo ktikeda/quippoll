@@ -12,6 +12,7 @@ export class Poll extends React.Component {
     super(props);
     this.state = {
                   responses: [],
+                  responseMap: new Map(),
                   chart : 'text',
                   items : ""
                   };
@@ -284,7 +285,18 @@ export class Poll extends React.Component {
   componentDidMount() {
     fetch('/api/polls/' + this.props.pollId + '/responses')
       .then( resp => resp.json())
-      .then( data => this.setState({ responses: data.response_data }));
+      .then( data => {
+        let order = data.response_data;
+        let rMap = new Map();
+
+        for (let response of order) {
+          rMap.set(response.response_id, response);
+        }
+
+        console.log(rMap);
+
+        this.setState({ responses: order, responseMap: rMap });
+      });
   
   } // end componentDidMount
 
