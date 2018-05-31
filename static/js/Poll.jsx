@@ -11,7 +11,7 @@ export class Poll extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-                  prompt : "",
+                  prompt : '',
                   responseData: [],
                   chart : 'text',
                   items : ""
@@ -25,7 +25,7 @@ export class Poll extends React.Component {
     this.getUpdate = this.getUpdate.bind(this);
     this.onSortEnd = this.onSortEnd.bind(this);
 
-    onNewResult(this.props.id, 
+    onNewResult(this.props.pollId, 
       (err, data) => {
         this.setState({ responseData : data.responses })
         this.setState({ prompt : data.prompt })
@@ -46,7 +46,7 @@ export class Poll extends React.Component {
 
     let data = {'prompt' : this.state.prompt};
 
-    $.post('/api/polls/' + this.props.id,
+    $.post('/api/polls/' + this.props.pollId,
       data,
       resp => console.log(resp)
     );
@@ -103,7 +103,7 @@ export class Poll extends React.Component {
 
     // implement reWeigh if String(response.weight).length > 15
 
-    $.post('/api/polls/' + this.props.id + '/responses/' + response.response_id,
+    $.post('/api/polls/' + this.props.pollId + '/responses/' + response.response_id,
       response,
       (resp) => console.log(resp));
 
@@ -125,15 +125,15 @@ export class Poll extends React.Component {
   getDeletion(response) {
     /* get response send response to be deleted to server
        change responseData on state */
-    let url = '/api/polls/' + this.props.id + '/responses/' + response.response_id;
+    let url = '/api/polls/' + this.props.pollId + '/responses/' + response.response_id;
     console.log(url);
 
     $.ajax({
-      url: '/api/polls/' + this.props.id + '/responses/' + response.response_id,
+      url: '/api/polls/' + this.props.pollId + '/responses/' + response.response_id,
       type: 'delete',
       success: (resp) => {
         console.log(resp.status);
-        fetch('/api/polls/' + this.props.id + '/responses')
+        fetch('/api/polls/' + this.props.pollId + '/responses')
         .then(resp => resp.json())
         .then(data => this.setState({responseData: data.response_data}));
       }
@@ -149,7 +149,7 @@ export class Poll extends React.Component {
                                   'weight' : responses[responses.length-1].weight + 1}]};
 
     $.ajax({ 
-      url: '/api/polls/' + this.props.id + '/responses',
+      url: '/api/polls/' + this.props.pollId + '/responses',
       dataType: 'json',
       contentType : 'application/json',
       type: 'post',
@@ -205,12 +205,12 @@ export class Poll extends React.Component {
 
   showPrompt() {
     
-    let id = this.props.id;
+    let id = this.props.pollId;
     let prompt = this.state.prompt;
     let mode = this.props.mode;
 
     if (mode === 'edit') {
-      return (<div><input type="text" id={id} className="" value={prompt} onChange={this.handleChange} onBlur={this.updatePrompt} /></div>);
+      return (<div><input type="text" id={id} className="" defaultValue={prompt} onChange={this.handleChange} onBlur={this.updatePrompt} /></div>);
       
     } else {
       return (<h1>{prompt}</h1>);
@@ -221,7 +221,7 @@ export class Poll extends React.Component {
   showResponses(responses) {
 
     let mode = this.props.mode;
-    let pollId = this.props.id;
+    let pollId = this.props.pollId;
 
     const SortableItem = SortableElement(({value}) =>
       <li key={ value.response_id }><Response 
@@ -231,7 +231,7 @@ export class Poll extends React.Component {
             weight={ value.weight } 
             mode='edit' 
             isVisible={ value.is_visible }
-            pollId={ this.props.id }
+            pollId={ this.props.pollId }
             cbDelete={ this.getDeletion }
             cbUpdate={ this.getUpdate } />
       </li>
@@ -272,8 +272,8 @@ export class Poll extends React.Component {
 
 
   render() {
-    
-    let responses = this.state.responseData;
+    debugger;
+    let responses = this.props.responses;
     //responses = responses.sort((a, b) => a.weight - b.weight );
     let mode = this.props.mode
 
@@ -283,7 +283,7 @@ export class Poll extends React.Component {
 
         { this.showPrompt() }
             
-        { this.showResponses(responses) }
+        { responses ? this.showResponses(responses) : <div/> }
         
         { this.showResults(responses) }
         
@@ -291,10 +291,9 @@ export class Poll extends React.Component {
     
   } // End of render
 
-  componentDidMount() {
-    let resp = fetch('/api/polls/' + this.props.id).then(resp => resp.json());
+  componentDidUpdate() {
+    let resp = fetch('/api/polls/' + this.props.pollId).then(resp => resp.json());
 
-    resp.then( data => this.setState({ id: data.poll_id }));
     resp.then( data => this.setState({ prompt: data.prompt }));
     resp.then( data => this.setState({ responseData: data.responses }));
   

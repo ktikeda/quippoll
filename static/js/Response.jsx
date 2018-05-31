@@ -22,9 +22,7 @@ export class Response extends React.Component {
   updateResponse(evt) {
 
     let data = {'response_id' : this.props.id,
-                'text' : this.state.text,
-                'value' : this.state.value,
-                'is_visible': this.state.isVisible};
+                'text' : evt.target.value};
 
     $.post('/api/polls/' + this.props.pollId + '/responses/' + this.props.id,
       data,
@@ -57,7 +55,7 @@ export class Response extends React.Component {
     if (mode === 'respond') {
       return (<button className="response-option btn btn-primary btn-lg btn-block">{text}</button>);
     } else if (mode === 'edit') {
-      return (<div><label>{weight}. </label><input type="text" id={id} className="" defaultValue={text} onChange={this.handleChange} onBlur={this.updateResponse} />
+      return (<div><label>{weight}. </label><input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
               <button className="" type="button" onClick={this.passDeletion}>Delete</button>
               </div>);
     } else if (mode === 'results') {

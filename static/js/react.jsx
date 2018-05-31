@@ -5,41 +5,13 @@ import ReactDOM from "react-dom";
 
 import Poll from "./Poll.jsx";
 
-class UserSettings extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-                  userId : "",
-                  isAdmin: true,
-                  mayRespond : true
-                  };
-    }
-
-  componentDidMount() {
-    fetch('/api/polls/' + pollId + '/user', 
-      {
-      method: 'GET',
-      credentials: 'include'
-      })
-      .then(resp => resp.json())
-      .then( data => this.setState({ userId : data.user_id, 
-                                     isAdmin : data.is_admin, 
-                                     mayRespond : data.may_respond }));
-  
-  } // end componentDidMount
-
-  render() {
-    return(
-      <PollSettings userId={this.state.userId} isAdmin={this.state.isAdmin} mayRespond={this.state.mayRespond} />
-  )}
-
-} // end UsersSettings
-
-
 class PollSettings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+                  userId : '',
+                  isAdmin: '',
+                  mayRespond : '',
                   pollId : '',
                   collectResponse : '',
                   collectTally : '',
@@ -49,7 +21,7 @@ class PollSettings extends React.Component {
                   shortCode : '',
                   responses : ''
                   };
-  }
+    }
 
   componentDidMount() {
     fetch('/api/polls/' + pollId, 
@@ -67,13 +39,50 @@ class PollSettings extends React.Component {
                                      shortCode : data.short_code,
                                      responses : data.responses
                                    }));
+    fetch('/api/polls/' + pollId + '/user', 
+      {
+      method: 'GET',
+      credentials: 'include'
+      })
+      .then(resp => resp.json())
+      .then( data => this.setState({ userId : data.user_id, 
+                                     isAdmin : data.is_admin, 
+                                     mayRespond : data.may_respond }));
+
+    
+  
   } // end componentDidMount
+
+  render() {
+    return(
+      <RouteSettings 
+        userId={this.state.userId} 
+        isAdmin={this.state.isAdmin} 
+        mayRespond={this.state.mayRespond} 
+        pollId={this.state.pollId}
+        collectResponse={this.state.collectResponse}
+        collectTally={this.state.collectTally}
+        multiSelect={this.state.multiSelect}
+        title={this.state.title}
+        prompt={this.state.prompt}
+        shortCode={this.state.shortCode}
+        responses={this.state.responses}
+      />
+  )}
+
+} // end PollSettings
+
+
+class RouteSettings extends React.Component {
+  constructor(props) {
+    super(props);
+  }
   
   render() {
-
   // source: https://tylermcginnis.com/react-router-protected-routes-authentication/
-
+    
     const Main = ({match}) => {
+
       const AdminRoute = ({ component: Component, ...rest }) => (
         <Route {...rest} render={(props) => (
           this.props.isAdmin === true
@@ -95,11 +104,11 @@ class PollSettings extends React.Component {
           <main>
             <Switch>
               <Route exact path={match.url} 
-                component={(props) => <Poll id={pollId} mode="respond" {...props}/>} />
+                render={() => <Poll mode="respond" {...this.props}/>} />
               <Route exact path={ match.url + '/edit' } 
-                component={(props) => <Poll id={pollId} mode="edit" {...props}/>} />
+                render={() => <Poll mode="edit" cbUpdate={this.getUpdate} {...this.props}/>} />
               <Route exact path={ match.url + '/results' }
-                component={(props) => <Poll id={pollId} mode="results" {...props}/>} />
+                render={() => <Poll mode="results" {...this.props}/>} />
             </Switch>
           </main>
       )} else {
@@ -107,11 +116,11 @@ class PollSettings extends React.Component {
           <main>
             <Switch>
               <ConditionalRoute exact path={match.url} 
-                component={(props) => <Poll id={pollId} mode="respond" {...props}/>} />
+                render={() => <Poll mode="respond" {...this.props}/>} />
               <Route exact path={ match.url + '/edit' } 
-                component={() => <Redirect to={'/' + pollCode} />} />
+                render={() => <Redirect to={'/' + pollCode} />} />
               <Route exact path={ match.url + '/results' }
-                component={(props) => <Poll id={pollId} mode="results" {...props}/>} />
+                render={() => <Poll mode="results" {...this.props}/>} />
             </Switch>
           </main>
       )}
@@ -136,14 +145,13 @@ class PollSettings extends React.Component {
       }
     } // end Header
 
-
     return(
       <div>
-        <Route path={ '/' + pollCode } render={ props => <Header {...props} isAdmin={true} />} />
-        <Route path={ '/' + pollCode } render={ props => <Main {...props} isAdmin={true} mayRespond={true}/>} />
+        <Route path={ '/' + pollCode } render={ props => <Header {...props} />} />
+        <Route path={ '/' + pollCode } render={ props => <Main {...props} />} />
       </div>
   )} // end render
-} //end app
+} //end Route Settings
 
 /* routes-end */
 
@@ -152,12 +160,11 @@ class PollSettings extends React.Component {
 const content = document.getElementById('root');
 const pollId = content.dataset.poll;
 const pollCode = content.dataset.code;
-console.log(pollCode);
 
 // add flag, document.cookie.isadmin in vanilla js
 ReactDOM.render(
   <Router>
-    <UserSettings />
+    <PollSettings />
   </Router>,
     document.getElementById("root")
 );
