@@ -11,14 +11,14 @@ export class Poll extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-                  responseData: [],
+                  responses: [],
                   chart : 'text',
                   items : ""
                   };
 
     onNewResult (this.props.pollId, 
       (err, data) => {
-        this.setState({ responseData : data.responses })
+        this.setState({ responses : data.responses })
         this.setState({ prompt : data.prompt })
     }); // end onNewResult
 
@@ -89,10 +89,10 @@ export class Poll extends React.Component {
     // console.log(evt);
 
     this.setState({
-      responseData: assignWeight(arrayMove(this.state.responseData, oldIndex, newIndex), newIndex)
+      responses: assignWeight(arrayMove(this.state.responses, oldIndex, newIndex), newIndex)
     });
 
-    let response = this.state.responseData[newIndex];
+    let response = this.state.responses[newIndex];
 
     // implement reWeigh if String(response.weight).length > 15
 
@@ -103,7 +103,7 @@ export class Poll extends React.Component {
   }; // end onSortEnd
 
   getUpdate = (data) => {
-    let responses = this.state.responseData;
+    let responses = this.state.responses;
 
     for (let response of responses) {
       if (response.response_id === data.response_id) {
@@ -111,13 +111,13 @@ export class Poll extends React.Component {
       }
     }
 
-    this.setState({responseData : responses});
+    this.setState({responses : responses});
 
   }
 
   getDeletion = (response) => {
     /* get response send response to be deleted to server
-       change responseData on state */
+       change responses on state */
     let url = '/api/polls/' + this.props.pollId + '/responses/' + response.response_id;
 
     $.ajax({
@@ -127,7 +127,7 @@ export class Poll extends React.Component {
         console.log(resp.status);
         fetch('/api/polls/' + this.props.pollId + '/responses')
         .then(resp => resp.json())
-        .then(data => this.setState({responseData: data.response_data}));
+        .then(data => this.setState({responses: data.response_data}));
       }
     }); // end $.ajax
 
@@ -135,9 +135,9 @@ export class Poll extends React.Component {
 
   handleOptionAdd = (evt) => {
     //update poll options and reset options to an empty string
-    let responses = this.state.responseData;
+    let responses = this.state.responses;
 
-    let _data = {responseData : [{'text' : '',
+    let _data = {responses : [{'text' : '',
                                   'weight' : responses[responses.length-1].weight + 1}]};
 
     $.ajax({ 
@@ -148,7 +148,7 @@ export class Poll extends React.Component {
       data: JSON.stringify(_data),
       success: (resp) => {
         console.log(resp);
-        this.setState({responseData: this.state.responseData.concat(resp.response_data)});
+        this.setState({responses: this.state.responses.concat(resp.response_data)});
       }
     });
     
@@ -249,7 +249,7 @@ export class Poll extends React.Component {
       
     } else {
       return (<div><ol> {responses.map(function(response){
-            return <li><Response 
+            return <li key={ response.response_id }><Response 
                       key={ response.response_id } 
                       id={ response.response_id } 
                       mode={ mode }
@@ -264,7 +264,7 @@ export class Poll extends React.Component {
 
 
   render() {
-    let responses = this.state.responseData;
+    let responses = this.state.responses;
     //responses = responses.sort((a, b) => a.weight - b.weight );
     let mode = this.props.mode
 
@@ -285,7 +285,7 @@ export class Poll extends React.Component {
   componentDidMount() {
     fetch('/api/polls/' + this.props.pollId + '/responses')
       .then( resp => resp.json())
-      .then( data => this.setState({ responseData: data.response_data }));
+      .then( data => this.setState({ responses: data.response_data }));
   
   } // end componentDidMount
 

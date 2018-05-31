@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import OrdinalFrame from "semiotic";
+import {OrdinalFrame} from "semiotic";
 
 export class PieChart extends React.Component {
   constructor(props) {
@@ -9,7 +9,8 @@ export class PieChart extends React.Component {
     }
 
   render() {
-    const chartData = this.props.data; 
+    const chartData = this.props.data;
+    console.log(chartData);
 
     return (<div>
     <OrdinalFrame

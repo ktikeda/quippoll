@@ -18,8 +18,7 @@ class PollSettings extends React.Component {
                   multiSelect : '',
                   title : '',
                   prompt : '',
-                  shortCode : '',
-                  responses : ''
+                  shortCode : ''
                   };
 
     }
@@ -44,7 +43,6 @@ class PollSettings extends React.Component {
                                      title : data.title,
                                      prompt : data.prompt,
                                      shortCode : data.short_code,
-                                     responses : data.responses
                                    }));
 
     fetch('/api/polls/' + pollId + '/user', 
@@ -71,7 +69,6 @@ class PollSettings extends React.Component {
         title={this.state.title}
         prompt={this.state.prompt}
         shortCode={this.state.shortCode}
-        responses={this.state.responses}
         cbUpdate={this.getUpdate}
       />
   )}

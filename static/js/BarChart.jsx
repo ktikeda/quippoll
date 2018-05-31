@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import OrdinalFrame from "semiotic";
+import {OrdinalFrame} from "semiotic";
 
 export class BarChart extends React.Component {
   constructor(props) {
