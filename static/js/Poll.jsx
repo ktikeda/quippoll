@@ -272,7 +272,6 @@ export class Poll extends React.Component {
 
 
   render() {
-    debugger;
     let responses = this.props.responses;
     //responses = responses.sort((a, b) => a.weight - b.weight );
     let mode = this.props.mode
@@ -285,13 +284,13 @@ export class Poll extends React.Component {
             
         { responses ? this.showResponses(responses) : <div/> }
         
-        { this.showResults(responses) }
+        { responses ? this.showResults(responses) : <div/> }
         
       </div>);
     
   } // End of render
 
-  componentDidUpdate() {
+  componentDidMount() {
     let resp = fetch('/api/polls/' + this.props.pollId).then(resp => resp.json());
 
     resp.then( data => this.setState({ prompt: data.prompt }));

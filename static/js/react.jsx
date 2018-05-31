@@ -39,6 +39,7 @@ class PollSettings extends React.Component {
                                      shortCode : data.short_code,
                                      responses : data.responses
                                    }));
+
     fetch('/api/polls/' + pollId + '/user', 
       {
       method: 'GET',
@@ -48,18 +49,15 @@ class PollSettings extends React.Component {
       .then( data => this.setState({ userId : data.user_id, 
                                      isAdmin : data.is_admin, 
                                      mayRespond : data.may_respond }));
-
-    
-  
+ 
   } // end componentDidMount
 
   render() {
     return(
-      <RouteSettings 
+      <Routes
         userId={this.state.userId} 
         isAdmin={this.state.isAdmin} 
         mayRespond={this.state.mayRespond} 
-        pollId={this.state.pollId}
         collectResponse={this.state.collectResponse}
         collectTally={this.state.collectTally}
         multiSelect={this.state.multiSelect}
@@ -72,90 +70,89 @@ class PollSettings extends React.Component {
 
 } // end PollSettings
 
+const Routes = (props) => (
+  <div>
+    <Route path={ '/' + pollCode } render={ routeProps => <Header routeProps={routeProps} {...props} />} />
+    <Route path={ '/' + pollCode } render={ routeProps => <Main routeProps={routeProps} {...props} />} />
+  </div>
+)
 
-class RouteSettings extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-  
-  render() {
-  // source: https://tylermcginnis.com/react-router-protected-routes-authentication/
-    
-    const Main = ({match}) => {
+const Main = (props) => {
+  const match = props.routeProps.match;
+  console.log(props);
 
-      const AdminRoute = ({ component: Component, ...rest }) => (
-        <Route {...rest} render={(props) => (
-          this.props.isAdmin === true
-            ? <Component {...props} />
-            : <Redirect to={'/' + pollCode} />
-        )} />
-      );
+  const AdminRoute = ({ component: Component, ...rest }) => (
+    <Route {...rest} render={(props) => (
+      props.isAdmin === true
+        ? <Component {...props} />
+        : <Redirect to={'/' + pollCode} />
+    )} />
+  );
 
-      const ConditionalRoute = ({ component: Component, ...rest }) => (
-        <Route {...rest} render={(props) => (
-          this.props.mayRespond === true
-            ? <Component {...props} />
-            : <Redirect to={'/' + pollCode + '/results'} />
-        )} />
-      );
+  const ConditionalRoute = ({ component: Component, ...rest }) => (
+    <Route {...rest} render={(props) => (
+      props.mayRespond === true
+        ? <Component {...props} />
+        : <Redirect to={'/' + pollCode + '/results'} />
+    )} />
+  );
 
-      if (this.props.isAdmin === true) {
-        return(
-          <main>
-            <Switch>
-              <Route exact path={match.url} 
-                render={() => <Poll mode="respond" {...this.props}/>} />
-              <Route exact path={ match.url + '/edit' } 
-                render={() => <Poll mode="edit" cbUpdate={this.getUpdate} {...this.props}/>} />
-              <Route exact path={ match.url + '/results' }
-                render={() => <Poll mode="results" {...this.props}/>} />
-            </Switch>
-          </main>
-      )} else {
-        return(
-          <main>
-            <Switch>
-              <ConditionalRoute exact path={match.url} 
-                render={() => <Poll mode="respond" {...this.props}/>} />
-              <Route exact path={ match.url + '/edit' } 
-                render={() => <Redirect to={'/' + pollCode} />} />
-              <Route exact path={ match.url + '/results' }
-                render={() => <Poll mode="results" {...this.props}/>} />
-            </Switch>
-          </main>
-      )}
-    } // end main
-
-    // The Header creates links that can be used to navigate
-    // between routes.
-    const Header = ({match}) => {
-      if (this.props.isAdmin === true) {
-        return(
-          <header>
-            <nav>
-              <ul>
-                <li><Link to={ match.url } >Respond</Link></li>
-                <li><Link to={ match.url + '/edit' } >Edit</Link></li>
-                <li><Link to={ match.url + '/results' }>Results</Link></li>
-              </ul>
-            </nav>
-          </header>
-      )} else {
-          return(<header />)
-      }
-    } // end Header
-
+  if (props.isAdmin === true) {
     return(
-      <div>
-        <Route path={ '/' + pollCode } render={ props => <Header {...props} />} />
-        <Route path={ '/' + pollCode } render={ props => <Main {...props} />} />
-      </div>
-  )} // end render
-} //end Route Settings
+      <main>
+        <Switch>
+          <Route key="1" exact path={match.url}
+            render={routeProps => <Poll  key="1" pollId={pollId} routeProps={routeProps} mode="respond" {...props}/>} />
+          <Route key="2" exact path={ match.url + '/edit' }
+            render={routeProps => <Poll  key="2" pollId={pollId} routeProps={routeProps} mode="edit" {...props}/>} />
+          <Route key="3" exact path={ match.url + '/results' }
+            render={routeProps => <Poll  key="3" pollId={pollId} routeProps={routeProps} mode="results" {...props}/>} />
+        </Switch>
+      </main>
+  )} else {
+    return(
+      <main>
+        <Switch>
+          <ConditionalRoute key="1" exact path={match.url} {...props}
+            render={routeProps => <Poll  key="1" pollId={pollId} routeProps={routeProps} mode="respond" {...props}/>} />
+          <Route key="2" exact path={ match.url + '/edit' } {...props}
+            render={() => <Redirect to={'/' + pollCode} />} />
+          <Route key="3" exact path={ match.url + '/results' } {...props}
+            render={routeProps => <Poll  key="2" pollId={pollId} routeProps={routeProps} mode="results" {...props}/>} />
+        </Switch>
+      </main>
+  )}
+} // end main
+
+// The Header creates links that can be used to navigate
+// between routes.
+const Header = (props) => {
+  const match = props.routeProps.match;
+  if (props.isAdmin === true) {
+    return(
+      <header>
+        <nav>
+          <ul>
+            <li key="1"><Link to={ match.url } >Respond</Link></li>
+            <li key="2"><Link to={ match.url + '/edit' } >Edit</Link></li>
+            <li key="3"><Link to={ match.url + '/results' }>Results</Link></li>
+          </ul>
+        </nav>
+      </header>
+  )} else {
+      return(<header />)
+  }
+} // end Header
 
 /* routes-end */
 
 /* main-start */
+
+const getUpdate = (data) => {
+  console.log(data);
+  this.setState(data);
+
+}
 
 const content = document.getElementById('root');
 const pollId = content.dataset.poll;
