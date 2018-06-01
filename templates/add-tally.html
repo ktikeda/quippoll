@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1 class="text-center">{{ poll.prompt }}</h1>
-<form name="poll_responses" id="poll_responses" action="/{{ poll.short_code }}" method="POST">
+<form name="poll_responses" id="poll_responses" action="/polls/{{ poll.short_code }}" method="POST">
     
 
       {% for response in poll.responses %}
@@ -12,7 +12,7 @@
 
       {% endfor %}
       <input type="hidden" id="multi_select" name="multi_select" value="{{ poll.poll_type.multi_select }}">
-      <input type="hidden" id="poll" name="poll" value="{{ poll.short_code }}.json">
+      <input type="hidden" id="poll" name="poll" value="polls/{{ poll.short_code }}">
       <input type="submit" value="Submit" class="btn btn-secondary d-flex justify-content-center">
 
 </form>

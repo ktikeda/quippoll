@@ -11,16 +11,19 @@ export class Poll extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-                  responses: [],
-                  responseMap: new Map(),
+                  responseOrder: [],
+                  responseData: new Map(),
                   chart : 'text',
                   items : ""
                   };
 
+    //TODO: Fix to work with Map
     onNewResult (this.props.pollId, 
       (err, data) => {
-        this.setState({ responses : data.responses })
-        this.setState({ prompt : data.prompt })
+        let responses = this.state.responseData;
+        responses.get(data.response_id).value = data.value;
+
+        this.setState({ responseData : responses });
     }); // end onNewResult
 
   } // end constructor
@@ -90,10 +93,10 @@ export class Poll extends React.Component {
     // console.log(evt);
 
     this.setState({
-      responses: assignWeight(arrayMove(this.state.responses, oldIndex, newIndex), newIndex)
+      responseOrder: assignWeight(arrayMove(this.state.responseOrder, oldIndex, newIndex), newIndex)
     });
 
-    let response = this.state.responses[newIndex];
+    let response = this.state.responseOrder[newIndex];
 
     // implement reWeigh if String(response.weight).length > 15
 
@@ -104,11 +107,11 @@ export class Poll extends React.Component {
   }; // end onSortEnd
 
   getUpdate = (data) => {
-    let responses = this.state.responseMap;
+    let responses = this.state.responseData;
 
     responses.get(data.response_id).text = data.text;
 
-    this.setState({responseMap : responses});
+    this.setState({responseData : responses});
 
   }
 
@@ -117,9 +120,9 @@ export class Poll extends React.Component {
        change responses on state */
     const id = data.response_id;
     let url = '/api/polls/' + this.props.pollId + '/responses/' + id;
-    let responses = this.state.responseMap;
+    let responses = this.state.responseData;
     let response = responses.get(id);
-    let order = this.state.responses;
+    let order = this.state.responseOrder;
 
     $.ajax({
       url: '/api/polls/' + this.props.pollId + '/responses/' + id,
@@ -129,7 +132,7 @@ export class Poll extends React.Component {
         let index = order.indexOf(response);
         order.splice(index, 1);
         responses.delete(id);
-        this.setState({responseMap : responses, responses : order});
+        this.setState({responseData : responses, responseOrder : order});
 
       }
     }); // end $.ajax
@@ -138,10 +141,10 @@ export class Poll extends React.Component {
 
   handleOptionAdd = (evt) => {
     //update poll options and reset options to an empty string
-    let responses = this.state.responses;
+    let order = this.state.responseOrder;
 
     let _data = {responses : [{'text' : '',
-                                  'weight' : responses[responses.length-1].weight + 1}]};
+                                  'weight' : order[order.length-1].weight + 1}]};
 
     $.ajax({ 
       url: '/api/polls/' + this.props.pollId + '/responses',
@@ -150,14 +153,14 @@ export class Poll extends React.Component {
       type: 'post',
       data: JSON.stringify(_data),
       success: (resp) => {
-        console.log(resp);
+        console.log(resp.status);
         const response = resp.response_data[0];
         const id = response.response_id;
-        const rMap = this.state.responseMap;
+        const rMap = this.state.responseData;
         rMap.set(id, response);
 
-        this.setState({responseMap : rMap,
-                       responses: this.state.responses.concat(rMap.get(id))});
+        this.setState({responseData : rMap,
+                       responseOrder: this.state.responseOrder.concat(rMap.get(id))});
       }
     });
     
@@ -273,7 +276,7 @@ export class Poll extends React.Component {
 
 
   render() {
-    let responses = this.state.responses;
+    let responses = this.state.responseOrder;
     let mode = this.props.mode
 
     return(
@@ -303,7 +306,7 @@ export class Poll extends React.Component {
 
       //   console.log(rMap);
 
-      //   this.setState({ responses: order, responseMap: rMap });
+      //   this.setState({ responses: order, responseData: rMap });
       // });
       .then( data => {
         let order = new Array();
@@ -317,7 +320,7 @@ export class Poll extends React.Component {
           order.push(rMap.get(datum.response_id));
         }
 
-        this.setState({ responses: order, responseMap: rMap });
+        this.setState({ responseOrder: order, responseData: rMap });
       });
   
   } // end componentDidMount

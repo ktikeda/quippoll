@@ -28,19 +28,19 @@ def emit_new_result(response):
                   namespace='/poll')
 
 
-def emit_new_result_id(poll):
+def emit_new_result_id(response):
     """Send new result data as server generated event to clients."""
 
     print "Server emitted"
 
-    responses = [{'response_id' : response.response_id, 
+    data = {'response_id' : response.response_id, 
                   'weight' : response.weight, 
                   'text' : response.text,
                   'value' : response.value(),
-                  'is_visible': response.is_visible} for response in poll.responses]
+                  'is_visible': response.is_visible}
 
-    socketio.emit('new_result_' + str(poll.poll_id),
-                  {"poll_id" : poll.poll_id, "prompt" : poll.prompt, "responses" : responses},
+    socketio.emit('new_result_' + str(response.poll_id),
+                  data,
                   namespace='/poll')
 
 
@@ -148,7 +148,7 @@ def _():
     return ''
 
 
-@app.route('/polls/<short_code>', methods=["POST"])
+@app.route('/polls/<short_code>.json', methods=["POST"])
 def add_response_to_db(short_code):
     """Add response data to db"""
 
@@ -174,14 +174,14 @@ def add_response_to_db(short_code):
     # Specify route
     if poll.is_results_visible:
         flash('Your response has been recorded.')
-        route = '/' + poll.short_code + '/r'
+        route = '/' + poll.short_code
     else:
         route = '/' + poll.short_code + '/success'
 
     return redirect(route)
 
 
-@app.route('/polls/<short_code>.json', methods=["POST"])
+@app.route('/polls/<short_code>', methods=["POST"])
 def add_tally_to_db(short_code):
     """Add tally data to db"""
 
@@ -201,12 +201,12 @@ def add_tally_to_db(short_code):
         db.session.commit()
 
         # emit_new_result(response)
-        emit_new_result_id(poll)
+        emit_new_result_id(response)
 
     # Specify route
     if poll.is_results_visible:
         flash('Your response has been recorded.')
-        route = '/' + poll.short_code + '/r'
+        route = '/' + poll.short_code
     else:
         route = '/' + poll.short_code + '/success'
 
