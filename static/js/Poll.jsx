@@ -112,19 +112,25 @@ export class Poll extends React.Component {
 
   }
 
-  getDeletion = (response) => {
+  getDeletion = (data) => {
     /* get response send response to be deleted to server
        change responses on state */
-    let url = '/api/polls/' + this.props.pollId + '/responses/' + response.response_id;
+    const id = data.response_id;
+    let url = '/api/polls/' + this.props.pollId + '/responses/' + id;
+    let responses = this.state.responseMap;
+    let response = responses.get(id);
+    let order = this.state.responses;
 
     $.ajax({
-      url: '/api/polls/' + this.props.pollId + '/responses/' + response.response_id,
+      url: '/api/polls/' + this.props.pollId + '/responses/' + id,
       type: 'delete',
       success: (resp) => {
         console.log(resp.status);
-        fetch('/api/polls/' + this.props.pollId + '/responses')
-        .then(resp => resp.json())
-        .then(data => this.setState({responses: data.response_data}));
+        let index = order.indexOf(response);
+        order.splice(index, 1);
+        responses.delete(id);
+        this.setState({responseMap : responses, responses : order});
+
       }
     }); // end $.ajax
 
@@ -145,7 +151,13 @@ export class Poll extends React.Component {
       data: JSON.stringify(_data),
       success: (resp) => {
         console.log(resp);
-        this.setState({responses: this.state.responses.concat(resp.response_data)});
+        const response = resp.response_data[0];
+        const id = response.response_id;
+        const rMap = this.state.responseMap;
+        rMap.set(id, response);
+
+        this.setState({responseMap : rMap,
+                       responses: this.state.responses.concat(rMap.get(id))});
       }
     });
     
