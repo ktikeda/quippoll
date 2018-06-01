@@ -75,12 +75,17 @@ class PollSettings extends React.Component {
 
 } // end PollSettings
 
-const Routes = (props) => (
-  <div>
-    <Route path={ '/' + pollCode } render={ routeProps => <Header routeProps={routeProps} {...props} />} />
-    <Route path={ '/' + pollCode } render={ routeProps => <Main routeProps={routeProps} {...props} />} />
-  </div>
-)
+const Routes = (props) => {
+  if (props.userId) {
+    return(
+    <div>
+      <Route path={ '/' + pollCode } render={ routeProps => <Header routeProps={routeProps} {...props} />} />
+      <Route path={ '/' + pollCode } render={ routeProps => <Main routeProps={routeProps} {...props} />} />
+    </div> );
+  } else {
+      return(<div/>);
+  }
+}
 
 const Main = (props) => {
   const match = props.routeProps.match;
@@ -121,8 +126,11 @@ const Main = (props) => {
     return(
       <main>
         <Switch>
-          <Route key="1" exact path={match.url}
-            render={routeProps => <Poll  key="1" pollId={pollId} routeProps={routeProps} mode="respond" {...props}/>} />
+        { props.mayRespond === true
+          ? <Route key="1" exact path={match.url}
+            render={routeProps => <Poll  key="1" pollId={pollId} routeProps={routeProps} mode="respond" {...props}/>} /> 
+          : <Redirect to={'/' + pollCode + '/results'} />
+        }
           <Route key="2" exact path={ match.url + '/edit' }
             render={() => <Redirect to={'/' + pollCode} />} />
           <Route key="3" exact path={ match.url + '/results' }

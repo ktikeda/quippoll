@@ -191,7 +191,10 @@ class User(UserMixin, db.Model):
 
     def may_respond(self, poll):
 
-        if poll.poll_type.collect_response:
+        if PollAdmin.query.filter(PollAdmin.user_id == self.user_id,
+                                  PollAdmin.poll_id == poll.poll_id).first():
+            return True
+        elif poll.poll_type.collect_response:
             if Response.query.filter(Response.user_id == self.user_id,
                                          Response.poll_id == poll.poll_id).first():
                 return False
