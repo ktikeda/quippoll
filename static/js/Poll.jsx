@@ -17,11 +17,17 @@ export class Poll extends React.Component {
                   items : ""
                   };
 
-    //TODO: Fix to work with Map
     onNewResult (this.props.pollId, 
       (err, data) => {
         let responses = this.state.responseData;
-        responses.get(data.response_id).value = data.value;
+        const id = data.response_id;
+        // TODO: for each key in data, find corresponding key in responses and reset value
+        for (let property in data) {
+          debugger;
+          responses.get(id)[property] = data[property];
+        }
+
+        //responses.get(id).value = data.value;
 
         this.setState({ responseData : responses });
     }); // end onNewResult

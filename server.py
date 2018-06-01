@@ -24,7 +24,7 @@ def emit_new_result(response):
     socketio.emit('new_result',
                   {'response': response.text,
                    'response_id': response.response_id,
-                   'val': response.value()},
+                   'value': response.value()},
                   namespace='/poll')
 
 
@@ -34,10 +34,9 @@ def emit_new_result_id(response):
     print "Server emitted"
 
     data = {'response_id' : response.response_id, 
-                  'weight' : response.weight, 
-                  'text' : response.text,
-                  'value' : response.value(),
-                  'is_visible': response.is_visible}
+            'text' : response.text,
+            'value' : response.value(),
+            'is_visible': response.is_visible}
 
     socketio.emit('new_result_' + str(response.poll_id),
                   data,
@@ -744,6 +743,8 @@ def update_response(poll_id, response_id):
             response.updated_at = datetime.now()
             db.session.add(response)
             db.session.commit()
+
+    emit_new_result_id(response)
 
     return jsonify(response.data())
 
