@@ -35,7 +35,6 @@ export class Response extends React.Component {
   render() {
     let mode = this.props.mode;
     let id = "response-opt-" + this.props.id;
-    let weight = this.props.weight
     let text = this.props.text;
     let value = this.props.value;
     let isVisible = this.props.isVisible;
@@ -43,7 +42,7 @@ export class Response extends React.Component {
     if (mode === 'respond') {
       return (<button className="response-option btn btn-primary btn-lg btn-block">{text}</button>);
     } else if (mode === 'edit') {
-      return (<div><label>{weight}. </label><input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
+      return (<div><input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
               <button className="" type="button" onClick={this.passDeletion}>Delete</button>
               </div>);
     } else if (mode === 'results') {

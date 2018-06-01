@@ -713,8 +713,33 @@ def update_response(poll_id, response_id):
 
     data = request.form.to_dict()
 
+    # TODO: Check that attr are in dict
     for attr, val in data.iteritems():
-        if attr != 'response_id':
+        if attr == 'weight':
+            index = int(val)
+            print index
+            weight = 1
+            if index != 0:
+                prev_response = Response.query.filter(Response.poll_id == poll_id).order_by(Response.weight.asc()).offset(index-1).first()
+                print "prev_response", prev_response
+                weight += prev_response.weight
+            setattr(response, attr, weight)
+            response.updated_at = datetime.now()
+            db.session.add(response)
+            db.session.commit()
+            print 'updated response', response
+
+            responses = Response.query.filter(Response.poll_id == poll_id).order_by(Response.weight.asc(), Response.updated_at.desc()).offset(index).all()
+            print 'responses to be weighed', responses
+            if len(responses) > 1:
+                index = 1
+                while index != len(responses) and responses[index-1].weight >= responses[index].weight:
+                    responses[index].weight += 1
+                    db.session.add(responses[index])
+                    index += 1
+                db.session.commit()
+            print 'responses after', responses
+        elif attr != 'response_id':
             setattr(response, attr, val)
             response.updated_at = datetime.now()
             db.session.add(response)

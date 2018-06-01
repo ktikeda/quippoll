@@ -53,55 +53,15 @@ export class Poll extends React.Component {
   onSortEnd = ({oldIndex, newIndex}, evt) => {
     // send new index to server, server return json with response weight data
 
-    function assignWeight(array, index) {
-      // take an array of objects and assigns object.weight based on the object's position in the array.
-      let prevWeight = 0;
-      let nextWeight;
-      let length = array.length;
-      let weight
-
-      if (length === 1) {
-        
-        return array;
-
-      } else if (index === 0) {
-        
-        nextWeight = array[index+1].weight;
-
-      } else if (index === length-1) {
-        
-        // weight should be greater than prevWeight
-        prevWeight = array[index-1].weight;
-        weight = prevWeight + 1;
-        array[index].weight = weight;
-        return array
-
-      } else {
-        prevWeight = array[index-1].weight;
-        nextWeight = array[index+1].weight; 
-
-      }
-      
-      weight = (prevWeight + nextWeight) / 2.0;
-
-      array[index].weight = weight;
-
-      return array;
-
-    } // end assignWeight
-
-    // console.log(evt);
-
     this.setState({
-      responseOrder: assignWeight(arrayMove(this.state.responseOrder, oldIndex, newIndex), newIndex)
+      responseOrder: arrayMove(this.state.responseOrder, oldIndex, newIndex)
     });
 
-    let response = this.state.responseOrder[newIndex];
+    let id = this.state.responseOrder[newIndex].response_id;
+    let data = {response_id : id, weight : newIndex};
 
-    // implement reWeigh if String(response.weight).length > 15
-
-    $.post('/api/polls/' + this.props.pollId + '/responses/' + response.response_id,
-      response,
+    $.post('/api/polls/' + this.props.pollId + '/responses/' + id,
+      data,
       (resp) => console.log(resp));
 
   }; // end onSortEnd
@@ -113,7 +73,7 @@ export class Poll extends React.Component {
 
     this.setState({responseData : responses});
 
-  }
+  } // end getUpdate
 
   getDeletion = (data) => {
     /* get response send response to be deleted to server
@@ -232,7 +192,6 @@ export class Poll extends React.Component {
             key={ value.response_id } 
             id={ value.response_id }
             text={ value.text }
-            weight={ value.weight } 
             mode='edit' 
             isVisible={ value.is_visible }
             pollId={ this.props.pollId }
@@ -267,7 +226,6 @@ export class Poll extends React.Component {
                       mode={ mode }
                       pollId={ pollId }
                       text={ response.text }
-                      weight={ response.weight }
                       value={ response.value } /></li>;
           })}</ol></div>);
     } // end if
@@ -326,5 +284,42 @@ export class Poll extends React.Component {
   } // end componentDidMount
 
 } // End of Poll
+
+function assignWeight(array, index) {
+  // take an array of objects and assigns object.weight based on the object's position in the array.
+  let prevWeight = 0;
+  let nextWeight;
+  let length = array.length;
+  let weight
+
+  if (length === 1) {
+    
+    return array;
+
+  } else if (index === 0) {
+    
+    nextWeight = array[index+1].weight;
+
+  } else if (index === length-1) {
+    
+    // weight should be greater than prevWeight
+    prevWeight = array[index-1].weight;
+    weight = prevWeight + 1;
+    array[index].weight = weight;
+    return array
+
+  } else {
+    prevWeight = array[index-1].weight;
+    nextWeight = array[index+1].weight; 
+
+  }
+  
+  weight = (prevWeight + nextWeight) / 2.0;
+
+  array[index].weight = weight;
+
+  return array;
+
+} // end assignWeight
 
 export default Poll;
