@@ -14,7 +14,8 @@ export class Poll extends React.Component {
                   responseOrder: [],
                   responseData: new Map(),
                   chart : 'text',
-                  items : ""
+                  items : "",
+                  input : ''
                   };
 
     onNewResult (this.props.pollId, 
@@ -39,9 +40,10 @@ export class Poll extends React.Component {
     this.setState({chart : type});
   } // end setChart
 
-  handleChange = (evt) => {
-    this.setState({ prompt : evt.target.value });
-  } // end handleChange
+  handleInput = (evt) => {
+    console.log(evt);
+    this.setState({ input : evt.target.value });
+  } // end handleInput
 
   updatePrompt = (evt) => {
 
@@ -105,12 +107,15 @@ export class Poll extends React.Component {
 
   } // end getDeletion
 
-  handleOptionAdd = (evt) => {
+  addResponse = (evt, text='') => {
     //update poll options and reset options to an empty string
     let order = this.state.responseOrder;
+    let weight;
 
-    let _data = {responses : [{'text' : '',
-                                  'weight' : order[order.length-1].weight + 1}]};
+    order.length > 0 ? weight = order[order.length-1].weight + 1 : weight = 1;
+
+    let _data = {responses : [{'text' : text,
+                               'weight' : weight}]};
 
     $.ajax({ 
       url: '/api/polls/' + this.props.pollId + '/responses',
@@ -127,10 +132,34 @@ export class Poll extends React.Component {
 
         this.setState({responseData : rMap,
                        responseOrder: this.state.responseOrder.concat(rMap.get(id))});
-      }
-    });
+      } // end success
+    }); // end ajax
     
-  } // end handleOptionAdd
+  } // end addResponse
+
+  saveResponse = (evt) => {
+    console.log('Response', this.state.input);
+    let data = {responses : [{'text' : this.state.input}]};
+
+    $.ajax({ 
+      url: '/api/polls/' + this.props.pollId + '/responses',
+      dataType: 'json',
+      contentType : 'application/json',
+      type: 'post',
+      data: JSON.stringify(_data),
+      success: (resp) => {
+        console.log(resp.status);
+        const response = resp.response_data[0];
+        const id = response.response_id;
+        const rMap = this.state.responseData;
+        rMap.set(id, response);
+
+        this.setState({responseData : rMap,
+                       responseOrder: this.state.responseOrder.concat(rMap.get(id))});
+      } // end success
+    }); // end ajax
+
+  } // end saveResponse
 
   /* Begin render elements */
 
@@ -148,30 +177,6 @@ export class Poll extends React.Component {
     } // end if
   } // showNav
 
-  showResults = (responses) => {
-    
-    let chart = this.state.chart;
-    let mode = this.props.mode
-    
-    if (mode === 'results') {
-
-      return (
-        <div>
-          
-              { (chart === 'bar') ? 
-                (<BarChart data={responses} />) : 
-                ((chart === 'pie') ? 
-                 (<PieChart data={responses} />) : (<p>{chart}</p>))
-              }
-        </div>
-
-      ) // end of return
-    } else {
-
-      return(<p>{mode}</p>);
-
-    } // end if
-  } // end showResults
 
   showPrompt = () => {
     
@@ -188,7 +193,7 @@ export class Poll extends React.Component {
 
   } // end showPrompt
 
-  showResponses = (responses) => {
+  showResponsesForTally = (responses) => {
 
     let mode = this.props.mode;
     let pollId = this.props.pollId;
@@ -221,7 +226,7 @@ export class Poll extends React.Component {
       return (
         <div>
           <SortableList items={responses} onSortEnd={this.onSortEnd} />
-          <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.handleOptionAdd}>Add option</button>
+          <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addResponse}>Add option</button>
         </div>);
       
     } else {
@@ -236,12 +241,53 @@ export class Poll extends React.Component {
           })}</ol></div>);
     } // end if
 
-  } // end showResponses
+  } // end showResponsesForTally
 
 
-  render() {
-    let responses = this.state.responseOrder;
+  showResponsesForResponse = (responses) => {
+    let mode = this.props.mode;
+    let pollId = this.props.pollId;
+    let text = this.state.input;
+    const url = '/polls/' + this.props.shortCode + '/response'
+
+    if (mode === 'respond') {
+      return(
+        <form action={url} method="POST">
+          <input type="text" id="response" name="response" />
+          <input type="submit" value="submit" />
+        </form>
+      );
+    } else if (mode === 'results') {
+      return(<div/>);
+    } else {
+      return(<div/>);
+    }
+
+  } // showResponsesForResponse
+
+  showCharts = (responses) => {
+    
+    let chart = this.state.chart;
     let mode = this.props.mode
+    
+    return (
+      <div>
+        { (chart === 'bar') ? 
+          (<BarChart data={responses} />) : 
+          ((chart === 'pie') ? 
+           (<PieChart data={responses} />) : <div/>)
+        }
+      </div>
+
+    ) // end of return
+  } // end showCharts
+
+
+render() {
+    let responses = this.state.responseOrder;
+    const mode = this.props.mode;
+    const collectTally = this.props.collectTally;
+    const collectResponse = this.props.collectResponse;
 
     return(
       <div> 
@@ -249,29 +295,20 @@ export class Poll extends React.Component {
 
         { this.showPrompt() }
             
-        { responses ? this.showResponses(responses) : <div/> }
+        { responses && collectTally === true ? this.showResponsesForTally(responses) : <div/> }
+
+        { responses && collectResponse === true ? this.showResponsesForResponse(responses) : <div/> }
         
-        { responses ? this.showResults(responses) : <div/> }
+        { responses && mode === 'results' ? this.showCharts(responses) : <div/> }
         
-      </div>);
+      </div>
+    );
     
   } // End of render
 
   componentDidMount() {
     fetch('/api/polls/' + this.props.pollId + '/responses')
       .then( resp => resp.json())
-      // .then( data => {
-      //   let order = data.response_data;
-      //   let rMap = new Map();
-
-      //   for (let response of order) {
-      //     rMap.set(response.response_id, response);
-      //   }
-
-      //   console.log(rMap);
-
-      //   this.setState({ responses: order, responseData: rMap });
-      // });
       .then( data => {
         let order = new Array();
         let rMap = new Map();

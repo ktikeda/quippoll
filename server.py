@@ -147,7 +147,7 @@ def _():
     return ''
 
 
-@app.route('/polls/<short_code>.json', methods=["POST"])
+@app.route('/polls/<short_code>/response', methods=["POST"])
 def add_response_to_db(short_code):
     """Add response data to db"""
 
@@ -168,7 +168,7 @@ def add_response_to_db(short_code):
     db.session.commit()
 
     # emit_new_result(response)
-    emit_new_result_id(poll)
+    emit_new_result_id(response)
 
     # Specify route
     if poll.is_results_visible:
