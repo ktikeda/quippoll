@@ -23,7 +23,7 @@ export class Poll extends React.Component {
         const id = data.response_id;
         // TODO: for each key in data, find corresponding key in responses and reset value
         for (let property in data) {
-          debugger;
+
           responses.get(id)[property] = data[property];
         }
 

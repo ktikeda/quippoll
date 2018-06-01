@@ -16,7 +16,7 @@ export class Response extends React.Component {
       data,
       (resp) => console.log(resp));
 
-    this.props.cbUpdate(data);
+    //this.props.cbUpdate(data);
 
     
   } // end updateResponse

@@ -85,7 +85,9 @@ const Routes = (props) => (
 const Main = (props) => {
   const match = props.routeProps.match;
   const cbUpdate = props.cbUpdate;
+  const mayRespond = props.mayRespond;
   console.log(props);
+  console.log(mayRespond)
 
   const AdminRoute = ({ component: Component, ...rest }) => (
     <Route {...rest} render={(props) => (
@@ -97,7 +99,7 @@ const Main = (props) => {
 
   const ConditionalRoute = ({ component: Component, ...rest }) => (
     <Route {...rest} render={(props) => (
-      props.mayRespond === true
+      mayRespond === true
         ? <Component {...props} />
         : <Redirect to={'/' + pollCode + '/results'} />
     )} />
@@ -119,7 +121,7 @@ const Main = (props) => {
     return(
       <main>
         <Switch>
-          <ConditionalRoute key="1" exact path={match.url}
+          <Route key="1" exact path={match.url}
             render={routeProps => <Poll  key="1" pollId={pollId} routeProps={routeProps} mode="respond" {...props}/>} />
           <Route key="2" exact path={ match.url + '/edit' }
             render={() => <Redirect to={'/' + pollCode} />} />

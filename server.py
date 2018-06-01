@@ -213,7 +213,6 @@ def add_tally_to_db(short_code):
 
 
 @app.route('/<short_code>')
-@app.route('/<short_code>/results')
 def render_poll(short_code):
     """Show poll in React."""
 
@@ -221,24 +220,49 @@ def render_poll(short_code):
     user = User.get_user()
 
     print session
+    print 'poll:', poll
+
+    if poll is not None:  # Ensure this is a valid poll route
+        if user.is_admin(poll):
+            print "Admin view"
+            return render_template('poll-react.html', poll=poll)
+        elif not poll.is_open:
+            print "poll not open"
+            return render_template('poll-closed.html', poll=poll)
+        elif user.may_respond(poll):
+            print 'User may respond'
+            return render_template('poll-react.html', poll=poll)
+        elif not poll.is_results_visible:
+            "User has voted but results not visible"
+            route = '/' + poll.short_code + '/success'
+        else:
+            "User has voted, showing results"
+            route = '/' + short_code + '/results'
+    else:
+        flash('Sorry, that page does not exist.')
+        route = '/'
+
+    return redirect(route)
+
+
+@app.route('/<short_code>/results')
+def show_results(short_code):
+
+    poll = Poll.get_from_code(short_code)
+    user = User.get_user()
 
     if poll is not None:  # Ensure this is a valid poll route
         if user.is_admin(poll):
             return render_template('poll-react.html', poll=poll)
         elif not poll.is_open:
             return render_template('poll-closed.html', poll=poll)
-        elif poll.poll_type.collect_response:
-            if not Response.query.filter(Response.user_id == user.user_id,
-                                         Response.poll_id == poll.poll_id).first():
-                return render_template('add-response.html', poll=poll)
-        elif user not in poll.get_users_from_tally() or user.is_admin(poll):
-                return render_template('poll-react.html', poll=poll)
-
+        elif not poll.is_results_visible:
+            route = '/' + poll.short_code + '/success'
         else:
-            route = '/' + short_code + '/results'
-
-    flash('Sorry, that page does not exist.')
-    route = '/'
+            return render_template('poll-react.html', poll=poll)
+    else:
+        flash('Sorry, that page does not exist.')
+        route = '/'
 
     return redirect(route)
 
@@ -634,11 +658,10 @@ def get_user_data(poll_id):
     """Get user data for a poll id"""
     poll = Poll.query.get(poll_id)
     user = User.get_user()
-    may_respond = True
 
     data = {"user_id" : user.user_id, 
             "is_admin" : user.is_admin(poll),
-            "may_respond" : may_respond}
+            "may_respond" : user.may_respond(poll)}
 
     return jsonify(data)
 

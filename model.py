@@ -189,6 +189,20 @@ class User(UserMixin, db.Model):
         else:
             return False
 
+    def may_respond(self, poll):
+
+        if poll.poll_type.collect_response:
+            if Response.query.filter(Response.user_id == self.user_id,
+                                         Response.poll_id == poll.poll_id).first():
+                return False
+            else:
+                return True
+        else:
+            if self in poll.get_users_from_tally():
+                return False
+            else:
+                return True
+
     def get_id(self):
         """Helper method required for flask_login"""
         return self.user_id
