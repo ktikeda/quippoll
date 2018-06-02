@@ -24,7 +24,7 @@ export class Poll extends React.Component {
         const id = data.response_id;
         // TODO: for each key in data, find corresponding key in responses and reset value
         for (let property in data) {
-
+          debugger;
           responses.get(id)[property] = data[property];
         }
 
@@ -137,30 +137,6 @@ export class Poll extends React.Component {
     
   } // end addResponse
 
-  saveResponse = (evt) => {
-    console.log('Response', this.state.input);
-    let data = {responses : [{'text' : this.state.input}]};
-
-    $.ajax({ 
-      url: '/api/polls/' + this.props.pollId + '/responses',
-      dataType: 'json',
-      contentType : 'application/json',
-      type: 'post',
-      data: JSON.stringify(_data),
-      success: (resp) => {
-        console.log(resp.status);
-        const response = resp.response_data[0];
-        const id = response.response_id;
-        const rMap = this.state.responseData;
-        rMap.set(id, response);
-
-        this.setState({responseData : rMap,
-                       responseOrder: this.state.responseOrder.concat(rMap.get(id))});
-      } // end success
-    }); // end ajax
-
-  } // end saveResponse
-
   /* Begin render elements */
 
   showNav = () => {
@@ -230,7 +206,7 @@ export class Poll extends React.Component {
         </div>);
       
     } else {
-      return (<div><ol> {responses.map(function(response){
+      return (<ol> {responses.map(function(response){
             return <li key={ response.response_id }><Response 
                       key={ response.response_id } 
                       id={ response.response_id } 
@@ -238,7 +214,7 @@ export class Poll extends React.Component {
                       pollId={ pollId }
                       text={ response.text }
                       value={ response.value } /></li>;
-          })}</ol></div>);
+          })}</ol>);
     } // end if
 
   } // end showResponsesForTally
@@ -258,7 +234,15 @@ export class Poll extends React.Component {
         </form>
       );
     } else if (mode === 'results') {
-      return(<div/>);
+      return(<ul> {responses.map(function(response){
+            return <li key={ response.response_id }><Response 
+                      key={ response.response_id } 
+                      id={ response.response_id } 
+                      mode={ mode }
+                      pollId={ pollId }
+                      text={ response.text }
+                      value={ response.value } /></li>;
+          })}</ul>);
     } else {
       return(<div/>);
     }
