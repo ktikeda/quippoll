@@ -50,6 +50,6 @@ export class Response extends React.Component {
     } // end if
   } // end render
 
-}
+} // end Response
 
 export default Response;
