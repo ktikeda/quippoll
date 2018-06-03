@@ -111,10 +111,18 @@ export class Poll extends React.Component {
     let responses = this.state.responseData;
     responses.get(id).tally = data;
     let tally = responses.get(id).tally;
+    let tallys = this.state.tallys;
+
+    if (!this.props.multiSelect && this.state.tallys.length !== 0) {
+      //debugger;
+      let removed = tallys.pop();
+      delete responses.get(removed.response_id).tally;
+    }
+
     this.state.tallys.push(tally);
 
     this.setState({ responseData : responses,
-                    tallys : this.state.tallys })
+                    tallys : tallys });
   } // end addTally
 
   deleteTally = (data) => {
