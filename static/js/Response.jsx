@@ -28,7 +28,7 @@ export class Response extends React.Component {
 
     let data = {response_id : this.props.id};
 
-    if (this.state.selected) {
+    if (this.props.isSelected) {
       this.props.deleteTally(data);
     } else {
       data.value = 1;
@@ -56,9 +56,9 @@ export class Response extends React.Component {
     let text = this.props.text;
     let value = this.props.value;
     let isVisible = this.props.isVisible;
-    let selected = this.state.selected;
+    let isSelected = this.props.isSelected;
 
-    if (mode === 'respond') { return (<div> {selected
+    if (mode === 'respond') { return (<div> {isSelected
       ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block selected">{text}</button>
       : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block">{text}</button>
     }</div>)} else if (mode === 'edit') {

@@ -36,8 +36,9 @@
     });
 
     function onNewResult(id, cb) {
+      console.log('onNewResult ready');
       socket.on('new_result_' + id, function(data) {
-        console.log(data);
+        console.log('received', data);
         cb(null, data);
       });
       socket.emit('onNewResult', 1000);

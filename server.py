@@ -6,7 +6,7 @@ import json
 
 from twilio.twiml.messaging_response import Body, Message, Redirect, MessagingResponse
 
-from flask_socketio import emit, disconnect
+from flask_socketio import emit, disconnect, join_room
 
 from app import app, login
 from app import socketio, thread, thread_lock
@@ -40,7 +40,27 @@ def emit_new_result_id(response):
 
     socketio.emit('new_result_' + str(response.poll_id),
                   data,
-                  namespace='/poll')
+                  namespace='/poll',
+                  broadcast=True)
+
+# TODO: Create rooms for each poll
+
+@socketio.on('poll_state_change', namespace='/poll')
+def broadcast_response_order(message):
+    print message['data']
+    socketio.emit('new_response_order',
+         {'data': message['data']},
+         room=message['room'])
+
+@socketio.on('join', namespace='/poll')
+def join(message):
+    join_room(message['room'])
+    print message['room'], 'joined'
+
+@socketio.on('leave', namespace='/poll')
+def leave(message):
+    leave_room(message['room'])
+    print message['room'], 'left'
 
 
 @socketio.on('connect', namespace='/poll')
@@ -767,7 +787,7 @@ def update_response(poll_id, response_id):
             db.session.add(response)
             db.session.commit()
 
-    emit_new_result_id(response)
+    #emit_new_result_id(response)
 
     return jsonify(response.data())
 
@@ -808,7 +828,7 @@ def create_tallys(poll_id):
         db.session.commit()
 
         emit_new_result_id(response)
-        
+
 
         tallys_data.append(new_tally.data())
 

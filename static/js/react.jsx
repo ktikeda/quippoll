@@ -29,7 +29,12 @@ class PollSettings extends React.Component {
 
   }
 
+  componentWillUnmount() {
+    socket.emit('leave', {room: pollCode});
+  }
+
   componentDidMount() {
+    socket.emit('join', {room: pollCode});
     fetch('/api/polls/' + pollId, 
       {
       method: 'GET',

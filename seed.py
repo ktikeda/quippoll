@@ -21,7 +21,12 @@ def create_poll_types():
                           collect_tally=False,
                           multi_select=False)
 
-    db.session.add_all([multi_choice, select_all, open_ended])
+    ranked_questions = PollType(name='ranked questions',
+                          collect_response=True,
+                          collect_tally=True,
+                          multi_select=True)
+
+    db.session.add_all([multi_choice, select_all, open_ended, ranked_questions])
     db.session.commit()
 
 
@@ -74,19 +79,30 @@ def test_data():
                    prompt='What is your favorite color?',
                    short_code='open', admin_code='adminoe')
 
-    db.session.add_all([mc_poll, sa_poll, oe_poll])
+    q_poll = Poll(poll_type_id=3, title='Questions',
+                   prompt='Ask me anything.',
+                   short_code='questions', admin_code='adminq')
+
+    closed_poll = Poll(poll_type_id=3, title='Colors',
+                   prompt='What is your favorite color?',
+                   short_code='close', admin_code='adminclosed', 
+                   is_open=False)
+
+    db.session.add_all([mc_poll, sa_poll, oe_poll, q_poll, closed_poll])
     db.session.commit()
 
     # Create PollAdmin
     mc_admin = PollAdmin(poll_id=mc_poll.poll_id, user_id=admin.user_id)
     sa_admin = PollAdmin(poll_id=sa_poll.poll_id, user_id=admin.user_id)
     oe_admin = PollAdmin(poll_id=oe_poll.poll_id, user_id=admin.user_id)
+    q_admin = PollAdmin(poll_id=q_poll.poll_id, user_id=admin.user_id)
+    closed_admin = PollAdmin(poll_id=closed_poll.poll_id, user_id=admin.user_id)
 
     mc_anon_admin = PollAdmin(poll_id=mc_poll.poll_id, user_id=anon_admin.user_id)
     sa_anon_admin = PollAdmin(poll_id=sa_poll.poll_id, user_id=anon_admin.user_id)
     oe_anon_admin = PollAdmin(poll_id=oe_poll.poll_id, user_id=anon_admin.user_id)
 
-    db.session.add_all([mc_admin, sa_admin, oe_admin, mc_anon_admin, sa_anon_admin, oe_anon_admin])
+    db.session.add_all([mc_admin, sa_admin, oe_admin, q_admin, closed_admin, mc_anon_admin, sa_anon_admin, oe_anon_admin])
     db.session.commit
 
     # Create responses
@@ -101,7 +117,11 @@ def test_data():
     oe_r1 = Response(poll_id=oe_poll.poll_id, user_id=user_responded.user_id, text='Red', weight=1)
     oe_r2 = Response(poll_id=oe_poll.poll_id, user_id=anon_user_responded.user_id, text='Blue', weight=1)
 
-    db.session.add_all([mc_r1, mc_r2, mc_r3, sa_r1, sa_r2, sa_r3, oe_r1, oe_r2])
+    q_r1 = Response(poll_id=q_poll.poll_id, user_id=user_responded.user_id, text='What is your name?', weight=1)
+    q_r2 = Response(poll_id=q_poll.poll_id, user_id=anon_user_responded.user_id, text='Where do you live?', weight=1)
+    q_r3 = Response(poll_id=q_poll.poll_id, user_id=user_responded.user_id, text='How old are you?', weight=1)
+
+    db.session.add_all([mc_r1, mc_r2, mc_r3, sa_r1, sa_r2, sa_r3, oe_r1, oe_r2, q_r1, q_r2, q_r3])
     db.session.commit()
 
     # Create Tallys
@@ -113,7 +133,12 @@ def test_data():
     sa_r2_t1 = Tally(response_id=sa_r2.response_id, user_id=anon_user_responded.user_id)
     sa_r3_t1 = Tally(response_id=sa_r3.response_id, user_id=user_responded.user_id)
 
-    db.session.add_all([mc_r1_t1, mc_r1_t2, sa_r1_t1, sa_r1_t2, sa_r2_t1, sa_r3_t1])
+    q_r1_t1 = Tally(response_id=q_r1.response_id, user_id=user_responded.user_id)
+    q_r1_t2 = Tally(response_id=q_r1.response_id, user_id=anon_user_responded.user_id)
+    q_r2_t1 = Tally(response_id=q_r2.response_id, user_id=anon_user_responded.user_id)
+    q_r3_t1 = Tally(response_id=q_r3.response_id, user_id=user_responded.user_id)
+
+    db.session.add_all([mc_r1_t1, mc_r1_t2, sa_r1_t1, sa_r1_t2, sa_r2_t1, sa_r3_t1, q_r1_t1, q_r1_t2, q_r2_t1, q_r3_t1])
     db.session.commit()
 
 

@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 
 import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc';
 
+import FlipMove from 'react-flip-move';
+
 import Response from './Response.jsx';
 import BarChart from './BarChart.jsx';
 import PieChart from './PieChart.jsx';
@@ -19,17 +21,22 @@ export class Poll extends React.Component {
                   tallys: []
                   };
 
+
+
     onNewResult (this.props.pollId, 
       (err, data) => {
         let responses = this.state.responseData;
         const id = data.response_id;
-        // TODO: for each key in data, find corresponding key in responses and reset value
-        for (let property in data) {
-          //debugger;
-          responses.get(id)[property] = data[property];
-        }
 
-        this.setState({ responseData : responses });
+        if (responses.size !== 0) {
+          for (let property in data) {
+            responses.get(id)[property] = data[property];
+          }
+          this.setState({ responseData : responses });
+        }
+    
+    socket.on('new_response_order', (msg) => console.log(msg));
+
     }); // end onNewResult
 
   } // end constructor
@@ -70,6 +77,10 @@ export class Poll extends React.Component {
     $.post('/api/polls/' + this.props.pollId + '/responses/' + id,
       data,
       (resp) => console.log(resp));
+
+    // broadcast old and new index to room. On receiving end, reorder responses.
+    socket.emit('poll_state_change', {room: this.props.shortCode, data: {newOrder: [oldIndex, newIndex]}});
+
 
   }; // end onSortEnd
 
@@ -150,7 +161,7 @@ export class Poll extends React.Component {
       type: 'post',
       data: JSON.stringify(data),
       success: (resp) => {
-        console.log(resp);
+        console.log('tally success', resp);
 
         if (this.props.isAdmin) {
           this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
@@ -273,6 +284,7 @@ export class Poll extends React.Component {
                         value={ response.value }
                         addTally={ this.addTally }
                         deleteTally={ this.deleteTally }
+                        isSelected={ response.hasOwnProperty('tally') }
                          /></li>);})}           
             </ol>
             <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>
@@ -280,17 +292,18 @@ export class Poll extends React.Component {
 
       );
     } else if (mode === 'results') {
-      return (<ol> {responses.map((response) => {
-            return (<li key={ response.response_id }><Response 
+      return (<FlipMove > 
+                {responses.map(response => (
+                  <Response 
                       key={ response.response_id } 
                       id={ response.response_id } 
                       mode={ mode }
                       pollId={ pollId }
                       text={ response.text }
                       value={ response.value }
-                       /></li>);
+                       />
                       
-          })}</ol>);
+          ))}</FlipMove>);
     } else {
       <div />
     } // end if

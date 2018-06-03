@@ -45,6 +45,7 @@
     "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
+    "react-flip-move": "^3.0.2",
     "react-sortable-hoc": "^0.8.0"
   }
 }
