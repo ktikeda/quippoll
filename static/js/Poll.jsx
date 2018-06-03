@@ -14,8 +14,9 @@ export class Poll extends React.Component {
                   responseOrder: [],
                   responseData: new Map(),
                   chart : 'text',
-                  items : "",
-                  input : ''
+                  items : '',
+                  input : '',
+                  tallys: []
                   };
 
     onNewResult (this.props.pollId, 
@@ -106,6 +107,32 @@ export class Poll extends React.Component {
     }); // end $.ajax
 
   } // end getDeletion
+
+  addTally = (data) => {
+    const id = data.response_id;
+    let responses = this.state.responseData;
+    responses.get(id).tally = data;
+    let tally = responses.get(id).tally;
+    this.state.tallys.push(tally);
+
+    this.setState({ responseData : responses,
+                    tallys : this.state.tallys })
+  } // end addTally
+
+  deleteTally = (data) => {
+    const id = data.response_id;
+    let responses = this.state.responseData;
+
+    let tally = responses.get(id).tally;
+    let index = this.state.tallys.indexOf(tally);
+    this.state.tallys.splice(index, 1);
+
+    delete responses.get(id).tally;
+
+    this.setState({ responseData : responses,
+                    tallys : this.state.tallys });
+
+  } // end deleteTally
 
   addResponse = (evt, text='') => {
     //update poll options and reset options to an empty string
@@ -206,14 +233,18 @@ export class Poll extends React.Component {
         </div>);
       
     } else {
-      return (<ol> {responses.map(function(response){
-            return <li key={ response.response_id }><Response 
+      return (<ol> {responses.map((response) => {
+            return (<li key={ response.response_id }><Response 
                       key={ response.response_id } 
                       id={ response.response_id } 
                       mode={ mode }
                       pollId={ pollId }
                       text={ response.text }
-                      value={ response.value } /></li>;
+                      value={ response.value }
+                      addTally={ this.addTally }
+                      deleteTally={ this.deleteTally }
+                       /></li>);
+                      
           })}</ol>);
     } // end if
 

@@ -5,12 +5,15 @@ export class Response extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = { selected: false
+    }
+
   } // end constructor
 
   updateResponse = (evt) => {
 
-    let data = {'response_id' : this.props.id,
-                'text' : evt.target.value};
+    let data = {response_id : this.props.id,
+                text : evt.target.value};
 
     $.post('/api/polls/' + this.props.pollId + '/responses/' + this.props.id,
       data,
@@ -21,12 +24,27 @@ export class Response extends React.Component {
     
   } // end updateResponse
 
+  toggleSelection = (evt) => {
+
+    let data = {response_id : this.props.id};
+
+    if (this.state.selected) {
+      this.props.deleteTally(data);
+    } else {
+      data.value = 1;
+      this.props.addTally(data);
+    }
+
+    this.setState({ selected : !this.state.selected});
+
+  } // end toggleSelection
+
   passDeletion = (evt) => {
 
-    let data = {'response_id' : this.props.id};
+    let data = {response_id : this.props.id};
     
     this.props.cbDelete(data);
-  } 
+  } // end passDeletion
 
   showSaved = () => {
     // implement save badge
@@ -38,10 +56,12 @@ export class Response extends React.Component {
     let text = this.props.text;
     let value = this.props.value;
     let isVisible = this.props.isVisible;
+    let selected = this.state.selected;
 
-    if (mode === 'respond') {
-      return (<button className="response-option btn btn-primary btn-lg btn-block">{text}</button>);
-    } else if (mode === 'edit') {
+    if (mode === 'respond') { return (<div> {selected
+      ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block selected">{text}</button>
+      : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block">{text}</button>
+    }</div>)} else if (mode === 'edit') {
       return (<div><input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
               <button className="" type="button" onClick={this.passDeletion}>Delete</button>
               </div>);
