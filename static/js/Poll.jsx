@@ -13,7 +13,7 @@ export class Poll extends React.Component {
     this.state = {
                   responseOrder: [],
                   responseData: new Map(),
-                  chart : 'text',
+                  chart : 'bar',
                   items : '',
                   input : '',
                   tallys: []
@@ -25,7 +25,7 @@ export class Poll extends React.Component {
         const id = data.response_id;
         // TODO: for each key in data, find corresponding key in responses and reset value
         for (let property in data) {
-          debugger;
+          //debugger;
           responses.get(id)[property] = data[property];
         }
 
@@ -134,6 +134,24 @@ export class Poll extends React.Component {
 
   } // end deleteTally
 
+  createTallys = (evt) => {
+    let data = {tallys : this.state.tallys};
+
+    $.ajax({ 
+      url: '/api/polls/' + this.props.pollId + '/tallys',
+      dataType: 'json',
+      contentType : 'application/json',
+      type: 'post',
+      data: JSON.stringify(data),
+      success: (resp) => {
+        console.log(resp);
+
+        this.props.cbUpdate({mayRespond : false});
+
+      } // end success
+    }); // end ajax
+  }
+
   addResponse = (evt, text='') => {
     //update poll options and reset options to an empty string
     let order = this.state.responseOrder;
@@ -232,7 +250,26 @@ export class Poll extends React.Component {
           <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addResponse}>Add option</button>
         </div>);
       
-    } else {
+    } else if (mode === 'respond') {
+      return (
+        <div>
+          <ol> {responses.map((response) => {
+              return(<li key={ response.response_id }><Response 
+                        key={ response.response_id } 
+                        id={ response.response_id } 
+                        mode={ mode }
+                        pollId={ pollId }
+                        text={ response.text }
+                        value={ response.value }
+                        addTally={ this.addTally }
+                        deleteTally={ this.deleteTally }
+                         /></li>);})}           
+            </ol>
+            <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>
+          </div>
+
+      );
+    } else if (mode === 'results') {
       return (<ol> {responses.map((response) => {
             return (<li key={ response.response_id }><Response 
                       key={ response.response_id } 
@@ -241,11 +278,11 @@ export class Poll extends React.Component {
                       pollId={ pollId }
                       text={ response.text }
                       value={ response.value }
-                      addTally={ this.addTally }
-                      deleteTally={ this.deleteTally }
                        /></li>);
                       
           })}</ol>);
+    } else {
+      <div />
     } // end if
 
   } // end showResponsesForTally
@@ -296,6 +333,10 @@ export class Poll extends React.Component {
 
     ) // end of return
   } // end showCharts
+
+  showSubmit = () => {
+    <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.saveTallys}>Add option</button>
+  } // end showSubmit
 
 
 render() {

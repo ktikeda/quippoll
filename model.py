@@ -352,6 +352,12 @@ class Tally(db.Model):
             for attr, val in kwargs.iteritems():
                 setattr(self, attr, val)
 
+    def data(self):
+        return {'response_id' : self.response_id, 
+                'user_id' : self.user_id,
+                'tally_id' : self.tally_id, 
+                'value' : self.value }
+
 
 class AdminRole(db.Model):
     """Model for admin roles."""

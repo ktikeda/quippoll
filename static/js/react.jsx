@@ -94,22 +94,6 @@ const Main = (props) => {
   const isAdmin = props.isAdmin
   console.log(props);
 
-  const AdminRoute = ({ component: Component, ...rest }) => (
-    <Route {...rest} render={(props) => (
-      isAdmin === true
-        ? <Component {...props} />
-        : <Redirect to={'/' + pollCode} />
-    )} />
-  );
-
-  const ConditionalRoute = ({ component: Component, ...rest }) => (
-    <Route {...rest} render={(props) => (
-      mayRespond === true
-        ? <Component {...props} />
-        : <Redirect to={'/' + pollCode + '/results'} />
-    )} />
-  );
-
   if (props.isAdmin === true) {
     return(
       <main>
@@ -126,8 +110,12 @@ const Main = (props) => {
     return(
       <main>
         <Switch>
-          <ConditionalRoute key="1" exact path={match.url}
+        { props.mayRespond === true
+          ? <Route key="1" exact path={match.url}
             render={routeProps => <Poll  key="1" pollId={pollId} routeProps={routeProps} mode="respond" {...props}/>} /> 
+          : <Route key="1" exact path={ match.url }
+            render={() => <Redirect to={'/' + pollCode + '/results'} />} />
+        }
           <Route key="2" exact path={ match.url + '/edit' }
             render={() => <Redirect to={'/' + pollCode} />} />
           <Route key="3" exact path={ match.url + '/results' }

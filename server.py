@@ -788,6 +788,33 @@ def delete_response(poll_id, response_id):
     return 'Deleted'
 
 
+@app.route(api + '/polls/<int:poll_id>/tallys', methods=["POST"])
+def create_tallys(poll_id):
+    """Create multiple new tallys for a response in db"""
+
+    poll = Poll.query.get(poll_id)
+    user = User.get_user()
+
+    # TODO: Write logic to query user and poll, and not add to db if already exists
+
+    tallys = request.json['tallys']
+    tallys_data = []
+
+    for tally in tallys:
+        response = Response.query.get(tally['response_id'])
+
+        new_tally = Tally(response_id=response.response_id, user_id=user.user_id)
+        db.session.add(new_tally)
+        db.session.commit()
+
+        emit_new_result_id(response)
+        
+
+        tallys_data.append(new_tally.data())
+
+    return jsonify({'tallys' : tallys_data})
+
+
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
