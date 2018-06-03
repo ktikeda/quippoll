@@ -29,8 +29,6 @@ export class Poll extends React.Component {
           responses.get(id)[property] = data[property];
         }
 
-        //responses.get(id).value = data.value;
-
         this.setState({ responseData : responses });
     }); // end onNewResult
 
@@ -146,7 +144,11 @@ export class Poll extends React.Component {
       success: (resp) => {
         console.log(resp);
 
-        this.props.cbUpdate({mayRespond : false});
+        if (this.props.isAdmin) {
+          this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
+        } else {
+          this.props.cbUpdate({mayRespond : false});
+        }
 
       } // end success
     }); // end ajax
