@@ -16,10 +16,12 @@ export class Input extends React.Component {
   } // end updateResponse
 
 	render = () => {
-    <form>
-      <input type="text" onChange={this.updateInput} id="response" name="response"/>
-      <input type="submit" value="submit" onClick={this.props.addResponse} />
-    </form>
+    return(
+	    <form>
+	      <input type="text" onChange={this.updateInput} id="response" name="response"/>
+	      <input type="submit" value="submit" onClick={this.props.addResponse} />
+	    </form>
+	  );
   } // end render
 
 } // endInput
