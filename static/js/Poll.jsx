@@ -219,6 +219,15 @@ export class Poll extends React.Component {
         this.setState({input : '',
                        responseData : rMap,
                        responseOrder: this.state.responseOrder.concat(rMap.get(id))});
+
+        if (this.props.pollType !== 'ranked questions') {
+
+          if (this.props.isAdmin) {
+            this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
+          } else {
+            this.props.cbUpdate({mayRespond : false});
+          }
+        }
       } // end success
     }); // end ajax
     
