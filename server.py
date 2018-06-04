@@ -258,13 +258,13 @@ def render_poll(short_code):
     if poll is not None:  # Ensure this is a valid poll route
         if user.is_admin(poll):
             print "Admin view"
-            return render_template('poll-react.html', poll=poll)
+            return render_template('poll-react.html', poll=poll, async_mode=socketio.async_mode)
         elif not poll.is_open:
             print "poll not open"
             return render_template('poll-closed.html', poll=poll)
         elif user.may_respond(poll):
             print 'User may respond'
-            return render_template('poll-react.html', poll=poll)
+            return render_template('poll-react.html', poll=poll, async_mode=socketio.async_mode)
         elif not poll.is_results_visible:
             "User has voted but results not visible"
             route = '/' + poll.short_code + '/success'

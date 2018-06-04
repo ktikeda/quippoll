@@ -191,10 +191,12 @@ export class Poll extends React.Component {
     }); // end ajax
   }
 
-  addResponse = (evt, text='') => {
+  addResponse = (evt) => {
     //update poll options and reset options to an empty string
+    evt.preventDefault();
     let order = this.state.responseOrder;
     let weight;
+    let text = this.state.input;
 
     order.length > 0 ? weight = order[order.length-1].weight + 1 : weight = 1;
 
@@ -214,7 +216,8 @@ export class Poll extends React.Component {
         const rMap = this.state.responseData;
         rMap.set(id, response);
 
-        this.setState({responseData : rMap,
+        this.setState({input : '',
+                       responseData : rMap,
                        responseOrder: this.state.responseOrder.concat(rMap.get(id))});
       } // end success
     }); // end ajax
@@ -347,9 +350,9 @@ export class Poll extends React.Component {
 
     if (mode === 'respond') {
       return(
-        <form action={url} method="POST">
-          <input type="text" id="response" name="response" />
-          <input type="submit" value="submit" />
+        <form>
+          <input type="text" onChange={this.handleInput} id="response" name="response" value={text}/>
+          <input type="submit" value="submit" onClick={this.addResponse} />
         </form>
       );
     } else if (mode === 'results') {
@@ -391,7 +394,7 @@ export class Poll extends React.Component {
   } // end showSubmit
 
 
-render() {
+  render() {
     let responses = this.state.responseOrder;
     const mode = this.props.mode;
     const collectTally = this.props.collectTally;

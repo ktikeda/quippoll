@@ -77,7 +77,8 @@ export class Response extends React.Component {
       if (mode === 'respond') { return (<div> {isSelected
         ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block selected">{text}</button>
         : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block">{text}</button>
-      }</div>)} else if (mode === 'edit') {
+      }</div>)
+      } else if (mode === 'edit') {
         return (<div><input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
                 <button className="" type="button" onClick={this.passDeletion}>Delete</button>
                 </div>);
