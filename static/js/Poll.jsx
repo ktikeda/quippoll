@@ -6,6 +6,7 @@ import {SortableContainer, SortableElement, arrayMove} from 'react-sortable-hoc'
 import FlipMove from 'react-flip-move';
 
 import Response from './Response.jsx';
+import Input from './Input.jsx';
 import BarChart from './BarChart.jsx';
 import PieChart from './PieChart.jsx';
 
@@ -32,6 +33,16 @@ export class Poll extends React.Component {
     console.log(evt);
     this.setState({ input : evt.target.value });
   } // end handleInput
+
+  updateInput = (data) => {
+    // get response.txt from Response child and update state
+    let input = this.state.input;
+
+    input = data.text;
+
+    this.setState({input : input});
+
+  } // end getUpdate
 
   updatePrompt = (evt) => {
 
@@ -104,6 +115,7 @@ export class Poll extends React.Component {
   } // end getDeletion
 
   addTally = (data) => {
+  // add tally to this.state.tallys
     const id = data.response_id;
     let responses = this.state.responseData;
     responses.get(id).tally = data;
@@ -115,6 +127,7 @@ export class Poll extends React.Component {
       delete responses.get(removed.response_id).tally;
     }
 
+    // create tally in database if the poll is ranked questions
     if (this.props.pollType === 'ranked questions') {
       let data = {tallys : [tally]};
 
@@ -142,17 +155,19 @@ export class Poll extends React.Component {
   } // end addTally
 
   deleteTally = (data) => {
+  // remove tally from this.state.tallys
     const id = data.response_id;
     let responses = this.state.responseData;
-
     let tally = responses.get(id).tally;
     let index = this.state.tallys.indexOf(tally);
-    this.state.tallys.splice(index, 1);
+    let tallys = this.state.tallys
+    
+    tallys.splice(index, 1);
 
     delete responses.get(id).tally;
 
     this.setState({ responseData : responses,
-                    tallys : this.state.tallys });
+                    tallys : tallys });
 
     if (this.props.pollType === 'ranked questions') {
       let data = tally;
@@ -171,6 +186,7 @@ export class Poll extends React.Component {
   } // end deleteTally
 
   createTallys = (evt) => {
+  // create tally in database and redirect to results page
     let data = {tallys : this.state.tallys};
 
     $.ajax({ 
@@ -186,8 +202,7 @@ export class Poll extends React.Component {
           this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
         } else {
           this.props.cbUpdate({mayRespond : false});
-        }
-
+        } // end if
       } // end success
     }); // end ajax
   }
@@ -201,7 +216,7 @@ export class Poll extends React.Component {
 
     order.length > 0 ? weight = order[order.length-1].weight + 1 : weight = 1;
 
-    let _data = {responses : [{'text' : text,
+    let data = {responses : [{'text' : text,
                                'weight' : weight}]};
 
     $.ajax({ 
@@ -209,17 +224,17 @@ export class Poll extends React.Component {
       dataType: 'json',
       contentType : 'application/json',
       type: 'post',
-      data: JSON.stringify(_data),
+      data: JSON.stringify(data),
       success: (resp) => {
         console.log(resp.status);
         const response = resp.response_data[0];
         const id = response.response_id;
-        const rMap = this.state.responseData;
-        rMap.set(id, response);
+        let responses = this.state.responseData;
+        responses.set(id, response);
 
         this.setState({input : '',
-                       responseData : rMap,
-                       responseOrder: this.state.responseOrder.concat(rMap.get(id))});
+                       responseData : responses,
+                       responseOrder: this.state.responseOrder.concat(responses.get(id))});
 
         if (this.props.pollType !== 'ranked questions') {
 
@@ -237,7 +252,7 @@ export class Poll extends React.Component {
   /* Begin render elements */
 
   showNav = () => {
-    let mode = this.props.mode
+    const mode = this.props.mode
     if (mode === 'results') {
 
       return (
@@ -253,9 +268,9 @@ export class Poll extends React.Component {
 
   showPrompt = () => {
     
-    let id = this.props.pollId;
-    let prompt = this.props.prompt;
-    let mode = this.props.mode;
+    const id = this.props.pollId;
+    const prompt = this.props.prompt;
+    const mode = this.props.mode;
 
     if (mode === 'edit') {
       return (<div><input type="text" id={id} className="" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
@@ -266,12 +281,11 @@ export class Poll extends React.Component {
 
   } // end showPrompt
 
-  showResponsesForTally = (responses) => {
+  showResponses = (responses) => {
 
-    let mode = this.props.mode;
-    let pollId = this.props.pollId;
-    let pollType = this.props.pollType;
-
+    const mode = this.props.mode;
+    const pollId = this.props.pollId;
+    const pollType = this.props.pollType;
 
     const SortableItem = SortableElement(({value}) =>
       <li key={ value.response_id }><Response 
@@ -346,44 +360,17 @@ export class Poll extends React.Component {
       <div />
     } // end if
 
-  } // end showResponsesForTally
+  } // end showResponses
 
+  showInput = () => {
+    return(<Input updateInput={this.updateInput} addResponse={this.addResponse}/>);
+  } // end showInput
 
-  showResponsesForResponse = (responses) => {
-    let mode = this.props.mode;
-    let pollId = this.props.pollId;
-    let pollType = this.props.pollType;
-    let text = this.state.input;
-    const url = '/polls/' + this.props.shortCode + '/response'
-
-    if (mode === 'respond') {
-      return(
-        <form>
-          <input type="text" onChange={this.handleInput} id="response" name="response" value={text}/>
-          <input type="submit" value="submit" onClick={this.addResponse} />
-        </form>
-      );
-    } else if (mode === 'results') {
-      return(<ul> {responses.map(function(response){
-            return <li key={ response.response_id }><Response 
-                      key={ response.response_id } 
-                      id={ response.response_id } 
-                      mode={ mode }
-                      pollId={ pollId }
-                      pollType={ pollId }
-                      text={ response.text }
-                      value={ response.value } /></li>;
-          })}</ul>);
-    } else {
-      return(<div/>);
-    }
-
-  } // showResponsesForResponse
 
   showCharts = (responses) => {
     
     let chart = this.state.chart;
-    let mode = this.props.mode
+    const mode = this.props.mode;
     
     return (
       <div>
@@ -397,8 +384,8 @@ export class Poll extends React.Component {
     ) // end of return
   } // end showCharts
 
-  showSubmit = () => {
-    <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.saveTallys}>Add option</button>
+  showAddInput = () => {
+    <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}>Add option</button>
   } // end showSubmit
 
 
@@ -414,11 +401,13 @@ export class Poll extends React.Component {
 
         { this.showPrompt() }
 
-        { responses && collectResponse === true ? this.showResponsesForResponse(responses) : <div/> }
+        { responses && collectResponse === true ? this.showInput(responses) : <div/> }
             
-        { responses && collectTally === true ? this.showResponsesForTally(responses) : <div/> }
+        { responses && collectTally === true ? this.showResponses(responses) : <div/> }
         
         { responses && mode === 'results' ? this.showCharts(responses) : <div/> }
+
+        { mode === 'edit' ? this.showAddInput() : <div/> }
         
       </div>
     );
@@ -426,13 +415,15 @@ export class Poll extends React.Component {
   } // End of render
 
   componentDidMount() {
-    
+    let responses = this.state.responseData;
+    let order = this.state.responseOrder;
+    const pollType = this.props.pollType;
+
+  /* call socketio functions */
+
     onResponseUpdate (
       (err, data) => {
-        let responses = this.state.responseData;
-        let order = this.state.responseOrder;
         const id = data.response_id;
-        const pollType = this.props.pollType;
 
         if (responses.get(id) === undefined) {
           responses.set(id, {});
@@ -453,8 +444,6 @@ export class Poll extends React.Component {
 
     onResponseDeletion ( 
       (err, data) => {
-        let responses = this.state.responseData;
-        let order = this.state.responseOrder;
         const id = data.response_id;
 
         if (responses.get(id) !== undefined) {
@@ -463,9 +452,8 @@ export class Poll extends React.Component {
           order.splice(index, 1);
           responses.delete(id);
           this.setState({ responseData : responses, responseOrder : order});
-        }
+        } // end if
 
-    
     }); // end onResponseUpdate
 
     onNewOrder( 
@@ -478,62 +466,26 @@ export class Poll extends React.Component {
       
     }); // end onNewOrder
 
+    /* end calling socketio functions */  
+
+    // get data from server and set to state
     fetch('/api/polls/' + this.props.pollId + '/responses')
       .then( resp => resp.json())
       .then( data => {
-        let order = new Array();
-        let rMap = new Map();
 
         for (let response of data.response_data) {
-          rMap.set(response.response_id, response);
+          responses.set(response.response_id, response);
         }
 
         for (let datum of data.response_data) {
-          order.push(rMap.get(datum.response_id));
+          order.push(responses.get(datum.response_id));
         }
 
-        this.setState({ responseOrder: order, responseData: rMap });
+        this.setState({ responseOrder: order, responseData: responses });
       });
-  
+
   } // end componentDidMount
 
 } // End of Poll
-
-function assignWeight(array, index) {
-  // take an array of objects and assigns object.weight based on the object's position in the array.
-  let prevWeight = 0;
-  let nextWeight;
-  let length = array.length;
-  let weight
-
-  if (length === 1) {
-    
-    return array;
-
-  } else if (index === 0) {
-    
-    nextWeight = array[index+1].weight;
-
-  } else if (index === length-1) {
-    
-    // weight should be greater than prevWeight
-    prevWeight = array[index-1].weight;
-    weight = prevWeight + 1;
-    array[index].weight = weight;
-    return array
-
-  } else {
-    prevWeight = array[index-1].weight;
-    nextWeight = array[index+1].weight; 
-
-  }
-  
-  weight = (prevWeight + nextWeight) / 2.0;
-
-  array[index].weight = weight;
-
-  return array;
-
-} // end assignWeight
 
 export default Poll;
