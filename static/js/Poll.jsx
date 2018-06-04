@@ -110,7 +110,6 @@ export class Poll extends React.Component {
     let tallys = this.state.tallys;
 
     if (!this.props.multiSelect && this.state.tallys.length !== 0) {
-      //debugger;
       let removed = tallys.pop();
       delete responses.get(removed.response_id).tally;
     }
@@ -119,6 +118,21 @@ export class Poll extends React.Component {
 
     this.setState({ responseData : responses,
                     tallys : tallys });
+
+    if (this.props.pollType === 'ranked questions') {
+      let data = {tallys : [tally]};
+
+      $.ajax({ 
+        url: '/api/polls/' + this.props.pollId + '/tallys',
+        dataType: 'json',
+        contentType : 'application/json',
+        type: 'post',
+        data: JSON.stringify(data),
+        success: (resp) => {
+          console.log('tally success', resp);
+        }
+      });
+    } // end if
   } // end addTally
 
   deleteTally = (data) => {
@@ -225,6 +239,9 @@ export class Poll extends React.Component {
     let mode = this.props.mode;
     let pollId = this.props.pollId;
     let pollType = this.props.pollType;
+    if (pollType === 'ranked questions') {
+      responses.sort((a, b) => b.value - a.value );
+    }
 
     const SortableItem = SortableElement(({value}) =>
       <li key={ value.response_id }><Response 
