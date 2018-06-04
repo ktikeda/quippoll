@@ -35,13 +35,12 @@
 
     });
 
-    const onNewResult = (id, cb) => {
-      console.log('onNewResult ready');
-      socket.on('new_result_' + id, function(data) {
+    const onResponseUpdate = (id, cb) => {
+      console.log('onResponseUpdate ready');
+      socket.on('response_update', function(data) {
         console.log('received', data);
         cb(null, data);
       });
-      socket.emit('onNewResult', 1000);
     }
 
     const onNewOrder = (cb) => {

@@ -28,20 +28,22 @@ def emit_new_result(response):
                   namespace='/poll')
 
 
-def emit_new_result_id(response):
+def emit_response_update(response):
     """Send new result data as server generated event to clients."""
 
     print "Server emitted"
+
+    poll = Poll.query.get(response.poll_id)
 
     data = {'response_id' : response.response_id, 
             'text' : response.text,
             'value' : response.value(),
             'is_visible': response.is_visible}
 
-    socketio.emit('new_result_' + str(response.poll_id),
+    socketio.emit('response_update',
                   data,
                   namespace='/poll',
-                  broadcast=True)
+                  room=poll.short_code)
 
 # TODO: Create rooms for each poll
 
@@ -190,7 +192,7 @@ def add_response_to_db(short_code):
     db.session.commit()
 
     # emit_new_result(response)
-    emit_new_result_id(response)
+    emit_response_update(response)
 
     # Specify route
     if poll.is_results_visible:
@@ -222,7 +224,7 @@ def add_tally_to_db(short_code):
         db.session.commit()
 
         # emit_new_result(response)
-        emit_new_result_id(response)
+        emit_response_update(response)
 
     # Specify route
     if poll.is_results_visible:
@@ -562,7 +564,7 @@ def sms_add_input(short_code):
                     db.session.commit()
 
                     # emit_new_result(response)
-                    emit_new_result_id(poll)
+                    emit_response_update(response)
 
                     resp.message('Your response "{}" has been recorded.'.format(response.text))
 
@@ -722,6 +724,7 @@ def create_responses(poll_id):
         db.session.add(new_response)
         db.session.commit()
 
+
         response_data.append({'response_id' : new_response.response_id,
                               'user_id' : new_response.user_id,
                               'text' : new_response.text,
@@ -730,7 +733,6 @@ def create_responses(poll_id):
                               'is_visible' : new_response.is_visible})
 
     data = {'response_data' : response_data}
-    print data
 
     return jsonify(data)
 
@@ -789,7 +791,7 @@ def update_response(poll_id, response_id):
             db.session.add(response)
             db.session.commit()
 
-    #emit_new_result_id(response)
+    emit_response_update(response)
 
     return jsonify(response.data())
 
@@ -829,7 +831,7 @@ def create_tallys(poll_id):
         db.session.add(new_tally)
         db.session.commit()
 
-        emit_new_result_id(response)
+        emit_response_update(response)
 
 
         tallys_data.append(new_tally.data())

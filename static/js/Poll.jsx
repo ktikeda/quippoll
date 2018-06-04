@@ -21,20 +21,6 @@ export class Poll extends React.Component {
                   tallys: []
                   };
 
-    onNewResult (this.props.pollId, 
-      (err, data) => {
-        let responses = this.state.responseData;
-        const id = data.response_id;
-
-        if (responses.size !== 0) {
-          for (let property in data) {
-            responses.get(id)[property] = data[property];
-          }
-          this.setState({ responseData : responses });
-        }
-  
-    }); // end onNewResult
-
   } // end constructor
 
   setChart = (evt) => {
@@ -382,6 +368,27 @@ render() {
   } // End of render
 
   componentDidMount() {
+    
+    onResponseUpdate (this.props.pollId, 
+      (err, data) => {
+        let responses = this.state.responseData;
+        let order = this.state.responseOrder;
+        const id = data.response_id;
+
+        if (responses.get(id) === undefined) {
+          responses.set(id, {});
+          order.push(responses.get(id));
+        }
+
+        if (responses.size !== 0) {
+          for (let property in data) {
+            responses.get(id)[property] = data[property];
+          }
+          this.setState({ responseData : responses, responseOrder : order});
+        }
+    
+    }); // end onResponseUpdate
+
     onNewOrder( 
       (err, data) => {
         const oldIndex = data.order[0];
@@ -390,7 +397,7 @@ render() {
           responseOrder: arrayMove(this.state.responseOrder, oldIndex, newIndex)
         });
       
-    }); // end on NewOrder
+    }); // end onNewOrder
 
     fetch('/api/polls/' + this.props.pollId + '/responses')
       .then( resp => resp.json())
