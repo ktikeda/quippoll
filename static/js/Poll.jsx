@@ -270,22 +270,22 @@ export class Poll extends React.Component {
     } else if (mode === 'respond') {
       return (
         <div>
-          <ol> {responses.map((response) => {
-              return(<li key={ response.response_id }><Response 
-                        key={ response.response_id } 
-                        id={ response.response_id } 
-                        mode={ mode }
-                        pollId={ pollId }
-                        text={ response.text }
-                        value={ response.value }
-                        addTally={ this.addTally }
-                        deleteTally={ this.deleteTally }
-                        isSelected={ response.hasOwnProperty('tally') }
-                         /></li>);})}           
-            </ol>
-            <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>
-          </div>
-
+          <FlipMove >
+            {responses.map(response => (
+                <Response 
+                  key={ response.response_id } 
+                  id={ response.response_id } 
+                  mode={ mode }
+                  pollId={ pollId }
+                  text={ response.text }
+                  value={ response.value }
+                  addTally={ this.addTally }
+                  deleteTally={ this.deleteTally }
+                  isSelected={ response.hasOwnProperty('tally') }
+                   />))}           
+          </FlipMove>
+          <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>
+        </div>
       );
     } else if (mode === 'results') {
       return (<FlipMove > 
