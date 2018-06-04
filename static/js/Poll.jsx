@@ -92,6 +92,9 @@ export class Poll extends React.Component {
         let index = order.indexOf(response);
         order.splice(index, 1);
         responses.delete(id);
+
+        socket.emit('response_deletion', {room: this.props.shortCode, data: {response_id : response.response_id}});
+
         this.setState({responseData : responses, responseOrder : order});
 
       }
@@ -369,7 +372,7 @@ render() {
 
   componentDidMount() {
     
-    onResponseUpdate (this.props.pollId, 
+    onResponseUpdate (
       (err, data) => {
         let responses = this.state.responseData;
         let order = this.state.responseOrder;
@@ -386,6 +389,23 @@ render() {
           }
           this.setState({ responseData : responses, responseOrder : order});
         }
+    
+    }); // end onResponseUpdate
+
+    onResponseDeletion ( 
+      (err, data) => {
+        let responses = this.state.responseData;
+        let order = this.state.responseOrder;
+        const id = data.response_id;
+
+        if (responses.get(id) !== undefined) {
+          let response = responses.get(id);
+          let index = order.indexOf(response);
+          order.splice(index, 1);
+          responses.delete(id);
+          this.setState({ responseData : responses, responseOrder : order});
+        }
+
     
     }); // end onResponseUpdate
 

@@ -35,16 +35,21 @@
 
     });
 
-    const onResponseUpdate = (id, cb) => {
-      console.log('onResponseUpdate ready');
+    const onResponseUpdate = (cb) => {
       socket.on('response_update', function(data) {
         console.log('received', data);
         cb(null, data);
       });
     }
 
+    const onResponseDeletion = (cb) => {
+      socket.on('response_deletion', function(data) {
+        console.log('received', data);
+        cb(null, data);
+      });
+    }
+
     const onNewOrder = (cb) => {
-      console.log('onNewOrder ready');
       socket.on('new_response_order', function(data){ 
         console.log('received', data);
         cb(null, data);

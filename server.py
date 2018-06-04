@@ -56,6 +56,15 @@ def broadcast_response_order(message):
          room=message['room'],
          include_self=False)
 
+@socketio.on('response_deletion', namespace='/poll')
+def broadcast_response_deletion(message):
+    print message
+    socketio.emit('response_deletion',
+         {'response_id': message['data']['response_id']},
+         namespace='/poll',
+         room=message['room'],
+         include_self=False)
+
 @socketio.on('join', namespace='/poll')
 def join(message):
     join_room(message['room'])
