@@ -224,6 +224,7 @@ export class Poll extends React.Component {
 
     let mode = this.props.mode;
     let pollId = this.props.pollId;
+    let pollType = this.props.pollType;
 
     const SortableItem = SortableElement(({value}) =>
       <li key={ value.response_id }><Response 
@@ -233,6 +234,7 @@ export class Poll extends React.Component {
             mode='edit' 
             isVisible={ value.is_visible }
             pollId={ this.props.pollId }
+            pollType={ this.props.pollType }
             cbDelete={ this.getDeletion }
             cbUpdate={ this.getUpdate } />
       </li>
@@ -266,6 +268,7 @@ export class Poll extends React.Component {
                   id={ response.response_id } 
                   mode={ mode }
                   pollId={ pollId }
+                  pollType={ pollType }
                   text={ response.text }
                   value={ response.value }
                   addTally={ this.addTally }
@@ -273,7 +276,10 @@ export class Poll extends React.Component {
                   isSelected={ response.hasOwnProperty('tally') }
                    />))}           
           </FlipMove>
-          <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>
+          { pollType !== 'ranked questions' 
+            ? <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>
+            : <div />
+          }
         </div>
       );
     } else if (mode === 'results') {
@@ -299,6 +305,7 @@ export class Poll extends React.Component {
   showResponsesForResponse = (responses) => {
     let mode = this.props.mode;
     let pollId = this.props.pollId;
+    let pollType = this.props.pollType;
     let text = this.state.input;
     const url = '/polls/' + this.props.shortCode + '/response'
 
@@ -316,6 +323,7 @@ export class Poll extends React.Component {
                       id={ response.response_id } 
                       mode={ mode }
                       pollId={ pollId }
+                      pollType={ pollId }
                       text={ response.text }
                       value={ response.value } /></li>;
           })}</ul>);
@@ -358,10 +366,10 @@ render() {
         { this.showNav() }
 
         { this.showPrompt() }
-            
-        { responses && collectTally === true ? this.showResponsesForTally(responses) : <div/> }
 
         { responses && collectResponse === true ? this.showResponsesForResponse(responses) : <div/> }
+            
+        { responses && collectTally === true ? this.showResponsesForTally(responses) : <div/> }
         
         { responses && mode === 'results' ? this.showCharts(responses) : <div/> }
         

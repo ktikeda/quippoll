@@ -50,6 +50,15 @@ export class Response extends React.Component {
     // implement save badge
   } // end showSaved
 
+  showRankedQuestions = () => {
+    return(
+      <div>
+        <button type="button" className="btn btn-primary btn-sm">{ this.props.value }</button>
+        { this.props.text }
+      </div>
+    )
+  } // showRankedQuestions
+
   render() {
     let mode = this.props.mode;
     let id = "response-opt-" + this.props.id;
@@ -58,16 +67,24 @@ export class Response extends React.Component {
     let isVisible = this.props.isVisible;
     let isSelected = this.props.isSelected;
 
-    if (mode === 'respond') { return (<div> {isSelected
-      ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block selected">{text}</button>
-      : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block">{text}</button>
-    }</div>)} else if (mode === 'edit') {
-      return (<div><input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
-              <button className="" type="button" onClick={this.passDeletion}>Delete</button>
-              </div>);
-    } else if (mode === 'results') {
-      return (<div>{text} : {value}</div>);
+    if (this.props.pollType === 'ranked questions') {
+      return(<div>{ this.showRankedQuestions() }</div>);
+    } else {
+
+      if (mode === 'respond') { return (<div> {isSelected
+        ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block selected">{text}</button>
+        : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block">{text}</button>
+      }</div>)} else if (mode === 'edit') {
+        return (<div><input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
+                <button className="" type="button" onClick={this.passDeletion}>Delete</button>
+                </div>);
+      } else if (mode === 'results') {
+        return (<div>{text} : {value}</div>);
+      } // end if
+
     } // end if
+
+    
   } // end render
 
 } // end Response

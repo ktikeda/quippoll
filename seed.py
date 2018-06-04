@@ -79,7 +79,7 @@ def test_data():
                    prompt='What is your favorite color?',
                    short_code='open', admin_code='adminoe')
 
-    q_poll = Poll(poll_type_id=3, title='Questions',
+    q_poll = Poll(poll_type_id=4, title='Questions',
                    prompt='Ask me anything.',
                    short_code='questions', admin_code='adminq')
 

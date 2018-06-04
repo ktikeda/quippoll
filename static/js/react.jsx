@@ -13,6 +13,7 @@ class PollSettings extends React.Component {
                   isAdmin: '',
                   mayRespond : '',
                   pollId : '',
+                  pollType: '',
                   collectResponse : '',
                   collectTally : '',
                   multiSelect : '',
@@ -42,6 +43,7 @@ class PollSettings extends React.Component {
       })
       .then(resp => resp.json())
       .then( data => this.setState({ pollId : data.poll_id, 
+                                     pollType : data.poll_type,
                                      collectResponse : data.collect_response, 
                                      collectTally : data.collect_tally,
                                      multiSelect : data.multi_select,
@@ -68,6 +70,7 @@ class PollSettings extends React.Component {
         userId={this.state.userId} 
         isAdmin={this.state.isAdmin} 
         mayRespond={this.state.mayRespond} 
+        pollType={this.state.pollType}
         collectResponse={this.state.collectResponse}
         collectTally={this.state.collectTally}
         multiSelect={this.state.multiSelect}

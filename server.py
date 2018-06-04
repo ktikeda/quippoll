@@ -655,6 +655,7 @@ def get_poll(poll_id):
                   'is_visible': response.is_visible} for response in poll.responses]
 
     return jsonify({"poll_id" : poll.poll_id, 
+                    "poll_type" : poll.poll_type.name,
                     "collect_response" : poll.poll_type.collect_response,
                     "collect_tally" : poll.poll_type.collect_tally,
                     "multi_select" : poll.poll_type.multi_select,
