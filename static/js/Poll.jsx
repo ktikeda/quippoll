@@ -67,6 +67,7 @@ export class Poll extends React.Component {
   }; // end onSortEnd
 
   getUpdate = (data) => {
+    // get response.txt from Response child and update state
     let responses = this.state.responseData;
 
     responses.get(data.response_id).text = data.text;
@@ -270,9 +271,7 @@ export class Poll extends React.Component {
     let mode = this.props.mode;
     let pollId = this.props.pollId;
     let pollType = this.props.pollType;
-    if (pollType === 'ranked questions') {
-      responses.sort((a, b) => b.value - a.value );
-    }
+
 
     const SortableItem = SortableElement(({value}) =>
       <li key={ value.response_id }><Response 
@@ -433,6 +432,7 @@ export class Poll extends React.Component {
         let responses = this.state.responseData;
         let order = this.state.responseOrder;
         const id = data.response_id;
+        const pollType = this.props.pollType;
 
         if (responses.get(id) === undefined) {
           responses.set(id, {});
@@ -442,6 +442,9 @@ export class Poll extends React.Component {
         if (responses.size !== 0) {
           for (let property in data) {
             responses.get(id)[property] = data[property];
+            if (property === 'value' && pollType === 'ranked questions') {
+              order.sort((a, b) => b.value - a.value );
+            }
           }
           this.setState({ responseData : responses, responseOrder : order});
         }
