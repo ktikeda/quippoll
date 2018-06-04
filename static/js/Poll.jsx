@@ -18,7 +18,7 @@ export class Poll extends React.Component {
                   responseData: new Map(),
                   chart : 'bar',
                   items : '',
-                  inputs : [''],
+                  inputs : [],
                   tallys: []
                   };
 
@@ -209,12 +209,13 @@ export class Poll extends React.Component {
     this.setState({inputs : inputs});
   } // end addInput
 
-  addResponse = (evt) => {
+  addResponse = (childData) => {
     //update poll options and reset options to an empty string
-    evt.preventDefault();
+    const index = childData.index;
     let order = this.state.responseOrder;
     let weight;
-    let text = this.state.inputs[0];
+    let text = this.state.inputs[index];
+    
 
     order.length > 0 ? weight = order[order.length-1].weight + 1 : weight = 1;
 
@@ -228,19 +229,19 @@ export class Poll extends React.Component {
       type: 'post',
       data: JSON.stringify(data),
       success: (resp) => {
-        console.log(resp.status);
+        console.log(resp);
         const response = resp.response_data[0];
         const id = response.response_id;
         let responses = this.state.responseData;
         responses.set(id, response);
         let inputs = this.state.inputs;
-        inputs[0] = '';
+        inputs.splice(index, 1);
 
         this.setState({inputs : inputs,
                        responseData : responses,
                        responseOrder: this.state.responseOrder.concat(responses.get(id))});
 
-        if (this.props.pollType !== 'ranked questions') {
+        if (this.props.pollType !== 'ranked questions' && this.props.mode === 'respond') {
 
           if (this.props.isAdmin) {
             this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
@@ -347,7 +348,7 @@ export class Poll extends React.Component {
         </div>
       );
     } else if (mode === 'results') {
-      return (<FlipMove > 
+      return (<FlipMove> 
                 {responses.map(response => (
                   <Response 
                       key={ response.response_id } 
@@ -365,11 +366,12 @@ export class Poll extends React.Component {
 
   } // end showResponses
 
-  showInput = (inputs) => {
+  showInput = () => {
+    let inputs = this.state.inputs;
     return(
       <div>
-      {inputs.map(input => (
-        <Input key={inputs.indexOf(input)} updateInput={this.updateInput} addResponse={this.addResponse}/>
+      {inputs.map((value, index) => (
+        <Input key={`input-${index}`} index={index} mode={this.props.mode} value={value} updateInput={this.updateInput} addResponse={this.addResponse}/>
       ))}
       </div>
     );
@@ -377,7 +379,7 @@ export class Poll extends React.Component {
 
   showSubmit = () => {
     return(<button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>);
-  } // end showInput
+  } // end showSubmit
 
 
   showCharts = (responses) => {
@@ -401,8 +403,8 @@ export class Poll extends React.Component {
     let inputs = this.state.inputs;
     return(
       <div>
-        { inputs.length > 1 ? this.showInput(inputs.slice(1)) : <div/> }
         <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}>Add option</button>
+        
       </div>
     );
   } // end showSubmit
@@ -421,12 +423,14 @@ export class Poll extends React.Component {
 
         { this.showPrompt() }
 
-        { responses && collectResponse === true ? this.showInput([inputs[0]]) : <div/> }
+        { responses && collectResponse === true ? this.showInput() : <div/> }
             
         { responses && collectTally === true ? this.showResponses(responses) : <div/> }
         
         { responses && mode === 'results' ? this.showCharts(responses) : <div/> }
-
+        
+        { collectTally === true && mode === 'edit' ? this.showInput() : <div/> }
+        
         { mode === 'edit' ? this.showAddInput() : <div/> }
 
         { mode === 'respond' && collectResponse === false ? this.showSubmit() : <div/>}
@@ -488,7 +492,13 @@ export class Poll extends React.Component {
       
     }); // end onNewOrder
 
-    /* end calling socketio functions */  
+    /* end calling socketio functions */
+
+    if (this.props.mode === 'respond' && this.props.collectResponse === true) {
+      let inputs = this.state.inputs;
+      inputs.push('');
+      this.setState({inputs : inputs});
+    }
 
     // get data from server and set to state
     fetch('/api/polls/' + this.props.pollId + '/responses')
