@@ -21,8 +21,6 @@ export class Poll extends React.Component {
                   tallys: []
                   };
 
-
-
     onNewResult (this.props.pollId, 
       (err, data) => {
         let responses = this.state.responseData;
@@ -34,10 +32,14 @@ export class Poll extends React.Component {
           }
           this.setState({ responseData : responses });
         }
-    
-    socket.on('new_response_order', (msg) => console.log(msg));
-
+  
     }); // end onNewResult
+
+    onNewOrder( 
+      (err, data) => {
+        console.log(data);
+      
+    }); // end on NewOrder
 
   } // end constructor
 
@@ -79,7 +81,7 @@ export class Poll extends React.Component {
       (resp) => console.log(resp));
 
     // broadcast old and new index to room. On receiving end, reorder responses.
-    socket.emit('poll_state_change', {room: this.props.shortCode, data: {newOrder: [oldIndex, newIndex]}});
+    socket.emit('poll_state_change', {data: {newOrder: [oldIndex, newIndex]}});
 
 
   }; // end onSortEnd
