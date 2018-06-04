@@ -35,12 +35,6 @@ export class Poll extends React.Component {
   
     }); // end onNewResult
 
-    onNewOrder( 
-      (err, data) => {
-        console.log(data);
-      
-    }); // end on NewOrder
-
   } // end constructor
 
   setChart = (evt) => {
@@ -81,7 +75,7 @@ export class Poll extends React.Component {
       (resp) => console.log(resp));
 
     // broadcast old and new index to room. On receiving end, reorder responses.
-    socket.emit('poll_state_change', {data: {newOrder: [oldIndex, newIndex]}});
+    socket.emit('poll_state_change', {room: this.props.shortCode, data: [oldIndex, newIndex]});
 
 
   }; // end onSortEnd
@@ -388,6 +382,16 @@ render() {
   } // End of render
 
   componentDidMount() {
+    onNewOrder( 
+      (err, data) => {
+        const oldIndex = data.order[0];
+        const newIndex = data.order[1];
+        this.setState({
+          responseOrder: arrayMove(this.state.responseOrder, oldIndex, newIndex)
+        });
+      
+    }); // end on NewOrder
+
     fetch('/api/polls/' + this.props.pollId + '/responses')
       .then( resp => resp.json())
       .then( data => {

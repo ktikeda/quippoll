@@ -49,9 +49,10 @@ def emit_new_result_id(response):
 def broadcast_response_order(message):
     print message
     socketio.emit('new_response_order',
-         {'data': message['data']},
+         {'order': message['data']},
          namespace='/poll',
-         broadcast=True)
+         room=message['room'],
+         include_self=False)
 
 @socketio.on('join', namespace='/poll')
 def join(message):

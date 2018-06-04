@@ -46,8 +46,8 @@
 
     const onNewOrder = (cb) => {
       console.log('onNewOrder ready');
-      socket.on('new_response_order', function(msg){ 
-        console.log(msg);
+      socket.on('new_response_order', function(data){ 
+        console.log('received', data);
         cb(null, data);
       }); 
     }
