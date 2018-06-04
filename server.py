@@ -843,10 +843,25 @@ def create_tallys(poll_id):
 
         emit_response_update(response)
 
-
         tallys_data.append(new_tally.data())
 
     return jsonify({'tallys' : tallys_data})
+
+
+@app.route(api + '/polls/<int:poll_id>/responses/<int:response_id>/tallys/<int:tally_id>', methods=['DELETE'])
+def delete_tally(poll_id, response_id, tally_id):
+    """Delete response from poll"""
+    response = Response.query.get(response_id)
+    tally = Tally.query.get(tally_id)
+
+    Tally.query.filter(Tally.tally_id == tally.response_id).delete()
+    db.session.commit()
+
+    import pdb; pdb.set_trace()
+
+    emit_response_update(response)
+
+    return 'Deleted'
 
 
 if __name__ == "__main__":
