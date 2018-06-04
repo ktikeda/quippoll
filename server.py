@@ -854,10 +854,8 @@ def delete_tally(poll_id, response_id, tally_id):
     response = Response.query.get(response_id)
     tally = Tally.query.get(tally_id)
 
-    Tally.query.filter(Tally.tally_id == tally.response_id).delete()
+    Tally.query.filter(Tally.tally_id == tally.tally_id).delete()
     db.session.commit()
-
-    import pdb; pdb.set_trace()
 
     emit_response_update(response)
 
