@@ -35,6 +35,13 @@
 
     });
 
+    const onResponseCreation = (cb) => {
+      socket.on('response_creation', function(data) {
+        console.log('received', data);
+        cb(null, data);
+      });
+    }
+
     const onResponseUpdate = (cb) => {
       socket.on('response_update', function(data) {
         console.log('received', data);

@@ -88,6 +88,7 @@ export class Poll extends React.Component {
 
     let id = this.state.responseOrder[newIndex].response_id;
     let data = {response_id : id, weight : newIndex};
+    const shortCode = this.props.shortCode;
 
     $.post(
       '/api/polls/' + this.props.pollId + '/responses/' + id,
@@ -95,7 +96,7 @@ export class Poll extends React.Component {
       (resp) => {
         console.log(resp)
 
-        socket.emit('response_order_change', {room: this.props.shortCode, data: [oldIndex, newIndex]});
+        socket.emit('response_order_change', {room: shortCode, data: [oldIndex, newIndex]});
       }
     ); // end post
 
@@ -234,10 +235,11 @@ export class Poll extends React.Component {
     let text = this.state.inputs[index];
     
 
-    order.length > 0 ? weight = order[order.length-1].weight + 1 : weight = 1;
+    // order.length > 0 ? weight = order[order.length-1].weight + 1 : weight = 1;
 
-    let data = {responses : [{'text' : text,
-                               'weight' : weight}]};
+    let data = {responses : [{'text' : text}]};
+
+    console.log(data);
 
     $.ajax({ 
       url: '/api/polls/' + this.props.pollId + '/responses',
@@ -247,17 +249,14 @@ export class Poll extends React.Component {
       data: JSON.stringify(data),
       success: (resp) => {
         console.log(resp);
-        const response = resp.response_data[0];
-        const id = response.response_id;
-        let responses = this.state.responseData;
-        responses.set(id, response);
+
+        // clean up inputs
         let inputs = this.state.inputs;
         inputs.splice(index, 1);
 
-        this.setState({inputs : inputs,
-                       responseData : responses,
-                       responseOrder: this.state.responseOrder.concat(responses.get(id))});
+        this.setState({inputs : inputs});
 
+        // redirect to results
         if (this.props.pollType !== 'ranked questions' && this.props.mode === 'respond') {
 
           if (this.props.isAdmin) {
@@ -440,7 +439,16 @@ export class Poll extends React.Component {
     const pollType = this.props.pollType;
 
   /* call socketio functions */
+    onResponseCreation (
+      (err, data) => {
+        responses.set(data.response_id, data);
+        order.push(responses.get(data.response_id));
 
+        this.setState({ responseData : responses, responseOrder : order});
+
+      }
+    ); // end onResponseCreation
+    
     onResponseUpdate (
       (err, data) => {
         const id = data.response_id;

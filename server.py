@@ -18,9 +18,9 @@ from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
 # Begin socketio routes
 def emit_response_update(response):
-    """Send new result data as server generated event to clients."""
+    """Send updated response data as server generated event to clients."""
 
-    print "Server emitted"
+    print "Server emitted response update"
 
     poll = Poll.query.get(response.poll_id)
 
@@ -33,6 +33,23 @@ def emit_response_update(response):
                   data,
                   namespace='/poll',
                   room=poll.short_code)
+
+
+def emit_response_creation(response):
+    """Send new response data as server generated event to clients."""
+    print "Server emitted response creation"
+
+    poll = Poll.query.get(response.poll_id)
+
+    data = {'response_id' : response.response_id,
+            'text' : response.text,
+            'value' : response.value(),
+            'is_visible': response.is_visible}
+    
+    socketio.emit('response_creation',
+         data,
+         namespace='/poll',
+         room=poll.short_code)
 
 # TODO: Create rooms for each poll
 
@@ -641,7 +658,6 @@ def get_poll(poll_id):
     poll = Poll.query.get(poll_id)
 
     responses = [{'response_id' : response.response_id, 
-                  'weight' : response.weight, 
                   'text' : response.text,
                   'value' : response.value(),
                   'is_visible': response.is_visible} for response in poll.responses]
@@ -699,7 +715,6 @@ def get_responses(poll_id):
 
     responses = [{'response_id' : response.response_id,
                   'text' : response.text,
-                  'weight' : response.weight, 
                   'value' : response.value(),
                   'is_visible': response.is_visible} for response in poll.responses]
 
@@ -716,22 +731,25 @@ def create_responses(poll_id):
     user = User.get_user()
     responses = request.json['responses']
 
+    last_response = Response.query.filter(Response.poll_id == poll.poll_id).order_by(Response.weight.desc()).first()
+
     response_data = []
 
     for response in responses:
         new_response = Response(poll_id=poll.poll_id,
                             user_id=user.user_id,
                             text=response['text'],
-                            weight=float(response['weight']))
+                            weight=last_response.weight + 1)
         db.session.add(new_response)
         db.session.commit()
 
+        emit_response_creation(new_response);
 
         response_data.append({'response_id' : new_response.response_id,
                               'user_id' : new_response.user_id,
                               'text' : new_response.text,
-                              'weight' : new_response.weight,
                               'value' : 0,
+                              'weight' : new_response.weight,
                               'is_visible' : new_response.is_visible})
 
     data = {'response_data' : response_data}
@@ -746,7 +764,6 @@ def get_response(poll_id, response_id):
 
     response_data = {'response_id' : response.response_id, 
                      'user_id' : response.user_id,
-                     'weight' : response.weight, 
                      'text' : response.text,
                      'value' : response.value(),
                      'is_visible': response.is_visible}
