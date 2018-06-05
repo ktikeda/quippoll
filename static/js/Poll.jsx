@@ -325,8 +325,7 @@ export class Poll extends React.Component {
       
     } else if (mode === 'respond') {
       return (
-        <div>
-          <FlipMove >
+          <FlipMove typeName="ol">
             {responses.map(response => (
                 <Response 
                   key={ response.response_id } 
@@ -341,14 +340,9 @@ export class Poll extends React.Component {
                   isSelected={ response.hasOwnProperty('tally') }
                    />))}           
           </FlipMove>
-          { pollType !== 'ranked questions' 
-            ? <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit in showResponses</button>
-            : <div />
-          }
-        </div>
       );
     } else if (mode === 'results') {
-      return (<FlipMove> 
+      return (<FlipMove typeName="ol"> 
                 {responses.map(response => (
                   <Response 
                       key={ response.response_id } 
@@ -427,7 +421,7 @@ export class Poll extends React.Component {
             
         { responses && collectTally === true ? this.showResponses(responses) : <div/> }
         
-        { responses && mode === 'results' ? this.showCharts(responses) : <div/> }
+        { responses && mode === 'results' && collectTally === false ? this.showCharts(responses) : <div/> }
         
         { collectTally === true && mode === 'edit' ? this.showInput() : <div/> }
         

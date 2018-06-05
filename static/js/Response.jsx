@@ -18,9 +18,6 @@ export class Response extends React.Component {
     $.post('/api/polls/' + this.props.pollId + '/responses/' + this.props.id,
       data,
       (resp) => console.log(resp));
-
-    //this.props.cbUpdate(data);
-
     
   } // end updateResponse
 
@@ -44,6 +41,7 @@ export class Response extends React.Component {
     let data = {response_id : this.props.id};
     
     this.props.cbDelete(data);
+
   } // end passDeletion
 
   showSaved = () => {
@@ -53,12 +51,13 @@ export class Response extends React.Component {
   showRankedQuestions = () => {
     let isSelected = this.props.isSelected;
     return(
-      <div> {isSelected
+      <li> 
+        {isSelected
         ? <button onClick={this.toggleSelection} className="btn btn-primary btn-sm selected">{ this.props.value }</button>
         : <button onClick={this.toggleSelection} className="btn btn-primary btn-sm">{ this.props.value }</button>
         }
         { this.props.text }
-      </div>
+      </li>
     )
   } // showRankedQuestions
 
@@ -71,23 +70,30 @@ export class Response extends React.Component {
     let isSelected = this.props.isSelected;
 
     if (this.props.pollType === 'ranked questions') {
-      return(<div>{ this.showRankedQuestions() }</div>);
+      return(<li>{ this.showRankedQuestions() }</li>);
     } else {
 
-      if (mode === 'respond') { return (<div> {isSelected
-        ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block selected">{text}</button>
-        : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block">{text}</button>
-      }</div>)
+      if (mode === 'respond') { 
+        return(
+          <li> 
+            {isSelected
+            ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block selected">{text}</button>
+            : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block">{text}</button>
+            }
+          </li>
+        )
       } else if (mode === 'edit') {
-        return (<div><input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
-                <button className="" type="button" onClick={this.passDeletion}>Delete</button>
-                </div>);
+        return(
+          <li>
+            <input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
+            <button className="" type="button" onClick={this.passDeletion}>Delete</button>
+          </li>
+        );
       } else if (mode === 'results') {
-        return (<div>{text} : {value}</div>);
+        return(<li>{text} : {value}</li>);
       } // end if
 
     } // end if
-
     
   } // end render
 
