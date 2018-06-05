@@ -394,40 +394,31 @@ export class Poll extends React.Component {
   } // end showSubmit
 
 
-  showCharts = (responses) => {
-    
-    let chart = this.state.chart;
-    const mode = this.props.mode;
-    
-    return (
-      <div>
-        { (chart === 'bar') ? 
-          (<BarChart data={responses} />) : 
-          ((chart === 'pie') ? 
-           (<PieChart data={responses} />) : <div/>)
-        }
-      </div>
-
-    ) // end of return
-  } // end showCharts
-
-  showAddInput = () => {
-    let inputs = this.state.inputs;
-    return(
-      <div>
-        <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}>Add option</button>
-        
-      </div>
-    );
-  } // end showSubmit
-
-
   render() {
     let responses = this.state.responseOrder;
     let inputs = this.state.inputs;
+    let chart = this.state.chart;
     const mode = this.props.mode;
     const collectTally = this.props.collectTally;
     const collectResponse = this.props.collectResponse;
+
+    const showAddInput = () => (
+          <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}>Add option</button>
+          
+    ); // end showSubmit
+
+    const showCharts = (responses) => {    
+      return (
+        <div>
+          { (chart === 'bar') ? 
+            (<BarChart data={responses} />) : 
+            ((chart === 'pie') ? 
+             (<PieChart data={responses} />) : <div/>)
+          }
+        </div>
+
+      ) // end of return
+    } // end showCharts
 
     return(
       <div> 
@@ -439,11 +430,11 @@ export class Poll extends React.Component {
             
         { responses && collectTally === true ? this.showResponses(responses) : <div/> }
         
-        { responses && mode === 'results' && collectTally === false ? this.showCharts(responses) : <div/> }
+        { responses && mode === 'results' ? showCharts(responses) : <div/> }
         
         { collectTally === true && mode === 'edit' ? this.showInput() : <div/> }
         
-        { mode === 'edit' ? this.showAddInput() : <div/> }
+        { mode === 'edit' ? showAddInput() : <div/> }
 
         { mode === 'respond' && collectResponse === false ? this.showSubmit() : <div/>}
         
