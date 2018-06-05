@@ -24,21 +24,7 @@ export class Poll extends React.Component {
 
   } // end constructor
 
-  setChart = (evt) => {
-    let type = evt.target.id;
-    this.setState({chart : type});
-  } // end setChart
-
-  updateInput = (data) => {
-    // get response.txt from Response child and update state
-    let inputs = this.state.inputs;
-    const index = data.index;
- 
-    inputs[index] = data.text;
-
-    this.setState({inputs : inputs});
-
-  } // end getUpdate
+  /* Functions that callback to parent */
 
   updatePrompt = (evt) => {
 
@@ -53,7 +39,45 @@ export class Poll extends React.Component {
  
   } // end updatePrompt
 
-  onSortEnd = ({oldIndex, newIndex}, evt) => {
+  /* Functions to update component state */
+
+  updateChart = (evt) => {
+    let type = evt.target.id;
+
+    this.setState({chart : type});
+
+  } // end updateChart
+
+  updateInput = (data) => {
+    // get response.txt from Response child and update state
+    let inputs = this.state.inputs;
+    const index = data.index;
+ 
+    inputs[index] = data.text;
+
+    this.setState({inputs : inputs});
+
+  } // end updateInput
+
+  updateResponseData = (data) => {
+    // get response.txt from Response child and update state
+    let responses = this.state.responseData;
+
+    responses.get(data.response_id).text = data.text;
+
+    this.setState({responseData : responses});
+
+  } // end updateResponseData
+
+  addInput = () => {
+    let inputs = this.state.inputs;
+
+    inputs.push('');
+
+    this.setState({inputs : inputs});
+  } // end addInput
+
+  updateResponseOrder = ({oldIndex, newIndex}, evt) => {
     // send new index to server, server return json with response weight data
 
     this.setState({
@@ -63,31 +87,22 @@ export class Poll extends React.Component {
     let id = this.state.responseOrder[newIndex].response_id;
     let data = {response_id : id, weight : newIndex};
 
-    $.post('/api/polls/' + this.props.pollId + '/responses/' + id,
+    $.post(
+      '/api/polls/' + this.props.pollId + '/responses/' + id,
       data,
-      (resp) => console.log(resp));
+      (resp) => {
+        console.log(resp)
 
-    // broadcast old and new index to room. On receiving end, reorder responses.
-    socket.emit('poll_state_change', {room: this.props.shortCode, data: [oldIndex, newIndex]});
+        socket.emit('response_order_change', {room: this.props.shortCode, data: [oldIndex, newIndex]});
+      }
+    ); // end post
 
+  }; // end updateResponseOrder
 
-  }; // end onSortEnd
-
-  getUpdate = (data) => {
-    // get response.txt from Response child and update state
-    let responses = this.state.responseData;
-
-    responses.get(data.response_id).text = data.text;
-
-    this.setState({responseData : responses});
-
-  } // end getUpdate
-
-  getDeletion = (data) => {
+  deleteResponse = (data) => {
     /* get response send response to be deleted to server
        change responses on state */
     const id = data.response_id;
-    let url = '/api/polls/' + this.props.pollId + '/responses/' + id;
     let responses = this.state.responseData;
     let response = responses.get(id);
     let order = this.state.responseOrder;
@@ -96,24 +111,27 @@ export class Poll extends React.Component {
       url: '/api/polls/' + this.props.pollId + '/responses/' + id,
       type: 'delete',
       success: (resp) => {
-        console.log(resp.status);
+        console.log(resp);
+        
         let index = order.indexOf(response);
         order.splice(index, 1);
         responses.delete(id);
 
-        socket.emit('response_deletion', {room: this.props.shortCode, data: {response_id : response.response_id}});
-
         this.setState({responseData : responses, responseOrder : order});
+
+        socket.emit('response_deletion', {room: this.props.shortCode, data: {response_id : response.response_id}});
 
       }
     }); // end $.ajax
 
-  } // end getDeletion
+  } // end deleteResponse
 
   addTally = (data) => {
   // add tally to this.state.tallys
+    console.log(data);
     const id = data.response_id;
     let responses = this.state.responseData;
+
     responses.get(id).tally = data;
     let tally = responses.get(id).tally;
     let tallys = this.state.tallys;
@@ -143,15 +161,18 @@ export class Poll extends React.Component {
         }
       });
     } else {
-      this.state.tallys.push(tally);
+      
+      tallys.push(tally);
 
       this.setState({ responseData : responses,
                       tallys : tallys });
     } // end if
+
   } // end addTally
 
   deleteTally = (data) => {
   // remove tally from this.state.tallys
+    console.log(data);
     const id = data.response_id;
     let responses = this.state.responseData;
     let tally = responses.get(id).tally;
@@ -203,12 +224,6 @@ export class Poll extends React.Component {
     }); // end ajax
   }
 
-  addInput = () => {
-    let inputs = this.state.inputs;
-    inputs.push('');
-    this.setState({inputs : inputs});
-  } // end addInput
-
   addResponse = (childData) => {
     //update poll options and reset options to an empty string
     const index = childData.index;
@@ -254,17 +269,17 @@ export class Poll extends React.Component {
     
   } // end addResponse
 
-  /* Begin render elements */
+  /* Functions render elements */
 
   showNav = () => {
     const mode = this.props.mode
     if (mode === 'results') {
 
-      return (
+      return(
         <div>
-          <button id="pie" onClick={ this.setChart }><i className="fas fa-chart-pie"></i></button>
-          <button id="bar" onClick={ this.setChart }><i className="fas fa-chart-bar"></i></button>
-          <button id="text" onClick={ this.setChart }><i className="fas fa-font"></i></button>
+          <button id="pie" onClick={ this.updateChart }><i className="fas fa-chart-pie"></i></button>
+          <button id="bar" onClick={ this.updateChart }><i className="fas fa-chart-bar"></i></button>
+          <button id="text" onClick={ this.updateChart }><i className="fas fa-font"></i></button>
         </div>
       ) // end return
     } // end if
@@ -301,8 +316,8 @@ export class Poll extends React.Component {
             isVisible={ value.is_visible }
             pollId={ this.props.pollId }
             pollType={ this.props.pollType }
-            cbDelete={ this.getDeletion }
-            cbUpdate={ this.getUpdate } />
+            cbDelete={ this.deleteResponse }
+            cbUpdate={ this.updateResponseData } />
       </li>
     ); // end SortableItem
 
@@ -320,40 +335,43 @@ export class Poll extends React.Component {
     if (mode === 'edit') {
       return (
         <div>
-          <SortableList items={responses} onSortEnd={this.onSortEnd} />
+          <SortableList items={responses} updateResponseOrder={this.updateResponseOrder} />
         </div>);
       
     } else if (mode === 'respond') {
       return (
-          <FlipMove typeName="ol">
-            {responses.map(response => (
-                <Response 
-                  key={ response.response_id } 
-                  id={ response.response_id } 
-                  mode={ mode }
-                  pollId={ pollId }
-                  pollType={ pollType }
-                  text={ response.text }
-                  value={ response.value }
-                  addTally={ this.addTally }
-                  deleteTally={ this.deleteTally }
-                  isSelected={ response.hasOwnProperty('tally') }
-                   />))}           
-          </FlipMove>
+        <FlipMove typeName="ol">
+          {responses.map(response => (
+              <Response 
+                key={ response.response_id } 
+                id={ response.response_id } 
+                mode={ mode }
+                pollId={ pollId }
+                pollType={ pollType }
+                text={ response.text }
+                value={ response.value }
+                addTally={ this.addTally }
+                deleteTally={ this.deleteTally }
+                isSelected={ response.hasOwnProperty('tally') }
+                />
+          ))}           
+        </FlipMove>
       );
     } else if (mode === 'results') {
-      return (<FlipMove typeName="ol"> 
-                {responses.map(response => (
-                  <Response 
-                      key={ response.response_id } 
-                      id={ response.response_id } 
-                      mode={ mode }
-                      pollId={ pollId }
-                      text={ response.text }
-                      value={ response.value }
-                       />
-                      
-          ))}</FlipMove>);
+      return (
+        <FlipMove typeName="ol"> 
+          {responses.map(response => (
+            <Response 
+              key={ response.response_id } 
+              id={ response.response_id } 
+              mode={ mode }
+              pollId={ pollId }
+              text={ response.text }
+              value={ response.value }
+              />         
+          ))}
+        </FlipMove>
+      );
     } else {
       <div />
     } // end if

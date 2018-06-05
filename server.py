@@ -47,7 +47,7 @@ def emit_response_update(response):
 
 # TODO: Create rooms for each poll
 
-@socketio.on('poll_state_change', namespace='/poll')
+@socketio.on('response_order_change', namespace='/poll')
 def broadcast_response_order(message):
     print message
     socketio.emit('new_response_order',
@@ -55,6 +55,7 @@ def broadcast_response_order(message):
          namespace='/poll',
          room=message['room'],
          include_self=False)
+
 
 @socketio.on('response_deletion', namespace='/poll')
 def broadcast_response_deletion(message):
@@ -65,10 +66,12 @@ def broadcast_response_deletion(message):
          room=message['room'],
          include_self=False)
 
+
 @socketio.on('join', namespace='/poll')
 def join(message):
     join_room(message['room'])
     print message['room'], 'joined'
+
 
 @socketio.on('leave', namespace='/poll')
 def leave(message):
