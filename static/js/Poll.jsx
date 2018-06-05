@@ -269,174 +269,162 @@ export class Poll extends React.Component {
     
   } // end addResponse
 
-  /* Functions render elements */
-
-  showNav = () => {
-    const mode = this.props.mode
-    if (mode === 'results') {
-
-      return(
-        <div>
-          <button id="pie" onClick={ this.updateChart }><i className="fas fa-chart-pie"></i></button>
-          <button id="bar" onClick={ this.updateChart }><i className="fas fa-chart-bar"></i></button>
-          <button id="text" onClick={ this.updateChart }><i className="fas fa-font"></i></button>
-        </div>
-      ) // end return
-    } // end if
-  } // showNav
-
-
-  showPrompt = () => {
-    
-    const id = this.props.pollId;
-    const prompt = this.props.prompt;
-    const mode = this.props.mode;
-
-    if (mode === 'edit') {
-      return (<div><input type="text" id={id} className="" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
-      
-    } else {
-      return (<h1>{prompt}</h1>);
-    } // end if
-
-  } // end showPrompt
-
-  showResponses = (responses) => {
-
-    const mode = this.props.mode;
-    const pollId = this.props.pollId;
-    const pollType = this.props.pollType;
-
-    const SortableItem = SortableElement(({value}) =>
-      <Response 
-            key={ value.response_id } 
-            id={ value.response_id }
-            text={ value.text }
-            mode='edit' 
-            isVisible={ value.is_visible }
-            pollId={ this.props.pollId }
-            pollType={ this.props.pollType }
-            cbDelete={ this.deleteResponse }
-            cbUpdate={ this.updateResponseData } />
-      
-    ); // end SortableItem
-
-    const SortableList = SortableContainer(({items}) => {
-      return (
-        <ol>
-          {items.map((value, index) => (
-            <SortableItem key={`item-${index}`} index={index} value={value} />
-          ))}
-        </ol>
-      );
-    }); // end SortableList
-
-
-    if (mode === 'edit') {
-      return (
-        <div>
-          <SortableList items={responses} updateResponseOrder={this.updateResponseOrder} />
-        </div>);
-      
-    } else if (mode === 'respond') {
-      return (
-        <FlipMove typeName="ol">
-          {responses.map(response => (
-              <Response 
-                key={ response.response_id } 
-                id={ response.response_id } 
-                mode={ mode }
-                pollId={ pollId }
-                pollType={ pollType }
-                text={ response.text }
-                value={ response.value }
-                addTally={ this.addTally }
-                deleteTally={ this.deleteTally }
-                isSelected={ response.hasOwnProperty('tally') }
-                />
-          ))}           
-        </FlipMove>
-      );
-    } else if (mode === 'results') {
-      return (
-        <FlipMove typeName="ol"> 
-          {responses.map(response => (
-            <Response 
-              key={ response.response_id } 
-              id={ response.response_id } 
-              mode={ mode }
-              pollId={ pollId }
-              text={ response.text }
-              value={ response.value }
-              />         
-          ))}
-        </FlipMove>
-      );
-    } else {
-      <div />
-    } // end if
-
-  } // end showResponses
-
-  showInput = () => {
-    let inputs = this.state.inputs;
-    return(
-      <div>
-      {inputs.map((value, index) => (
-        <Input key={`input-${index}`} index={index} mode={this.props.mode} value={value} updateInput={this.updateInput} addResponse={this.addResponse}/>
-      ))}
-      </div>
-    );
-  } // end showInput
-
-  showSubmit = () => {
-    return(<button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>);
-  } // end showSubmit
-
+  /* render elements */
 
   render() {
     let responses = this.state.responseOrder;
     let inputs = this.state.inputs;
     let chart = this.state.chart;
+    const pollId = this.props.pollId;
+    const pollType = this.props.pollType;
+    const prompt = this.props.prompt;
     const mode = this.props.mode;
     const collectTally = this.props.collectTally;
     const collectResponse = this.props.collectResponse;
 
-    const showAddInput = () => (
-          <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}>Add option</button>
-          
-    ); // end showSubmit
+    const showNav = () => {
+      if (mode === 'results') {
 
-    const showCharts = (responses) => {    
-      return (
+        return(
+          <div>
+            <button id="pie" onClick={ this.updateChart }><i className="fas fa-chart-pie"></i></button>
+            <button id="bar" onClick={ this.updateChart }><i className="fas fa-chart-bar"></i></button>
+            <button id="text" onClick={ this.updateChart }><i className="fas fa-font"></i></button>
+          </div>
+        ) // end return
+      } // end if
+    } // showNav
+
+
+    const showPrompt = () => {
+      if (mode === 'edit') {
+        return (<div><input type="text" id={pollId} className="" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
+        
+      } else {
+        return (<h1>{prompt}</h1>);
+      } // end if
+
+    } // end showPrompt
+
+    const showInputs = () => {
+      return(
         <div>
-          { (chart === 'bar') ? 
-            (<BarChart data={responses} />) : 
-            ((chart === 'pie') ? 
-             (<PieChart data={responses} />) : <div/>)
-          }
+        {inputs.map((value, index) => (
+          <Input key={`input-${index}`} index={index} mode={this.props.mode} value={value} updateInput={this.updateInput} addResponse={this.addResponse}/>
+        ))}
         </div>
+      );
+    } // end showInputs
 
-      ) // end of return
+    const showResponses = () => {
+
+      const SortableItem = SortableElement(({value}) =>
+        <Response 
+              key={ value.response_id } 
+              id={ value.response_id }
+              text={ value.text }
+              mode='edit' 
+              isVisible={ value.is_visible }
+              pollId={ pollId }
+              pollType={ pollType }
+              cbDelete={ this.deleteResponse }
+              cbUpdate={ this.updateResponseData } />
+        
+      ); // end SortableItem
+
+      const SortableList = SortableContainer(({items}) => {
+        return (
+          <ol>
+            {items.map((value, index) => (
+              <SortableItem key={`item-${index}`} index={index} value={value} />
+            ))}
+          </ol>
+        );
+      }); // end SortableList
+
+      if (mode === 'edit') {
+        return (
+          <div>
+            <SortableList items={responses} updateResponseOrder={this.updateResponseOrder} />
+          </div>);
+        
+      } else if (mode === 'respond') {
+        return (
+          <FlipMove typeName="ol">
+            {responses.map(response => (
+                <Response 
+                  key={ response.response_id } 
+                  id={ response.response_id } 
+                  mode={ mode }
+                  pollId={ pollId }
+                  pollType={ pollType }
+                  text={ response.text }
+                  value={ response.value }
+                  addTally={ this.addTally }
+                  deleteTally={ this.deleteTally }
+                  isSelected={ response.hasOwnProperty('tally') }
+                  />
+            ))}           
+          </FlipMove>
+        );
+      } else if (mode === 'results') {
+        return (
+          <FlipMove typeName="ol"> 
+            {responses.map(response => (
+              <Response 
+                key={ response.response_id } 
+                id={ response.response_id } 
+                mode={ mode }
+                pollId={ pollId }
+                text={ response.text }
+                value={ response.value }
+                />         
+            ))}
+          </FlipMove>
+        );
+      } // end if
+
+    } // end showResponses
+
+    const showAddInput = () => {
+      if (mode === 'edit') {
+        return(<button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}>Add option</button>);
+      }
+    }; // end showSubmit
+
+    const showCharts = () => {    
+      if (mode === 'results') {
+        if (chart === 'bar') {
+          return(<BarChart data={responses} />);
+        } else if (chart === 'pie') {
+          return(<PieChart data={responses} />);
+        }
+      }
     } // end showCharts
+
+    const showSubmit = () => {
+      if (mode === 'respond') {
+        return(<button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>);
+      }
+    } // end showSubmit
 
     return(
       <div> 
-        { this.showNav() }
+        { showNav() }
 
-        { this.showPrompt() }
+        { showPrompt() }
 
-        { responses && collectResponse === true ? this.showInput() : <div/> }
+        { inputs && collectResponse === true ? showInputs() : <div/> }
             
-        { responses && collectTally === true ? this.showResponses(responses) : <div/> }
+        { responses && collectTally === true ? showResponses() : <div/> }
         
-        { responses && mode === 'results' ? showCharts(responses) : <div/> }
+        { responses ? showCharts() : <div/> }
         
-        { collectTally === true && mode === 'edit' ? this.showInput() : <div/> }
+        { inputs && collectTally === true && mode === 'edit' ? showInputs() : <div/> }
         
-        { mode === 'edit' ? showAddInput() : <div/> }
+        { showAddInput() }
 
-        { mode === 'respond' && collectResponse === false ? this.showSubmit() : <div/>}
+        { collectResponse === false ? showSubmit() : <div/>}
         
       </div>
     );
