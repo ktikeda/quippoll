@@ -308,7 +308,7 @@ export class Poll extends React.Component {
     const pollType = this.props.pollType;
 
     const SortableItem = SortableElement(({value}) =>
-      <li key={ value.response_id }><Response 
+      <Response 
             key={ value.response_id } 
             id={ value.response_id }
             text={ value.text }
@@ -318,7 +318,7 @@ export class Poll extends React.Component {
             pollType={ this.props.pollType }
             cbDelete={ this.deleteResponse }
             cbUpdate={ this.updateResponseData } />
-      </li>
+      
     ); // end SortableItem
 
     const SortableList = SortableContainer(({items}) => {
