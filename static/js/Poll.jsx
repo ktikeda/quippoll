@@ -300,10 +300,10 @@ export class Poll extends React.Component {
 
     const showPrompt = () => {
       if (mode === 'edit') {
-        return (<div><input type="text" id={pollId} className="" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
+        return (<div><input type="text" id="prompt" className="h1 prompt-edit" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
         
       } else {
-        return (<h1>{prompt}</h1>);
+        return (<h1 id="prompt">{prompt}</h1>);
       } // end if
 
     } // end showPrompt
@@ -336,7 +336,7 @@ export class Poll extends React.Component {
 
       const SortableList = SortableContainer(({items}) => {
         return (
-          <ol>
+          <ol className="responses">
             {items.map((value, index) => (
               <SortableItem key={`item-${index}`} index={index} value={value} />
             ))}
@@ -351,8 +351,9 @@ export class Poll extends React.Component {
           </div>);
         
       } else if (mode === 'respond') {
+
         return (
-          <FlipMove typeName="ol">
+          <FlipMove typeName="ol" className="responses">
             {responses.map(response => (
                 <Response 
                   key={ response.response_id } 
@@ -371,7 +372,7 @@ export class Poll extends React.Component {
         );
       } else if (mode === 'results') {
         return (
-          <FlipMove typeName="ol"> 
+          <FlipMove typeName="ol" className=""> 
             {responses.map(response => (
               <Response 
                 key={ response.response_id } 
@@ -416,13 +417,13 @@ export class Poll extends React.Component {
 
         { showPrompt() }
 
-        { inputs && collectResponse === true ? showInputs() : <div/> }
+        { inputs.length > 0 && collectResponse === true ? showInputs() : <div/> }
             
-        { responses && collectTally === true ? showResponses() : <div/> }
+        { responses.length > 0 && collectTally === true ? showResponses() : <div/> }
         
-        { responses ? showCharts() : <div/> }
+        { responses.length > 0 ? showCharts() : <div/> }
         
-        { inputs && collectTally === true && mode === 'edit' ? showInputs() : <div/> }
+        { inputs.length > 0 && collectTally === true && mode === 'edit' ? showInputs() : <div/> }
         
         { showAddInput() }
 

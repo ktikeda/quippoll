@@ -75,22 +75,26 @@ export class Response extends React.Component {
 
       if (mode === 'respond') { 
         return(
-          <li> 
+          <li className="li-response"> 
             {isSelected
-            ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block selected">{text}</button>
-            : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-block">{text}</button>
+            ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-inline-block selected">{text}</button>
+            : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-inline-block">{text}</button>
             }
           </li>
         )
       } else if (mode === 'edit') {
         return(
-          <li>
-            <input type="text" id={id} className="" defaultValue={text} onBlur={this.updateResponse} />
-            <button className="" type="button" onClick={this.passDeletion}>Delete</button>
+          <li className="li-response">
+            <div className="button-edit">
+            <input type="text" id={id} className="edit text-center" defaultValue={text} onBlur={this.updateResponse} />
+            
+            <button className="hidden" type="button" onClick={this.passDeletion}>Delete</button>
+            </div>
+
           </li>
         );
       } else if (mode === 'results') {
-        return(<li>{text} : {value}</li>);
+        return(<li className="li-response">{text} : {value}</li>);
       } // end if
 
     } // end if

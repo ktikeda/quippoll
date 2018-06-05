@@ -141,10 +141,10 @@ const Header = (props) => {
     return(
       <header>
         <nav>
-          <ul>
-            <li key="1"><Link to={ match.url } >Respond</Link></li>
-            <li key="2"><Link to={ match.url + '/edit' } >Edit</Link></li>
-            <li key="3"><Link to={ match.url + '/results' }>Results</Link></li>
+          <ul className="list-inline">
+            <li key="1" className="list-inline-item"><Link to={ match.url } >Respond</Link></li>
+            <li key="2" className="list-inline-item"><Link to={ match.url + '/edit' } >Edit</Link></li>
+            <li key="3" className="list-inline-item"><Link to={ match.url + '/results' }>Results</Link></li>
           </ul>
         </nav>
       </header>
