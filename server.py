@@ -17,17 +17,6 @@ from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
 
 # Begin socketio routes
-def emit_new_result(response):
-    """Send new result data as server generated event to clients."""
-
-    print "Server emitted"
-    socketio.emit('new_result',
-                  {'response': response.text,
-                   'response_id': response.response_id,
-                   'value': response.value()},
-                  namespace='/poll')
-
-
 def emit_response_update(response):
     """Send new result data as server generated event to clients."""
 
@@ -35,7 +24,7 @@ def emit_response_update(response):
 
     poll = Poll.query.get(response.poll_id)
 
-    data = {'response_id' : response.response_id, 
+    data = {'response_id' : response.response_id,
             'text' : response.text,
             'value' : response.value(),
             'is_visible': response.is_visible}

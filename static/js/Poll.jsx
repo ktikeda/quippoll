@@ -80,8 +80,10 @@ export class Poll extends React.Component {
   updateResponseOrder = ({oldIndex, newIndex}, evt) => {
     // send new index to server, server return json with response weight data
 
+    let order = this.state.responseOrder;
+
     this.setState({
-      responseOrder: arrayMove(this.state.responseOrder, oldIndex, newIndex)
+      responseOrder: arrayMove(order, oldIndex, newIndex)
     });
 
     let id = this.state.responseOrder[newIndex].response_id;
@@ -282,6 +284,7 @@ export class Poll extends React.Component {
     const collectTally = this.props.collectTally;
     const collectResponse = this.props.collectResponse;
 
+
     const showNav = () => {
       if (mode === 'results') {
 
@@ -345,7 +348,7 @@ export class Poll extends React.Component {
       if (mode === 'edit') {
         return (
           <div>
-            <SortableList items={responses} updateResponseOrder={this.updateResponseOrder} />
+            <SortableList items={responses} onSortEnd={this.updateResponseOrder} />
           </div>);
         
       } else if (mode === 'respond') {
@@ -454,7 +457,12 @@ export class Poll extends React.Component {
               order.sort((a, b) => b.value - a.value );
             }
           }
-          this.setState({ responseData : responses, responseOrder : order});
+
+          if (pollType === 'ranked questions') {
+            this.setState({ responseData : responses, responseOrder : order});
+          } else {
+            this.setState({ responseData : responses });
+          }
         }
     
     }); // end onResponseUpdate
