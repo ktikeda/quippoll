@@ -59,6 +59,13 @@ export class Poll extends React.Component {
 
   } // end updateInput
 
+  deleteInput = (index) => {
+    let inputs = this.state.inputs;
+    inputs.splice(index, 1);
+
+    this.setState({inputs : inputs});
+  } // end deleteInput
+ 
   updateResponseData = (data) => {
     // get response.txt from Response child and update state
     let responses = this.state.responseData;
@@ -80,25 +87,27 @@ export class Poll extends React.Component {
   updateResponseOrder = ({oldIndex, newIndex}, evt) => {
     // send new index to server, server return json with response weight data
 
-    let order = this.state.responseOrder;
+    if (oldIndex !== newIndex) {
+      let order = this.state.responseOrder;
 
-    this.setState({
-      responseOrder: arrayMove(order, oldIndex, newIndex)
-    });
+      this.setState({
+        responseOrder: arrayMove(order, oldIndex, newIndex)
+      });
 
-    let id = this.state.responseOrder[newIndex].response_id;
-    let data = {response_id : id, weight : newIndex};
-    const shortCode = this.props.shortCode;
+      let id = this.state.responseOrder[newIndex].response_id;
+      let data = {response_id : id, weight : newIndex};
+      const shortCode = this.props.shortCode;
 
-    $.post(
-      '/api/polls/' + this.props.pollId + '/responses/' + id,
-      data,
-      (resp) => {
-        console.log(resp)
+      $.post(
+        '/api/polls/' + this.props.pollId + '/responses/' + id,
+        data,
+        (resp) => {
+          console.log(resp)
 
-        socket.emit('response_order_change', {room: shortCode, data: [oldIndex, newIndex]});
-      }
-    ); // end post
+          socket.emit('response_order_change', {room: shortCode, data: [oldIndex, newIndex]});
+        }
+      ); // end post
+    }
 
   }; // end updateResponseOrder
 
@@ -310,11 +319,11 @@ export class Poll extends React.Component {
 
     const showInputs = () => {
       return(
-        <div>
+        <ul className="responses">
         {inputs.map((value, index) => (
-          <Input key={`input-${index}`} index={index} mode={this.props.mode} value={value} updateInput={this.updateInput} addResponse={this.addResponse}/>
+          <Input key={`input-${index}`} index={index} mode={this.props.mode} value={value} updateInput={this.updateInput} deleteInput={this.deleteInput} addResponse={this.addResponse}/>
         ))}
-        </div>
+        </ul>
       );
     } // end showInputs
 

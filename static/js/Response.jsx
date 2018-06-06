@@ -11,13 +11,18 @@ export class Response extends React.Component {
   } // end constructor
 
   updateResponse = (evt) => {
+    
+    let text = evt.target.value;
 
-    let data = {response_id : this.props.id,
-                text : evt.target.value};
+    if (text !== this.props.text && text !== '') {
 
-    $.post('/api/polls/' + this.props.pollId + '/responses/' + this.props.id,
-      data,
-      (resp) => console.log(resp));
+      let data = {response_id : this.props.id,
+                  text : evt.target.value};
+
+      $.post('/api/polls/' + this.props.pollId + '/responses/' + this.props.id,
+        data,
+        (resp) => console.log(resp));
+    }
     
   } // end updateResponse
 
@@ -36,13 +41,13 @@ export class Response extends React.Component {
 
   } // end toggleSelection
 
-  passDeletion = (evt) => {
+  deleteResponse = (evt) => {
 
     let data = {response_id : this.props.id};
     
     this.props.cbDelete(data);
 
-  } // end passDeletion
+  } // end deleteResponse
 
   showSaved = () => {
     // implement save badge
@@ -90,7 +95,7 @@ export class Response extends React.Component {
             <div className="button-outline">
             <input type="text" id={id} className="edit text-center" defaultValue={text} onBlur={this.updateResponse} />
             
-            <button className="" type="button" onClick={this.passDeletion}>Delete</button>
+            <button className="close" aria-label="Close" type="button" onClick={this.deleteResponse}>&times;</button>
             </div>
 
           </li>

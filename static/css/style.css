@@ -6,6 +6,18 @@
     background-color: #f44336;
 }
 
+.close {
+  color: #fff;
+  opacity: .8;
+  text-shadow: none;
+}
+
+.close:hover {
+  color: #fff;
+  opacity: 1;
+  text-shadow: none;
+}
+
 
 .btn-inline-block {
   display: inline-block;
@@ -41,10 +53,16 @@ h1#prompt {
   border-bottom: 1px solid #fff;
   width: 100%;
   color: #fff;
+  margin-right: 1rem;
+  padding-left: 2rem;
 
 }
 
 ol.responses {
+  padding: 0;
+}
+
+ul.responses {
   padding: 0;
 }
 

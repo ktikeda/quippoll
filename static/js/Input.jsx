@@ -16,33 +16,52 @@ export class Input extends React.Component {
   } // end updateResponse
 
   addResponse = (evt) => {
-  	evt.preventDefault();
-  	let data = {index : this.props.index};
+    let text = evt.target.value;
 
-  	this.props.addResponse(data);
+    if (text !== '') {
+  	  let data = {index : this.props.index};
+  	  this.props.addResponse(data);
+    }
 
   } // end addResponse
+
+  deleteInput = (evt) => {
+
+    let index = this.props.index;
+    
+    this.props.deleteInput(index);
+
+  } // end deleteResponse
 
 	render = () => {
     let buttonText;
     let inputClass = '';
     let divClass = '';
+    let blurFunc = '';
 
     if (this.props.mode === 'edit') {
-      buttonText = 'Save'; 
-      inputClass = 'edit text-center';
-      divClass = 'button-outline'
+        return(
+          <li className="li-response">
+          <div className="button-outline">
+            <input type="text" 
+                   className="response-input edit text-center" 
+                   onChange={this.updateInput} 
+                   onBlur={this.addResponse}
+                   value={this.props.value} />
+            <button className="close" aria-label="Close" type="button" onClick={this.deleteInput}>&times;</button>
+          </div>
+          </li>
+        );
+
     } else {
-      buttonText = 'Submit';
+        return(
+          <div>
+            <input type="text" className="response-input" onChange={this.updateInput} value={this.props.value} />
+            <button type="button" onClick={this.addResponse}>Submit</button>
+          </div>
+        );
     }
 
-    return(
-	    <div className={divClass}>
-	      
-        <input type="text" className={inputClass} onChange={this.updateInput} value={this.props.value} id="response" name="response"/>
-	      <button type="button" onClick={this.addResponse}>{buttonText}</button>
-	    </div>
-	  );
   } // end render
 
 } // endInput
