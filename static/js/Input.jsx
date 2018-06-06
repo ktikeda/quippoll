@@ -25,12 +25,21 @@ export class Input extends React.Component {
 
 	render = () => {
     let buttonText;
+    let inputClass = '';
+    let divClass = '';
 
-    this.props.mode === 'edit' ? buttonText = 'save' : buttonText = 'submit';
+    if (this.props.mode === 'edit') {
+      buttonText = 'Save'; 
+      inputClass = 'edit text-center';
+      divClass = 'button-outline'
+    } else {
+      buttonText = 'Submit';
+    }
 
     return(
-	    <div>
-	      <input type="text" onChange={this.updateInput} value={this.props.value} id="response" name="response"/>
+	    <div className={divClass}>
+	      
+        <input type="text" className={inputClass} onChange={this.updateInput} value={this.props.value} id="response" name="response"/>
 	      <button type="button" onClick={this.addResponse}>{buttonText}</button>
 	    </div>
 	  );

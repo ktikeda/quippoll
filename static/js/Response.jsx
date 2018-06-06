@@ -90,7 +90,7 @@ export class Response extends React.Component {
             <div className="button-outline">
             <input type="text" id={id} className="edit text-center" defaultValue={text} onBlur={this.updateResponse} />
             
-            <button className="hidden" type="button" onClick={this.passDeletion}>Delete</button>
+            <button className="" type="button" onClick={this.passDeletion}>Delete</button>
             </div>
 
           </li>

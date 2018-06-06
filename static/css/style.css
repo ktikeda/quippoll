@@ -25,7 +25,7 @@ h1#prompt {
 
 .button-outline {
   border-radius: .3rem;
-  display: inline-block;
+  display: inline-flex;
   background-color: #007bff;
   border-color: #007bff;
   padding: .5rem 1rem;
