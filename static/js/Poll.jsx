@@ -32,7 +32,7 @@ export class Poll extends React.Component {
 
     $.post('/api/polls/' + this.props.pollId,
       data,
-      resp => console.log(resp)
+      resp => console.log('server updated', resp)
     );
 
     this.props.cbUpdate(data);
@@ -102,7 +102,7 @@ export class Poll extends React.Component {
         '/api/polls/' + this.props.pollId + '/responses/' + id,
         data,
         (resp) => {
-          console.log(resp)
+          console.log('reweight responses on server', resp)
 
           socket.emit('response_order_change', {room: shortCode, data: [oldIndex, newIndex]});
         }
@@ -119,11 +119,14 @@ export class Poll extends React.Component {
     let response = responses.get(id);
     let order = this.state.responseOrder;
 
+    console.log('client requesting server delete response', id)
+
     $.ajax({
       url: '/api/polls/' + this.props.pollId + '/responses/' + id,
       type: 'delete',
       success: (resp) => {
-        console.log(resp);
+
+        console.log('server deleted', resp);
         
         let index = order.indexOf(response);
         order.splice(index, 1);
@@ -140,7 +143,7 @@ export class Poll extends React.Component {
 
   addTally = (data) => {
   // add tally to this.state.tallys
-    console.log(data);
+    console.log('tally created on client', data);
     const id = data.response_id;
     let responses = this.state.responseData;
 
@@ -164,7 +167,7 @@ export class Poll extends React.Component {
         type: 'post',
         data: JSON.stringify(data),
         success: (resp) => {
-          console.log('tally success', resp);
+          console.log('tally created on server', resp);
           responses.get(id).tally = resp.tallys[0];
           tally = responses.get(id).tally;
           this.state.tallys.push(tally);
@@ -207,7 +210,7 @@ export class Poll extends React.Component {
         type: 'delete',
         data: JSON.stringify(data),
         success: (resp) => {
-          console.log('tally deleted', resp);
+          console.log('server deleted', resp);
         }
       });
     } // end if
@@ -225,7 +228,7 @@ export class Poll extends React.Component {
       type: 'post',
       data: JSON.stringify(data),
       success: (resp) => {
-        console.log('tally success', resp);
+        console.log('tally created on server', resp);
 
         if (this.props.isAdmin) {
           this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
@@ -243,12 +246,11 @@ export class Poll extends React.Component {
     let weight;
     let text = this.state.inputs[index];
     
-
     // order.length > 0 ? weight = order[order.length-1].weight + 1 : weight = 1;
 
     let data = {responses : [{'text' : text}]};
 
-    console.log(data);
+    console.log('client sending data to create response');
 
     $.ajax({ 
       url: '/api/polls/' + this.props.pollId + '/responses',
@@ -257,7 +259,7 @@ export class Poll extends React.Component {
       type: 'post',
       data: JSON.stringify(data),
       success: (resp) => {
-        console.log(resp);
+        console.log('response created on server', resp);
 
         // clean up inputs
         let inputs = this.state.inputs;

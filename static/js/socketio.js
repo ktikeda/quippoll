@@ -37,28 +37,28 @@
 
     const onResponseCreation = (cb) => {
       socket.on('response_creation', function(data) {
-        console.log('received', data);
+        console.log('create new response on client', data);
         cb(null, data);
       });
     }
 
     const onResponseUpdate = (cb) => {
       socket.on('response_update', function(data) {
-        console.log('received', data);
+        console.log('update response on client', data);
         cb(null, data);
       });
     }
 
     const onResponseDeletion = (cb) => {
       socket.on('response_deletion', function(data) {
-        console.log('received', data);
+        console.log('delete response on client', data);
         cb(null, data);
       });
     }
 
     const onNewOrder = (cb) => {
       socket.on('new_response_order', function(data){ 
-        console.log('received', data);
+        console.log('reorder responses on client', data);
         cb(null, data);
       }); 
     }

@@ -691,8 +691,7 @@ def update_poll(poll_id):
         db.session.add(poll)
         db.session.commit()
 
-    status = 'Saved'
-    return status
+    return jsonify({'poll_id' : poll_id})
 
 
 @app.route(api + '/polls/<int:poll_id>/user', methods=["GET"])
@@ -828,7 +827,7 @@ def delete_response(poll_id, response_id):
     Response.query.filter(Response.response_id == response.response_id).delete()
     db.session.commit()
 
-    return 'Deleted'
+    return jsonify({'response_id' : response_id})
 
 
 @app.route(api + '/polls/<int:poll_id>/tallys', methods=["POST"])
@@ -859,7 +858,7 @@ def create_tallys(poll_id):
 
 @app.route(api + '/polls/<int:poll_id>/responses/<int:response_id>/tallys/<int:tally_id>', methods=['DELETE'])
 def delete_tally(poll_id, response_id, tally_id):
-    """Delete response from poll"""
+    """Delete tally from poll"""
     response = Response.query.get(response_id)
     tally = Tally.query.get(tally_id)
 
@@ -868,7 +867,7 @@ def delete_tally(poll_id, response_id, tally_id):
 
     emit_response_update(response)
 
-    return 'Deleted'
+    return jsonify({'tally_id' : tally_id})
 
 
 if __name__ == "__main__":

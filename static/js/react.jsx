@@ -25,7 +25,7 @@ class PollSettings extends React.Component {
     }
 
   getUpdate = (data) => {
-    console.log(data);
+    console.log('updating poll settings on client', data);
     this.setState(data);
 
   }
@@ -100,7 +100,6 @@ const Main = (props) => {
   const cbUpdate = props.cbUpdate;
   const mayRespond = props.mayRespond;
   const isAdmin = props.isAdmin
-  console.log(props);
 
   if (props.isAdmin === true) {
     return(
