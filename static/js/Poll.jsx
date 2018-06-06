@@ -362,7 +362,10 @@ export class Poll extends React.Component {
       } else if (mode === 'respond') {
 
         return (
-          <FlipMove typeName="ol" className="responses">
+          <FlipMove 
+            enterAnimation="accordionVertical" 
+            leaveAnimation="accordionVertical"
+            typeName="ol" className="responses">
             {responses.map(response => (
                 <Response 
                   key={ response.response_id } 
@@ -381,7 +384,10 @@ export class Poll extends React.Component {
         );
       } else if (mode === 'results') {
         return (
-          <FlipMove typeName="ol" className=""> 
+          <FlipMove 
+            enterAnimation="accordionVertical" 
+            leaveAnimation="accordionVertical"
+            typeName="ol" className=""> 
             {responses.map(response => (
               <Response 
                 key={ response.response_id } 
