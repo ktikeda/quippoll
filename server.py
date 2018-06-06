@@ -52,6 +52,15 @@ def emit_response_creation(response):
          room=poll.short_code)
 
 # TODO: Create rooms for each poll
+@socketio.on('response_update', namespace='/poll')
+def broadcast_response_update(message):
+    print message
+    socketio.emit('response_update',
+         {'order': message['data']},
+         namespace='/poll',
+         room=message['room'],
+         include_self=False)
+
 
 @socketio.on('response_order_change', namespace='/poll')
 def broadcast_response_order(message):
@@ -785,16 +794,16 @@ def update_response(poll_id, response_id):
             weight = 1
             if index != 0:
                 prev_response = Response.query.filter(Response.poll_id == poll_id).order_by(Response.weight.asc()).offset(index-1).first()
-                print "prev_response", prev_response
+                
                 weight += prev_response.weight
             setattr(response, attr, weight)
             response.updated_at = datetime.now()
             db.session.add(response)
             db.session.commit()
-            print 'updated response', response
+            
 
             responses = Response.query.filter(Response.poll_id == poll_id).order_by(Response.weight.asc(), Response.updated_at.desc()).offset(index).all()
-            print 'responses to be weighed', responses
+            
             if len(responses) > 1:
                 index = 1
                 while index != len(responses) and responses[index-1].weight >= responses[index].weight:
@@ -802,14 +811,14 @@ def update_response(poll_id, response_id):
                     db.session.add(responses[index])
                     index += 1
                 db.session.commit()
-            print 'responses after', responses
+            
         elif attr != 'response_id':
             setattr(response, attr, val)
             response.updated_at = datetime.now()
             db.session.add(response)
             db.session.commit()
 
-    emit_response_update(response)
+    # emit_response_update(response)
 
     return jsonify(response.data())
 

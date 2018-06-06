@@ -68,11 +68,26 @@ export class Poll extends React.Component {
  
   updateResponseData = (data) => {
     // get response.txt from Response child and update state
+    const id = data.response_id;
     let responses = this.state.responseData;
+    let response = responses.get(id);
+    
 
-    responses.get(data.response_id).text = data.text;
+    $.post('/api/polls/' + this.props.pollId + '/responses/' + id,
+        data,
+        (resp) => {
+          console.log('response updated on server', resp);
+          response.text = data.text;
 
-    this.setState({responseData : responses});
+          this.setState({responseData : responses});
+
+          socket.emit('response_update', 
+            {room: this.props.shortCode, 
+             data: {response_id : response.response_id, text : response.text}
+            }
+          );
+        }
+    );
 
   } // end updateResponseData
 
@@ -170,7 +185,7 @@ export class Poll extends React.Component {
           console.log('tally created on server', resp);
           responses.get(id).tally = resp.tallys[0];
           tally = responses.get(id).tally;
-          this.state.tallys.push(tally);
+          tallys.push(tally);
           this.setState({ responseData : responses,
                           tallys : tallys });
         }
@@ -229,6 +244,12 @@ export class Poll extends React.Component {
       data: JSON.stringify(data),
       success: (resp) => {
         console.log('tally created on server', resp);
+
+        socket.emit('response_update_all', 
+            {room: this.props.shortCode, 
+             data: {response_id : response.response_id, text : response.text}
+            }
+          );
 
         if (this.props.isAdmin) {
           this.props.routeProps.history.push('/' + this.props.shortCode + '/results');

@@ -19,9 +19,8 @@ export class Response extends React.Component {
       let data = {response_id : this.props.id,
                   text : evt.target.value};
 
-      $.post('/api/polls/' + this.props.pollId + '/responses/' + this.props.id,
-        data,
-        (resp) => console.log(resp));
+      this.props.cbUpdate(data);
+  
     }
     
   } // end updateResponse
