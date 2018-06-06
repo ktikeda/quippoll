@@ -12,13 +12,18 @@
   width: 100%;
 }
 
+h1#prompt {
+  margin-top: 1.05rem;
+  margin-bottom: 1.7rem;
+}
+
 .prompt-edit {
   border: none;
   border-bottom: 1px solid #ccc;
   width: 100%;
 }
 
-.button-edit {
+.button-outline {
   border-radius: .3rem;
   display: inline-block;
   background-color: #007bff;

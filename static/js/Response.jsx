@@ -75,17 +75,19 @@ export class Response extends React.Component {
 
       if (mode === 'respond') { 
         return(
-          <li className="li-response"> 
+          <li className="li-response">
+          <div className="">
             {isSelected
             ? <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-inline-block selected">{text}</button>
             : <button onClick={this.toggleSelection} className="response-option btn btn-primary btn-lg btn-inline-block">{text}</button>
             }
+          </div>
           </li>
         )
       } else if (mode === 'edit') {
         return(
           <li className="li-response">
-            <div className="button-edit">
+            <div className="button-outline">
             <input type="text" id={id} className="edit text-center" defaultValue={text} onBlur={this.updateResponse} />
             
             <button className="hidden" type="button" onClick={this.passDeletion}>Delete</button>
