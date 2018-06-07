@@ -62,3 +62,10 @@
         cb(null, data);
       }); 
     }
+
+    const onPollUpdate = (cb) => {
+      socket.on('poll_update', function(data) {
+        console.log('update poll on client', data);
+        cb(null, data);
+      });
+    }

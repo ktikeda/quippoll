@@ -29,7 +29,7 @@ export class Poll extends React.Component {
 
   updatePrompt = (evt) => {
 
-    const data = {prompt : evt.target.value};
+    const data = {poll_id : this.props.pollId, prompt : evt.target.value};
 
     $.post('/api/polls/' + this.props.pollId,
       data,
@@ -286,21 +286,25 @@ export class Poll extends React.Component {
       success: (resp) => {
         console.log('response created on server', resp);
 
-        // clean up inputs
         let inputs = this.state.inputs;
         inputs.splice(index, 1);
 
-        this.setState({inputs : inputs});
-
         // redirect to results
         if (this.props.pollType !== 'ranked questions' && mode === 'respond') {
+          // clean up inputs
+
+          
 
           if (this.props.isAdmin) {
             this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
           } else {
             this.props.cbUpdate({mayRespond : false});
           }
+        } else {
+          inputs.push('');
         }
+
+        this.setState({inputs : inputs});
       } // end success
     }); // end ajax
     

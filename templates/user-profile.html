@@ -12,7 +12,10 @@ Email: {{ current_user.email }}
   <h3>Polls</h3>
   <ul>
   {% for poll in current_user.admin_polls %}
-    <li><a href="/{{ poll.short_code }}">{{ poll.title }}</a> <form action="/delete" method="POST"><button type="submit" name="p" value="{{ poll.short_code }}">Delete</button></form></li>
+    <li><a href="/{{ poll.short_code }}">{{ poll.title }}</a> 
+        <form action="/delete" method="POST"><button type="submit" value="{{ poll.short_code }}">Delete</button></form>
+        <button type="submit" onclick="window.location.href='/poll/{{poll.poll_id}}/settings'" >Settings</button>
+    </li>
   {% endfor %}
   </ul>
 {% endif %}

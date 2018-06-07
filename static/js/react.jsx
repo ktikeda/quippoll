@@ -28,6 +28,12 @@ class PollSettings extends React.Component {
     console.log('updating poll settings on client', data);
     this.setState(data);
 
+    socket.emit('poll_update', 
+      {room: pollCode, 
+       data: data
+      }
+    );
+
   }
 
   componentWillUnmount() {
@@ -36,6 +42,15 @@ class PollSettings extends React.Component {
 
   componentDidMount() {
     socket.emit('join', {room: pollCode});
+
+    onPollUpdate (
+      (err, data) => {
+
+        this.setState(data);
+
+      }
+    ); // end onResponseCreation
+
     fetch('/api/polls/' + pollId, 
       {
       method: 'GET',
@@ -97,7 +112,7 @@ const Routes = (props) => {
 
 const Main = (props) => {
   const match = props.routeProps.match;
-  const cbUpdate = props.cbUpdate;
+  const cbUpdate = props.getUpdate;
   const mayRespond = props.mayRespond;
   const isAdmin = props.isAdmin
 

@@ -43,7 +43,7 @@ function showPosition(position) {
 
     data = {'latitude': position.coords.latitude,
             'longitude': position.coords.longitude};
-    let route = window.location.href;
+    let route = '/api/polls/{{poll.poll_id}}';
     $.post(route, data, function(result) {$('#geolocation').append(result);});
 }
 
@@ -53,7 +53,7 @@ function sendJson(evt) {
   let value = selector.val();
   let data = {};
   data[key] = value;
-  let route = window.location.href;
+  let route = '/api/polls/{{poll.poll_id}}';
 
   console.log(data);
 

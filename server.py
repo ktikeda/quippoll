@@ -85,6 +85,19 @@ def broadcast_response_deletion(message):
          include_self=False)
 
 
+@socketio.on('poll_update', namespace='/poll')
+def broadcast_poll_update(message):
+    print 'broadcast poll update', message
+    poll_id = message['data']['poll_id']
+    poll = Poll.query.get(poll_id)
+
+    socketio.emit('poll_update',
+         message['data'],
+         namespace='/poll',
+         room=message['room'],
+         include_self=False)
+
+
 @socketio.on('join', namespace='/poll')
 def join(message):
     join_room(message['room'])
@@ -744,13 +757,18 @@ def create_responses(poll_id):
 
     last_response = Response.query.filter(Response.poll_id == poll.poll_id).order_by(Response.weight.desc()).first()
 
+    if last_response:
+        weight = last_response.weight + 1
+    else:
+        weight = 1
+
     response_data = []
 
     for response in responses:
         new_response = Response(poll_id=poll.poll_id,
                             user_id=user.user_id,
                             text=response['text'],
-                            weight=last_response.weight + 1)
+                            weight=weight)
         db.session.add(new_response)
         db.session.commit()
 
