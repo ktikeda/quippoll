@@ -54,9 +54,12 @@ def emit_response_creation(response):
 # TODO: Create rooms for each poll
 @socketio.on('response_update', namespace='/poll')
 def broadcast_response_update(message):
-    print message
+    print 'broadcast response update', message
+    response_id = message['data']['response_id']
+    response = Response.query.get(response_id)
+
     socketio.emit('response_update',
-         {'order': message['data']},
+         {'response_id' : response_id, 'value': response.value()},
          namespace='/poll',
          room=message['room'],
          include_self=False)
@@ -858,7 +861,7 @@ def create_tallys(poll_id):
         db.session.add(new_tally)
         db.session.commit()
 
-        emit_response_update(response)
+        #emit_response_update(response)
 
         tallys_data.append(new_tally.data())
 

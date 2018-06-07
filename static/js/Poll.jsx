@@ -17,6 +17,7 @@ export class Poll extends React.Component {
                   responseOrder: [],
                   responseData: new Map(),
                   chart : 'bar',
+                  mode : this.props.mode,
                   items : '',
                   inputs : [],
                   tallys: []
@@ -235,6 +236,7 @@ export class Poll extends React.Component {
   createTallys = (evt) => {
   // create tally in database and redirect to results page
     let data = {tallys : this.state.tallys};
+    const shortCode = this.props.shortCode;
 
     $.ajax({ 
       url: '/api/polls/' + this.props.pollId + '/tallys',
@@ -244,9 +246,15 @@ export class Poll extends React.Component {
       data: JSON.stringify(data),
       success: (resp) => {
         console.log('tally created on server', resp);
+        let tallys = resp.tallys;
+        
+        for (let tally of tallys) {
+          socket.emit('response_update', {room: shortCode, data: {response_id : tally.response_id}});
+        }
 
         if (this.props.isAdmin) {
           this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
+          //this.setState({mode : 'results'});
         } else {
           this.props.cbUpdate({mayRespond : false});
         } // end if
@@ -260,6 +268,7 @@ export class Poll extends React.Component {
     let order = this.state.responseOrder;
     let weight;
     let text = this.state.inputs[index];
+    let mode = this.state.mode;
     
     // order.length > 0 ? weight = order[order.length-1].weight + 1 : weight = 1;
 
@@ -283,7 +292,7 @@ export class Poll extends React.Component {
         this.setState({inputs : inputs});
 
         // redirect to results
-        if (this.props.pollType !== 'ranked questions' && this.props.mode === 'respond') {
+        if (this.props.pollType !== 'ranked questions' && mode === 'respond') {
 
           if (this.props.isAdmin) {
             this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
@@ -305,7 +314,7 @@ export class Poll extends React.Component {
     const pollId = this.props.pollId;
     const pollType = this.props.pollType;
     const prompt = this.props.prompt;
-    const mode = this.props.mode;
+    const mode = this.state.mode;
     const collectTally = this.props.collectTally;
     const collectResponse = this.props.collectResponse;
 
@@ -338,7 +347,7 @@ export class Poll extends React.Component {
       return(
         <ul className="inputs">
         {inputs.map((value, index) => (
-          <Input key={`input-${index}`} index={index} mode={this.props.mode} value={value} updateInput={this.updateInput} deleteInput={this.deleteInput} addResponse={this.addResponse}/>
+          <Input key={`input-${index}`} index={index} mode={mode} value={value} updateInput={this.updateInput} deleteInput={this.deleteInput} addResponse={this.addResponse}/>
         ))}
         </ul>
       );
@@ -501,6 +510,7 @@ export class Poll extends React.Component {
   componentDidMount() {
     let responses = this.state.responseData;
     let order = this.state.responseOrder;
+    let mode = this.state.mode;
     const pollType = this.props.pollType;
 
   /* call socketio functions */
@@ -566,7 +576,7 @@ export class Poll extends React.Component {
 
     /* end calling socketio functions */
 
-    if (this.props.mode === 'respond' && this.props.collectResponse === true) {
+    if (mode === 'respond' && this.props.collectResponse === true) {
       let inputs = this.state.inputs;
       inputs.push('');
       this.setState({inputs : inputs});
