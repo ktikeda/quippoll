@@ -1,9 +1,13 @@
 .hidden {
-    display:none;
+  display:none;
 }
 
 .selected {
-    background-color: #f44336;
+  background-color: #f44336;
+}
+
+.selected:hover {
+  background-color: #f44336;
 }
 
 .close {
@@ -22,6 +26,10 @@
 .btn-inline-block {
   display: inline-block;
   width: 100%;
+}
+
+#save.btn {
+  margin: 15px 0;
 }
 
 h1#prompt {
@@ -58,16 +66,78 @@ h1#prompt {
 
 }
 
+button.value {
+  margin-right: 15px;
+  width: 2rem;
+}
+
+button.submit {
+  margin-left: 15px;
+}
+
 ol.responses {
   padding: 0;
 }
 
 ul.responses {
   padding: 0;
+  list-style-type: none;
+}
+
+ul.inputs {
+  padding: 0;
+  list-style-type: none;
 }
 
 .li-response {
   margin: 15px 0;
+}
+
+/*https://codepen.io/fox_hover/pen/bqZxLa?editors=0100#0*/
+.effect {
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    text-decoration: none;
+    color: #fff;
+    text-transform: capitalize;
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+    padding: 20px 0px;
+    width: 150px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.effect.effect-5 {
+  transition: all 0.2s linear 0s;
+  
+  &:before {
+    content: "\f054";
+    font-family: FontAwesome;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    left: 0px;
+    height: 100%;
+    width: 30px;
+    background-color: rgba($overlay-color,0.3);
+    border-radius: 0 50% 50% 0;
+    transform: scale(0,1);
+    transform-origin: left center;
+    transition: all 0.2s linear 0s;
+  }
+  
+   &:hover {
+    text-indent: 30px;
+    
+    &:before {
+      transform: scale(1,1);
+      text-indent: 0;
+    }
+  }
 }
 
 

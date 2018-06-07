@@ -55,13 +55,15 @@ export class Response extends React.Component {
   showRankedQuestions = () => {
     let isSelected = this.props.isSelected;
     return(
+      
       <span> 
         {isSelected
-        ? <button onClick={this.toggleSelection} className="btn btn-primary btn-sm selected">{ this.props.value }</button>
-        : <button onClick={this.toggleSelection} className="btn btn-primary btn-sm">{ this.props.value }</button>
+        ? <button onClick={this.toggleSelection} className="value btn btn-primary btn-sm selected">{ this.props.value }</button>
+        : <button onClick={this.toggleSelection} className="value btn btn-primary btn-sm">{ this.props.value }</button>
         }
         { this.props.text }
       </span>
+
     )
   } // showRankedQuestions
 
@@ -74,7 +76,8 @@ export class Response extends React.Component {
     let isSelected = this.props.isSelected;
 
     if (this.props.pollType === 'ranked questions') {
-      return(<div>{ this.showRankedQuestions() }</div>);
+      return(<li className="list-group-item">
+        { this.showRankedQuestions() }</li>);
     } else {
 
       if (mode === 'respond') { 

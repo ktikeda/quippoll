@@ -245,12 +245,6 @@ export class Poll extends React.Component {
       success: (resp) => {
         console.log('tally created on server', resp);
 
-        socket.emit('response_update_all', 
-            {room: this.props.shortCode, 
-             data: {response_id : response.response_id, text : response.text}
-            }
-          );
-
         if (this.props.isAdmin) {
           this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
         } else {
@@ -342,7 +336,7 @@ export class Poll extends React.Component {
 
     const showInputs = () => {
       return(
-        <ul className="responses">
+        <ul className="inputs">
         {inputs.map((value, index) => (
           <Input key={`input-${index}`} index={index} mode={this.props.mode} value={value} updateInput={this.updateInput} deleteInput={this.deleteInput} addResponse={this.addResponse}/>
         ))}
@@ -383,12 +377,20 @@ export class Poll extends React.Component {
           </div>);
         
       } else if (mode === 'respond') {
+        let divClass = '';
+        let olClass = 'responses';
+
+        if (pollType === 'ranked questions') {
+          divClass = 'card';
+          olClass = olClass + ' list-group list-group-flush';
+        }
 
         return (
+          <div className={divClass}>
           <FlipMove 
             enterAnimation="accordionVertical" 
             leaveAnimation="accordionVertical"
-            typeName="ol" className="responses">
+            typeName="ol" className={olClass}>
             {responses.map(response => (
                 <Response 
                   key={ response.response_id } 
@@ -404,10 +406,11 @@ export class Poll extends React.Component {
                   />
             ))}           
           </FlipMove>
+          </div>
         );
       } else if (mode === 'results') {
         return (
-          <FlipMove 
+          <FlipMove
             enterAnimation="accordionVertical" 
             leaveAnimation="accordionVertical"
             typeName="ol" className=""> 
@@ -429,9 +432,22 @@ export class Poll extends React.Component {
 
     const showAddInput = () => {
       if (mode === 'edit') {
-        return(<button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}>Add option</button>);
+        return(
+          <div className="">
+            <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}><span>&#43;</span></button>
+          </div>);
       }
-    }; // end showSubmit
+    }; // end showAddInput
+
+    const showSave = () => {
+      if (mode === 'edit') {
+        return(
+          <div className="d-flex justify-content-start">
+            <button className="btn btn-lg btn-success" type="button" id="save">Save</button>
+            <a className="effect effect-5" href="#" title="Learn More">Learn More</a>
+          </div>);
+      }
+    }; // end showSave
 
     const showCharts = () => {    
       if (mode === 'results') {
@@ -450,7 +466,7 @@ export class Poll extends React.Component {
     } // end showSubmit
 
     return(
-      <div> 
+      <div className="" id="poll"> 
         { showNav() }
 
         { showPrompt() }
@@ -465,12 +481,22 @@ export class Poll extends React.Component {
         
         { showAddInput() }
 
+        { showSave() }
+
         { collectResponse === false ? showSubmit() : <div/>}
         
       </div>
     );
     
   } // End of render
+
+  componentWillUnmount() {
+    console.log('componentWillUnmount')
+  }
+
+  componentDidUpdate() {
+    console.log('componentDidUpdate')
+  }
 
   componentDidMount() {
     let responses = this.state.responseData;

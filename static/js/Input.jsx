@@ -16,7 +16,7 @@ export class Input extends React.Component {
   } // end updateResponse
 
   addResponse = (evt) => {
-    let text = evt.target.value;
+    let text = this.props.text;
 
     if (text !== '') {
   	  let data = {index : this.props.index};
@@ -55,10 +55,12 @@ export class Input extends React.Component {
 
     } else {
         return(
-          <div>
-            <input type="text" className="response-input" onChange={this.updateInput} value={this.props.value} />
-            <button type="button" onClick={this.addResponse}>Submit</button>
+          <li>
+          <div className="form-group d-flex">
+            <input type="text" className="form-control response-input flex-fill" placeholder="Type your response" onChange={this.updateInput} value={this.props.value} />
+            <button type="button" className="submit btn btn-success flex-fill" onClick={this.addResponse}>Submit</button>
           </div>
+          </li>
         );
     }
 
