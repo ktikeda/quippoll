@@ -10,7 +10,12 @@ export class PieChart extends React.Component {
 
   render() {
     const chartData = this.props.data;
-    console.log(chartData);
+    const colorMap = [
+      '#00a2ce',
+      '#4d430c',
+      '#b3331d',
+      '#b6a756'
+    ];
 
     return (<div>
     <OrdinalFrame
@@ -18,7 +23,7 @@ export class PieChart extends React.Component {
           oAccessor={"text"}
           rAccessor={() => 1}
           dynamicColumnWidth={"value"}
-          style={{ fill: "#00a2ce", stroke: "white" }}
+          style={d => ({ fill: colorMap[chartData.indexOf(d)], stroke: "white" })}
           type={"bar"}
           projection={"radial"}
           oLabel={true} />

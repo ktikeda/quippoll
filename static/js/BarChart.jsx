@@ -11,12 +11,19 @@ export class BarChart extends React.Component {
   render() {
     const chartData = this.props.data; 
 
+    const colorMap = [
+      '#00a2ce',
+      '#4d430c',
+      '#b3331d',
+      '#b6a756'
+    ];
+
     return (<div>
     <OrdinalFrame
           data={chartData}
           oAccessor={"text"}
           rAccessor={"value"}
-          style={{ fill: "#00a2ce", stroke: "white" }}
+          style={d => ({ fill: colorMap[chartData.indexOf(d)], stroke: "white" })}
           type={"bar"}
           oLabel={true} />
     </div>);
