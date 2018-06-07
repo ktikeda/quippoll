@@ -189,6 +189,7 @@ export class Poll extends React.Component {
           tallys.push(tally);
           this.setState({ responseData : responses,
                           tallys : tallys });
+
         }
       });
     } else {
@@ -254,7 +255,7 @@ export class Poll extends React.Component {
 
         if (this.props.isAdmin) {
           this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
-          //this.setState({mode : 'results'});
+
         } else {
           this.props.cbUpdate({mayRespond : false});
         } // end if
@@ -268,7 +269,7 @@ export class Poll extends React.Component {
     let order = this.state.responseOrder;
     let weight;
     let text = this.state.inputs[index];
-    let mode = this.state.mode;
+    let mode = this.props.mode;
     
     // order.length > 0 ? weight = order[order.length-1].weight + 1 : weight = 1;
 
@@ -314,7 +315,7 @@ export class Poll extends React.Component {
     const pollId = this.props.pollId;
     const pollType = this.props.pollType;
     const prompt = this.props.prompt;
-    const mode = this.state.mode;
+    const mode = this.props.mode;
     const collectTally = this.props.collectTally;
     const collectResponse = this.props.collectResponse;
 
@@ -510,7 +511,7 @@ export class Poll extends React.Component {
   componentDidMount() {
     let responses = this.state.responseData;
     let order = this.state.responseOrder;
-    let mode = this.state.mode;
+    let mode = this.props.mode;
     const pollType = this.props.pollType;
 
   /* call socketio functions */
@@ -537,6 +538,7 @@ export class Poll extends React.Component {
           for (let property in data) {
             responses.get(id)[property] = data[property];
             if (property === 'value' && pollType === 'ranked questions') {
+
               order.sort((a, b) => b.value - a.value );
             }
           }
@@ -593,6 +595,10 @@ export class Poll extends React.Component {
 
         for (let datum of data.response_data) {
           order.push(responses.get(datum.response_id));
+        }
+
+        if (pollType === 'ranked questions') {
+          order.sort((a, b) => b.value - a.value );
         }
 
         this.setState({ responseOrder: order, responseData: responses });

@@ -861,9 +861,10 @@ def create_tallys(poll_id):
         db.session.add(new_tally)
         db.session.commit()
 
-        #emit_response_update(response)
-
         tallys_data.append(new_tally.data())
+
+        if poll.poll_type.poll_type_id == 4:
+            emit_response_update(response)
 
     return jsonify({'tallys' : tallys_data})
 

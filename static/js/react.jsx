@@ -105,11 +105,11 @@ const Main = (props) => {
     return(
       <main>
         <Switch>
-          <Route key="1" exact path={match.url} mode="respond"
+          <Route key="1" exact path={match.url}
             render={routeProps => <Poll  key="1" pollId={pollId} routeProps={routeProps} mode="respond" {...props}/>} />
-          <Route key="2" exact path={ match.url + '/edit' } mode="edit"
+          <Route key="2" exact path={ match.url + '/edit' }
             render={routeProps => <Poll  key="2" pollId={pollId} routeProps={routeProps} mode="edit" cbUpdate={cbUpdate} {...props}/>} />
-          <Route key="3" exact path={ match.url + '/results' } mode="results"
+          <Route key="3" exact path={ match.url + '/results' }
             render={routeProps => <Poll  key="3" pollId={pollId} routeProps={routeProps} mode="results" {...props}/>} />
         </Switch>
       </main>
