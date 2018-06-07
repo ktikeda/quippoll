@@ -294,13 +294,12 @@ export class Poll extends React.Component {
           // clean up inputs
 
           
-
           if (this.props.isAdmin) {
             this.props.routeProps.history.push('/' + this.props.shortCode + '/results');
           } else {
             this.props.cbUpdate({mayRespond : false});
           }
-        } else {
+        } else if (mode === 'edit') {
           inputs.push('');
         }
 
@@ -479,9 +478,17 @@ export class Poll extends React.Component {
       }
     } // end showSubmit
 
+    const showSMS = () => {
+      if (mode === 'respond') {
+       return(<div>Text {this.props.shortCode} to (628) 800-0602 to respond.</div>); 
+      }
+    }
+
     return(
       <div className="" id="poll"> 
         { showNav() }
+
+        { showSMS() }
 
         { showPrompt() }
 
