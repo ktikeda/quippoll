@@ -9,6 +9,12 @@ body {
   padding: 0;
   margin: 0;
   max-width: 1920px;
+  color: #767676;
+  font-family: Lato, "Helvetica Neue", Arial, sans-serif;
+}
+
+.container a {
+  color: #247FB9;
 }
 
 #poll {

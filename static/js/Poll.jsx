@@ -447,7 +447,7 @@ export class Poll extends React.Component {
       if (mode === 'edit') {
         return(
           <div className="">
-            <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}><span>&#43;</span></button>
+            <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}><i class="fas fa-plus"></i></button>
           </div>);
       }
     }; // end showAddInput

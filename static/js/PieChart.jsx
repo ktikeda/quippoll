@@ -11,10 +11,13 @@ export class PieChart extends React.Component {
   render() {
     const chartData = this.props.data;
     const colorMap = [
-      '#00a2ce',
-      '#4d430c',
-      '#b3331d',
-      '#b6a756'
+      '#F04E48',
+      '#FD8E4B',
+      '#FDB548',
+      '#1AAD8A',
+      '#329ED0',
+      '#127FB6',
+      '#6A58BB'
     ];
 
     return (<div>
