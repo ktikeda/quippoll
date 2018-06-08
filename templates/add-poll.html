@@ -6,15 +6,33 @@
 <h1>Add Poll</h1>
 
 <form action="/add-poll" method="POST">
-    Title: <input type="text" name="title" required><br>
-    Prompt: <input type="text" name="prompt" required><br>
-    Poll Type:
-    <select name="poll_type" id="poll_type"> 
+  <div class="input-group mb-3 form-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text">Title</span>
+    </div>
+    <input class="form-control" type="text" name="title" required>
+  </div>
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text">Prompt</span>
+    </div>
+    <input type="text" class="form-control" name="prompt" required>
+  </div>
+  <div class="form-group">
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <label class="input-group-text" for="inputGroupSelect01">Poll Type</label>
+    </div>
+    <select class="custom-select" name="poll_type" id="poll_type"> 
       <option value="1">Multiple Choice</option>
       <option value="2">Select All</option>
       <option value="3">Open-Ended</option>
-      <option value="4">Open-Ended/Select All</option>
-    </select><br>
+      <option value="4">Open-Ended with Voting</option>
+    </select>
+  </div>
+      <small id="poll-help" class="form-text text-muted">Users may select one response option.</small>
+  </div>
+
     Show Results: 
         <input type="radio" name="is_results_visible" value="True" checked> Yes
         <input type="radio" name="is_results_visible" value="False"> No<br>
@@ -22,30 +40,42 @@
     Email: <input type="text" name="email" required><br>
     {% endif %}
     <!-- TODO: for multiple choice and select-all polls: Need js to add responses -->
-    <div id="response_options" class="">
-    <label>Response Options:</label><br>
-        <textarea name="responses"></textarea><br>
+    <div class="input-group collapse show" id="response_options">
+      <div class="input-group-prepend">
+        <span class="input-group-text">Response Options</span>
+      </div>
+      <textarea class="form-control" aria-label="With textarea" name="responses"></textarea>
     </div>
+
     <!-- TODO: for open-ended polls: Add js logic for is_unique_responses, is_moderated response_max -->
     <!-- TODO: Implement tally max -->
     <!-- TODO: Implement poll scheduling with open_at and close_at -->
-    <input type="submit" value="Submit">
-    
+    <div class="d-flex">
+      <input type="submit" class="btn btn-success ml-auto mt-3" value="Submit">
+    </div>
+  </div>
 </form>
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
   "use strict";
-  let poll_type
+  let poll_type;
+  let pollHelp = $('#poll-help');
 
   $('#poll_type').on('change', function() {
     poll_type = parseInt($('#poll_type option:selected').val());
     console.log(poll_type);
 
-    if (poll_type === 3) {
-      $('#response_options').addClass('hidden');
+    if (poll_type === 1) {
+      pollHelp.html('Users may select one response option.');
+    } else if (poll_type === 2) {
+      pollHelp.html('Users may select any available response options.');
+    }
+
+    if (poll_type === 3 | poll_type === 4) {
+      $('#response_options').removeClass('show');
     } else {
-      $('#response_options').removeClass('hidden');
+      $('#response_options').addClass('show');
     }
   });
 
