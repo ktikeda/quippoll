@@ -151,9 +151,16 @@ const Main = (props) => {
 // between routes.
 const Header = (props) => {
   const match = props.routeProps.match;
+
+  const showSMS = () => {
+     return(<div className="alert alert-primary" role="alert">Text "<strong>{pollCode}</strong>" to <strong>(628) 800-0602</strong> to respond.</div>); 
+    
+  }
+
   if (props.isAdmin === true) {
     return(
       <header>
+        {showSMS()}
         <nav>
           <ul className="list-inline">
             <li key="1" className="list-inline-item"><Link to={ match.url } >Respond</Link></li>

@@ -465,9 +465,9 @@ export class Poll extends React.Component {
     const showCharts = () => {    
       if (mode === 'results') {
         if (chart === 'bar') {
-          return(<BarChart data={responses} />);
+          return(<div className="d-flex"><BarChart data={responses} /></div>);
         } else if (chart === 'pie') {
-          return(<PieChart data={responses} />);
+          return(<div className="d-flex"><PieChart data={responses} /></div>);
         }
       }
     } // end showCharts
@@ -478,17 +478,10 @@ export class Poll extends React.Component {
       }
     } // end showSubmit
 
-    const showSMS = () => {
-      if (mode === 'respond') {
-       return(<div>Text {this.props.shortCode} to (628) 800-0602 to respond.</div>); 
-      }
-    }
 
     return(
       <div className="" id="poll"> 
         { showNav() }
-
-        { showSMS() }
 
         { showPrompt() }
 

@@ -20,6 +20,7 @@ export class BarChart extends React.Component {
 
     return (<div>
     <OrdinalFrame
+          size={[540,400]}
           data={chartData}
           oAccessor={"text"}
           rAccessor={"value"}

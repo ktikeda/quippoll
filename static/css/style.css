@@ -1,5 +1,20 @@
-.hidden {
-  display:none;
+body {
+  background-color: #EAEAEA;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  background-color: #EAEAEA;
+  padding: 0;
+  margin: 0;
+  max-width: 1920px;
+}
+
+#poll {
+  background-color: #FFF;
+  padding: 2rem;
+  border-radius: 0.2rem;
 }
 
 .selected {

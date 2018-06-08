@@ -911,7 +911,7 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     # Run server
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)
