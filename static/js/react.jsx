@@ -175,7 +175,7 @@ const Header = (props) => {
     return(
       <header>
         {showSMS()}
-        <nav>
+        <nav id="admin-nav">
           <ul className="nav nav-tabs">
             <li key="1" className="nav-item"><Link className={"nav-link " + respondActive } to={ match.url } >Respond</Link></li>
             <li key="3" className="nav-item"><Link className={"nav-link " + resultsActive } to={ match.url + '/results' }>Results</Link></li>

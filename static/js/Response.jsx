@@ -53,18 +53,31 @@ export class Response extends React.Component {
   } // end showSaved
 
   showRankedQuestions = () => {
-    let isSelected = this.props.isSelected;
-    return(
-      
-      <span> 
-        {isSelected
-        ? <button onClick={this.toggleSelection} className="value btn btn-primary btn-sm selected">{ this.props.value }</button>
-        : <button onClick={this.toggleSelection} className="value btn btn-primary btn-sm">{ this.props.value }</button>
-        }
-        { this.props.text }
-      </span>
+    const isSelected = this.props.isSelected;
+    const mode = this.props.mode;
+    const value = this.props.value;
+    
+    if (mode === 'edit') {
+      return(
+        <span>
+          <span className="badge badge-primary mr-3">{ value }</span>
+          { this.props.text }
+          <button className="close" aria-label="Close" type="button" onClick={this.deleteResponse}>&times;</button>
+        </span>
+      )
 
-    )
+    } else {
+      return(
+        <span> 
+          {isSelected
+          ? <button onClick={this.toggleSelection} className="value btn btn-primary btn-sm selected">{ this.props.value }</button>
+          : <button onClick={this.toggleSelection} className="value btn btn-primary btn-sm">{ this.props.value }</button>
+          }
+          { this.props.text }
+        </span>
+
+      );
+    }
   } // showRankedQuestions
 
   render() {
@@ -97,7 +110,7 @@ export class Response extends React.Component {
             <div className="button-outline">
             <input type="text" id={id} className="edit text-center" defaultValue={text} onBlur={this.updateResponse} />
             
-            <button className="close" aria-label="Close" type="button" onClick={this.deleteResponse}>&times;</button>
+            <button className="close light" aria-label="Close" type="button" onClick={this.deleteResponse}>&times;</button>
             </div>
 
           </li>

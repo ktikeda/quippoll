@@ -48,21 +48,14 @@
           </div>
         </nav>
 
-        <ul>
+        <ul class="list-group">
         {% for message in get_flashed_messages() %}
-            <li>{{ message }}</li>
+            <li class="list-group-item list-group-item-warning" role="alert">{{ message }}</li>
         {% endfor %}
         </ul>
 
-        <div class="row">
-          <div class="col-lg-3"></div>
+        {% block content %}CONTENT{% endblock %}
 
-          <div class="col-lg-6 col-xs-12 ml-3 mr-3">
-            {% block content %}CONTENT{% endblock %}
-          </div>
-
-          <div class="col-lg-3"></div>
-        </div>
     </div>
 
 </body>

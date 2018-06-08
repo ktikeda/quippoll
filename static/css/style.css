@@ -17,9 +17,14 @@ body {
   color: #247FB9;
 }
 
+
 form {
   background-color: #FFF;
   border-radius: 0.2rem;
+}
+
+.btn.response-option {
+  font-size: 4rem;
 }
 
 #poll {
@@ -35,13 +40,13 @@ form {
   background-color: #f44336;
 }
 
-.close {
+.close.light {
   color: #fff;
   opacity: .8;
   text-shadow: none;
 }
 
-.close:hover {
+.close.light:hover {
   color: #fff;
   opacity: 1;
   text-shadow: none;
@@ -58,8 +63,11 @@ form {
 }
 
 h1#prompt {
-  margin-top: 1.05rem;
-  margin-bottom: 1.7rem;
+  font-size: 4rem;
+}
+
+button#submit {
+  font-size: 4rem;
 }
 
 .prompt-edit {

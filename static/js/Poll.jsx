@@ -364,7 +364,8 @@ export class Poll extends React.Component {
               key={ value.response_id } 
               id={ value.response_id }
               text={ value.text }
-              mode='edit' 
+              mode='edit'
+              value={ value.value }
               isVisible={ value.is_visible }
               pollId={ pollId }
               pollType={ pollType }
@@ -457,7 +458,7 @@ export class Poll extends React.Component {
         return(
           <div className="d-flex justify-content-start">
             <button className="btn btn-lg btn-success" type="button" id="save">Save</button>
-            <a className="effect effect-5" href="#" title="Learn More">Learn More</a>
+            
           </div>);
       }
     }; // end showSave
@@ -474,13 +475,13 @@ export class Poll extends React.Component {
 
     const showSubmit = () => {
       if (mode === 'respond') {
-        return(<button className="btn btn-lg btn-success btn-block" type="button" onClick={this.createTallys}>Submit</button>);
+        return(<button className="btn btn-lg btn-success btn-block" id="submit" type="button" onClick={this.createTallys}>Submit</button>);
       }
     } // end showSubmit
 
 
     return(
-      <div className="px-5 py-3" id="poll"> 
+      <div className="px-5 py-5" id="poll"> 
         { showNav() }
 
         { showPrompt() }
