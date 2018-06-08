@@ -151,6 +151,20 @@ const Main = (props) => {
 // between routes.
 const Header = (props) => {
   const match = props.routeProps.match;
+  const path = props.routeProps.location.pathname
+  let respondActive = '';
+  let editActive = '';
+  let resultsActive = '';
+
+  if (path === '/' + pollCode) {
+    respondActive = 'active';
+  } else if (path === '/' + pollCode + '/edit') {
+    editActive = 'active';
+  } else if (path === '/' + pollCode + '/results') {
+    resultsActive = 'active';
+  }
+
+
 
   const showSMS = () => {
      return(<div className="alert alert-primary" role="alert">Text "<strong>{pollCode}</strong>" to <strong>(628) 800-0602</strong> to respond.</div>); 
@@ -162,10 +176,10 @@ const Header = (props) => {
       <header>
         {showSMS()}
         <nav>
-          <ul className="list-inline">
-            <li key="1" className="list-inline-item"><Link to={ match.url } >Respond</Link></li>
-            <li key="2" className="list-inline-item"><Link to={ match.url + '/edit' } >Edit</Link></li>
-            <li key="3" className="list-inline-item"><Link to={ match.url + '/results' }>Results</Link></li>
+          <ul className="nav nav-tabs">
+            <li key="1" className="nav-item"><Link className={"nav-link " + respondActive } to={ match.url } >Respond</Link></li>
+            <li key="3" className="nav-item"><Link className={"nav-link " + resultsActive } to={ match.url + '/results' }>Results</Link></li>
+            <li key="2" className="nav-item"><Link className={"nav-link " + editActive } to={ match.url + '/edit' } >Edit</Link></li>
           </ul>
         </nav>
       </header>

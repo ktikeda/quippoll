@@ -17,9 +17,13 @@ body {
   color: #247FB9;
 }
 
+form {
+  background-color: #FFF;
+  border-radius: 0.2rem;
+}
+
 #poll {
   background-color: #FFF;
-  padding: 2rem;
   border-radius: 0.2rem;
 }
 

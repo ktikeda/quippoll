@@ -447,7 +447,7 @@ export class Poll extends React.Component {
       if (mode === 'edit') {
         return(
           <div className="">
-            <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}><i class="fas fa-plus"></i></button>
+            <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}><i className="fas fa-plus"></i></button>
           </div>);
       }
     }; // end showAddInput
@@ -480,7 +480,7 @@ export class Poll extends React.Component {
 
 
     return(
-      <div className="" id="poll"> 
+      <div className="px-5 py-3" id="poll"> 
         { showNav() }
 
         { showPrompt() }
