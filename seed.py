@@ -66,16 +66,16 @@ def test_data():
     db.session.commit()
 
     # Create polls
-    mc_poll = Poll(poll_type_id=1, title='Colors',
+    mc_poll = Poll(poll_type_id=1, title='Colors - Multiple Choice',
                    prompt='What is your favorite color?',
                    short_code='multi', admin_code='adminmc',
                    latitude=37.7888197,
                    longitude=-122.4116021)
-    sa_poll = Poll(poll_type_id=2, title='Colors',
+    sa_poll = Poll(poll_type_id=2, title='Colors - Select All',
                    prompt='What is your favorite color?',
                    short_code='all', admin_code='adminsa',
                    is_results_visible=False)
-    oe_poll = Poll(poll_type_id=3, title='Colors',
+    oe_poll = Poll(poll_type_id=3, title='Colors - Open-Ended',
                    prompt='What is your favorite color?',
                    short_code='open', admin_code='adminoe')
 
@@ -83,7 +83,7 @@ def test_data():
                    prompt='Ask me anything.',
                    short_code='questions', admin_code='adminq')
 
-    closed_poll = Poll(poll_type_id=3, title='Colors',
+    closed_poll = Poll(poll_type_id=3, title='Closed',
                    prompt='What is your favorite color?',
                    short_code='close', admin_code='adminclosed', 
                    is_open=False)
