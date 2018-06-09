@@ -99,6 +99,10 @@ button#submit {
 
 }
 
+#chart {
+  margin-right: 32rem;
+}
+
 button.value {
   margin-right: 15px;
   width: 2rem;

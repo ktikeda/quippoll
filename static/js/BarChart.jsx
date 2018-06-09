@@ -21,7 +21,7 @@ export class BarChart extends React.Component {
       '#6A58BB'
     ];
 
-    return (<div>
+    return (
     <OrdinalFrame
           size={[540,400]}
           data={chartData}
@@ -30,7 +30,7 @@ export class BarChart extends React.Component {
           style={d => ({ fill: colorMap[chartData.indexOf(d)], stroke: "white" })}
           type={"bar"}
           oLabel={true} />
-    </div>);
+    );
   } // End of the render function
 
 } // End of BarChart

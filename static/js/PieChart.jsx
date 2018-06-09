@@ -20,7 +20,7 @@ export class PieChart extends React.Component {
       '#6A58BB'
     ];
 
-    return (<div>
+    return (
     <OrdinalFrame
           size={[540,400]}
           data={chartData}
@@ -31,7 +31,7 @@ export class PieChart extends React.Component {
           type={"bar"}
           projection={"radial"}
           oLabel={true} />
-    </div>);
+    );
   } // End of the render function
 
 } // End of PieChart

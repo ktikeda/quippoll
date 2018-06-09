@@ -386,7 +386,7 @@ export class Poll extends React.Component {
 
       if (mode === 'edit') {
         return (
-          <div>
+          <div className="w-100">
             <SortableList items={responses} onSortEnd={this.updateResponseOrder} />
           </div>);
         
@@ -400,7 +400,7 @@ export class Poll extends React.Component {
         }
 
         return (
-          <div className={divClass}>
+          <div className={divClass + 'w-100'}>
           <FlipMove 
             enterAnimation="accordionVertical" 
             leaveAnimation="accordionVertical"
@@ -424,10 +424,11 @@ export class Poll extends React.Component {
         );
       } else if (mode === 'results') {
         return (
+          <div className="" id="legend">
           <FlipMove
             enterAnimation="accordionVertical" 
             leaveAnimation="accordionVertical"
-            typeName="ol" className=""> 
+            typeName="ol" > 
             {responses.map(response => (
               <Response 
                 key={ response.response_id } 
@@ -439,6 +440,7 @@ export class Poll extends React.Component {
                 />         
             ))}
           </FlipMove>
+          </div>
         );
       } // end if
 
@@ -466,9 +468,9 @@ export class Poll extends React.Component {
     const showCharts = () => {    
       if (mode === 'results') {
         if (chart === 'bar') {
-          return(<div className="d-flex"><BarChart data={responses} /></div>);
+          return(<div id="chart"><BarChart data={responses} /></div>);
         } else if (chart === 'pie') {
-          return(<div className="d-flex"><PieChart data={responses} /></div>);
+          return(<div id="chart"><PieChart data={responses} /></div>);
         }
       }
     } // end showCharts
@@ -487,10 +489,12 @@ export class Poll extends React.Component {
         { showPrompt() }
 
         { inputs.length > 0 && collectResponse === true ? showInputs() : <div/> }
-            
-        { responses.length > 0 && collectTally === true ? showResponses() : <div/> }
         
-        { responses.length > 0 ? showCharts() : <div/> }
+        <div className="d-flex flex-row justify-content-lg-between">    
+          { responses.length > 0 && collectTally === true ? showResponses() : <div/> }
+          
+          { responses.length > 0 ? showCharts() : <div/> }
+        </div>
         
         { inputs.length > 0 && collectTally === true && mode === 'edit' ? showInputs() : <div/> }
         
