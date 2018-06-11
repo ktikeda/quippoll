@@ -339,7 +339,7 @@ export class Poll extends React.Component {
 
     const showPrompt = () => {
       if (mode === 'edit') {
-        return (<div><input type="text" id="prompt" className="h1 prompt-edit" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
+        return (<div><input type="text" id="prompt" className="prompt-edit" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
         
       } else {
         return (<h1 id="prompt">{prompt}</h1>);
@@ -400,7 +400,7 @@ export class Poll extends React.Component {
         }
 
         return (
-          <div className={divClass + 'w-100'}>
+          <div className={divClass + ' w-100'}>
           <FlipMove 
             enterAnimation="accordionVertical" 
             leaveAnimation="accordionVertical"

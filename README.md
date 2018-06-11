@@ -6,6 +6,8 @@ Quippoll allows users to create, view, update, and delete their own polls to gat
 Quippoll was created by [Karynn Ikeda](https://www.linkedin.com/in/ktikeda/), a software engineer in San Francisco, CA.
 
 ## Technologies
+
+Backend
 * Python
 * Flask
 * Flask-Login
@@ -13,6 +15,8 @@ Quippoll was created by [Karynn Ikeda](https://www.linkedin.com/in/ktikeda/), a 
 * Jinja
 * Postgresql
 * SQLAlchemy
+
+Frontend
 * Javascript
 * jQuery
 * Webpack
@@ -22,6 +26,8 @@ Quippoll was created by [Karynn Ikeda](https://www.linkedin.com/in/ktikeda/), a 
 * Semiotic
 * Bootstrap
 * CSS/HTML
+
+APIs
 * Twilio API
 
 ## Features

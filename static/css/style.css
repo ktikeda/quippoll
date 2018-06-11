@@ -17,6 +17,11 @@ body {
   color: #247FB9;
 }
 
+#shortcode {
+  margin-left: -16px;
+  color: #247FB9 !important;
+}
+
 
 form {
   background-color: #FFF;
@@ -71,6 +76,7 @@ button#submit {
 }
 
 .prompt-edit {
+  font-size: 4rem;
   border: none;
   border-bottom: 1px solid #ccc;
   width: 100%;
@@ -88,7 +94,7 @@ button#submit {
 .edit {
 
   background-color:transparent;
-  font-size: 1.25rem;
+  font-size: 4rem;
   line-height: 1.5;
   border: none;
   border-bottom: 1px solid #fff;
