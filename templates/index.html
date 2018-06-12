@@ -3,10 +3,19 @@
 {% block title %}Quippoll{% endblock %}
 
 {% block content %}
-<p>
-Gather input in a snap.
-</p>
+<div class='row' id="banner">
+    <div class="col-12 d-flex justify-content-end"> 
+      <div id="banner-text">
+        <div class="display-4 text-right" id="tagline">
+          Create, View, Edit and<br>Delete Live Polls.
+        </div> 
+        <br>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-lg btn-success" onclick="window.location.href='/add-poll'">Add Poll</button>
+        </div>
+      </div>
+    </div>
 
-<button class="btn btn-lg btn-success" onclick="window.location.href='/add-poll'">Add Poll</button>
+</div>
 
 {% endblock %}

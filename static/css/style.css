@@ -26,6 +26,26 @@ body {
   color: #247FB9 !important;
 }
 
+#banner {
+  background-image: url("/static/images/banner.jpg");
+  height: 740px;
+  width: 100%;
+  margin: 0;
+  padding: 3rem 10rem;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+#banner-text {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #FFF;
+  display: table;
+  padding: 2rem;
+  backdrop-filter: blur(10px);  
+  -webkit-backdrop-filter: blur(10px);
+}
+
 
 form {
   background-color: #FFF;
