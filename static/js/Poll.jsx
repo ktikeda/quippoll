@@ -266,6 +266,7 @@ export class Poll extends React.Component {
   addResponse = (childData) => {
     //update poll options and reset options to an empty string
     const index = childData.index;
+    const pollType = this.props.pollType;
     let order = this.state.responseOrder;
     let weight;
     let text = this.state.inputs[index];
@@ -299,7 +300,11 @@ export class Poll extends React.Component {
           } else {
             this.props.cbUpdate({mayRespond : false});
           }
-        } else if (mode === 'edit') {
+        } 
+        else if ((mode === 'respond' && pollType === 'ranked questions') 
+          | (mode === 'edit' && (pollType === 'ranked questions' | pollType === 'open-ended')))
+          
+        {
           inputs.push('');
         }
 
@@ -475,7 +480,7 @@ export class Poll extends React.Component {
     } // end showResponses
 
     const showAddInput = () => {
-      if (mode === 'edit') {
+      if (mode === 'edit' && (this.props.pollType === 'select all' | this.props.pollType === 'multiple choice')) {
         return(
           <div className="">
             <button className="btn btn-lg btn-success btn-block" id="add-input" type="button" onClick={this.addInput}><i className="fas fa-plus"></i></button>
@@ -484,7 +489,7 @@ export class Poll extends React.Component {
     }; // end showAddInput
 
     const showSave = () => {
-      if (mode === 'edit') {
+      if (mode === 'edit' && (this.props.pollType === 'select all' | this.props.pollType === 'multiple choice')) {
         return(
           <div className="">
             <button className="btn btn-lg btn-success" type="button" id="save">Save</button>
@@ -516,7 +521,7 @@ export class Poll extends React.Component {
 
         { showPrompt() }
 
-        { inputs.length > 0 && collectResponse === true ? showInputs() : <div/> }
+        { inputs.length > 0 && collectResponse === true && mode === 'respond' ? showInputs() : <div/> }
         
         <div className="d-flex flex-row mt-3">    
           { responses.length > 0 ? showCharts() : <div/> }
@@ -616,7 +621,7 @@ export class Poll extends React.Component {
 
     /* end calling socketio functions */
 
-    if (mode === 'respond' && this.props.collectResponse === true) {
+    if ((mode === 'respond' | mode === 'edit') && this.props.collectResponse === true) {
       let inputs = this.state.inputs;
       inputs.push('');
       this.setState({inputs : inputs});

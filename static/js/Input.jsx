@@ -39,7 +39,7 @@ export class Input extends React.Component {
     let divClass = '';
     let blurFunc = '';
 
-    if (this.props.mode === 'edit') {
+    if (this.props.mode === 'edit' && (this.props.pollType === 'select all' | this.props.pollType === 'multiple choice')) {
         return(
           <li className="li-input">
           <div className="button-outline">
