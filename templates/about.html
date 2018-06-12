@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-3"></div>
+
+  <div class="col-lg-6 col-xs-12 m-3">
+    <h1>About</h1>
+    <h2>Technologies</h2>
+    <p><strong>Backend</strong>: Python, Flask, Flask-Login, Flask-Socketio, Jinja, Postgresql, SQLAlchemy</p>
+    <p><strong>Frontend</strong>: Javascript, React, React-Router, SocketIO, jQuery, Webpack, Semiotic, Bootstrap, CSS/HTML</p>
+    <h2>Features</h2>
+    <ul>
+      <li>Create poll via webform
+      <li>Handle open-ended, multiple choice, and multi-select response types
+      <li>Manage user permissions to enforce single response per poll and access to admin edit feature
+      <li>Respond to poll via webform
+      <li>Respond to poll via SMS (Twilio API)
+      <li>Generate unique link for poll
+      <li>Optionally hide poll results
+      <li>Visualize poll results via Semiotic
+      <li>Delete poll and response data
+      <li>Create account/login
+      <li>View user profile
+      <li>Auto-update poll results upon new input
+      <li>Find poll via geolocation API
+      <li>Reorder responses and edit poll prompt and response text
+    </ul>
+
+  </div>
+
+  <div class="col-lg-3"></div>
+</div>
+
+{% endblock %}
