@@ -182,7 +182,7 @@ button#save {
   background-color: #FFF;
   display: table;
   padding: 15px 15px 0px 15px;
-  margin-left: 40px;
+  left: 75%;
 
 }
 
@@ -192,7 +192,11 @@ svg.visualization-layer {
 
 button.value {
   margin-right: 15px;
-  width: 2rem;
+  font-size: 2rem;
+  padding: .25em .4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
 }
 
 button.submit {
@@ -244,6 +248,10 @@ ul.inputs {
 
 #td-6 {
   background-color: #6A58BB;
+}
+
+.ranked-response {
+  font-size: 2rem;
 }
 
 /*https://codepen.io/fox_hover/pen/bqZxLa?editors=0100#0*/

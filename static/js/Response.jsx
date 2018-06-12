@@ -59,7 +59,7 @@ export class Response extends React.Component {
     
     if (mode === 'edit') {
       return(
-        <span>
+        <span className="ranked-response">
           <span className="badge badge-primary mr-3">{ value }</span>
           { this.props.text }
           <button className="close" aria-label="Close" type="button" onClick={this.deleteResponse}>&times;</button>
@@ -68,7 +68,7 @@ export class Response extends React.Component {
 
     } else {
       return(
-        <span> 
+        <span className="ranked-response"> 
           {isSelected
           ? <button onClick={this.toggleSelection} className="value btn btn-primary btn-sm selected">{ this.props.value }</button>
           : <button onClick={this.toggleSelection} className="value btn btn-primary btn-sm">{ this.props.value }</button>

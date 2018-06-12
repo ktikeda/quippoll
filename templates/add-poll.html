@@ -37,10 +37,17 @@
       </div>
           <small id="poll-help" class="form-text text-muted">Users may select one response option.</small>
       </div>
-
-        Show Results: 
-            <input type="radio" name="is_results_visible" value="True" checked> Yes
-            <input type="radio" name="is_results_visible" value="False"> No<br>
+      <div class="mb-3">
+      Show Results: 
+        <div class="form-check form-check-inline">
+          
+              <input class="form-check-input ml-3" type="radio" name="is_results_visible" value="True" checked> 
+              <label class="form-check-label">Yes</label>
+              <input class="form-check-input ml-3" type="radio" name="is_results_visible" value="False"> 
+              <label class="form-check-label">No</label>
+              <br>
+        </div>
+      </div>
         {% if current_user.is_anonymous %}
         Email: <input type="text" name="email" required><br>
         {% endif %}
