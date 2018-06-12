@@ -332,7 +332,7 @@ export class Poll extends React.Component {
       if (mode === 'results') {
         let barClass = 'fas fa-chart-bar';
         let pieClass = "fas fa-chart-pie";
-        let textClass = "fas fa-font"
+        let textClass = "fas fa-table"
 
         if (chart === 'bar') {
           barClass += ' selected';
@@ -355,10 +355,10 @@ export class Poll extends React.Component {
 
     const showPrompt = () => {
       if (mode === 'edit') {
-        return (<div><input type="text" id="prompt" className="prompt-edit" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
+        return (<div><input type="text" id="prompt" className="prompt-edit text-center" defaultValue={prompt} onBlur={this.updatePrompt} /></div>);
         
       } else {
-        return (<h1 id="prompt">{prompt}</h1>);
+        return (<h1 id="prompt" className="text-center">{prompt}</h1>);
       } // end if
 
     } // end showPrompt
@@ -367,7 +367,7 @@ export class Poll extends React.Component {
       return(
         <ul className="inputs">
         {inputs.map((value, index) => (
-          <Input key={`input-${index}`} index={index} mode={mode} value={value} updateInput={this.updateInput} deleteInput={this.deleteInput} addResponse={this.addResponse}/>
+          <Input key={`input-${index}`} index={index} mode={mode} pollType={pollType} value={value} updateInput={this.updateInput} deleteInput={this.deleteInput} addResponse={this.addResponse}/>
         ))}
         </ul>
       );
@@ -482,7 +482,7 @@ export class Poll extends React.Component {
     const showAddInput = () => {
       if (mode === 'edit' && (this.props.pollType === 'select all' | this.props.pollType === 'multiple choice')) {
         return(
-          <div className="">
+          <div className="add-input button">
             <button className="btn btn-lg btn-success btn-block" id="add-input" type="button" onClick={this.addInput}><i className="fas fa-plus"></i></button>
           </div>);
       }
@@ -491,8 +491,8 @@ export class Poll extends React.Component {
     const showSave = () => {
       if (mode === 'edit' && (this.props.pollType === 'select all' | this.props.pollType === 'multiple choice')) {
         return(
-          <div className="">
-            <button className="btn btn-lg btn-success" type="button" id="save">Save</button>
+          <div className="save button">
+            <button className="btn btn-block btn-success" type="button" id="save">Save</button>
             
           </div>);
       }
@@ -510,7 +510,11 @@ export class Poll extends React.Component {
 
     const showSubmit = () => {
       if (mode === 'respond') {
-        return(<button className="btn btn-lg btn-success btn-block" id="submit" type="button" onClick={this.createTallys}>Submit</button>);
+        return(
+          <div className="submit button">
+            <button className="btn btn-lg btn-success btn-block" id="submit" type="button" onClick={this.createTallys}>Submit</button>
+          </div>
+        );
       }
     } // end showSubmit
 

@@ -16,7 +16,7 @@ export class Input extends React.Component {
   } // end updateResponse
 
   addResponse = (evt) => {
-    let text = this.props.text;
+    let text = this.props.value;
 
     if (text !== '') {
   	  let data = {index : this.props.index};
@@ -42,7 +42,7 @@ export class Input extends React.Component {
     if (this.props.mode === 'edit' && (this.props.pollType === 'select all' | this.props.pollType === 'multiple choice')) {
         return(
           <li className="li-input">
-          <div className="button-outline">
+          <div className="button-outline input">
             <input type="text" 
                    className="response-input edit text-center" 
                    onChange={this.updateInput} 

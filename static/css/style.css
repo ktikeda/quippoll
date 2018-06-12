@@ -77,11 +77,11 @@ form {
   opacity: 1;
 }
 
-.fa-font {
+.fa-table {
   opacity: .6;
 }
 
-.fa-font:hover {
+.fa-table:hover {
   opacity: 1;
 }
 
@@ -97,29 +97,33 @@ form {
 }
 
 h1#prompt {
-  font-size: 3rem;
+  font-size: 4rem;
+  padding: 0.7rem 0;
 }
 
 button#submit {
   font-size: 3rem;
-  margin: 0 40px;
-  width: 95.6%;
 }
 
 button#add-input {
   font-size: 1.5rem;
-  margin: 0 40px;
-  width: 95.6%;
 }
 
 button#save {
   font-size: 1.5rem;
-  margin: 15px 40px;
-  width: 95.6%;
+}
+
+.button {
+  margin-left: 40px;
+  margin-bottom: 15px;
+}
+
+.li-input {
+  margin-left: 40px;
 }
 
 .prompt-edit {
-  font-size: 3rem;
+  font-size: 4rem;
   color: #767676;
   border: none;
   border-bottom: 1px solid #ccc;
@@ -159,6 +163,10 @@ button#save {
   display: table;
   padding: 15px 15px 0px 15px;
 
+}
+
+svg.visualization-layer {
+    overflow: visible;
 }
 
 button.value {
