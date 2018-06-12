@@ -22,7 +22,8 @@ const config = {
 
     watchOptions: {
       poll: true
-    }
+    },
+
 };
 
 module.exports = config;

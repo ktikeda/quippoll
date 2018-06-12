@@ -325,12 +325,23 @@ export class Poll extends React.Component {
 
     const showNav = () => {
       if (mode === 'results') {
+        let barClass = 'fas fa-chart-bar';
+        let pieClass = "fas fa-chart-pie";
+        let textClass = "fas fa-font"
+
+        if (chart === 'bar') {
+          barClass += ' selected';
+        } else if (chart === 'pie') {
+          pieClass += ' selected';
+        } else {
+          textClass += ' selected';
+        }
 
         return(
-          <div>
-            <button id="pie" onClick={ this.updateChart }><i className="fas fa-chart-pie"></i></button>
-            <button id="bar" onClick={ this.updateChart }><i className="fas fa-chart-bar"></i></button>
-            <button id="text" onClick={ this.updateChart }><i className="fas fa-font"></i></button>
+          <div className="d-flex justify-content-around mb-3">
+            <i className={barClass} id="bar" onClick={ this.updateChart }></i>
+            <i className={pieClass} id="pie" onClick={ this.updateChart }></i>
+            <i className={textClass} id="text" onClick={ this.updateChart }></i>
           </div>
         ) // end return
       } // end if
@@ -375,13 +386,23 @@ export class Poll extends React.Component {
       ); // end SortableItem
 
       const SortableList = SortableContainer(({items}) => {
-        return (
-          <ol className="responses">
-            {items.map((value, index) => (
-              <SortableItem key={`item-${index}`} index={index} value={value} />
-            ))}
-          </ol>
-        );
+        if (pollType === 'ranked questions') {
+          return(
+            <ul className="responses mt-3">
+              {items.map((value, index) => (
+                <SortableItem key={`item-${index}`} index={index} value={value} />
+              ))}
+            </ul>
+          );
+        } else {
+          return (
+            <ol className="responses">
+              {items.map((value, index) => (
+                <SortableItem key={`item-${index}`} index={index} value={value} />
+              ))}
+            </ol>
+          );
+        }
       }); // end SortableList
 
       if (mode === 'edit') {
@@ -393,10 +414,12 @@ export class Poll extends React.Component {
       } else if (mode === 'respond') {
         let divClass = '';
         let olClass = 'responses';
+        let type = 'ol';
 
         if (pollType === 'ranked questions') {
           divClass = 'card';
           olClass = olClass + ' list-group list-group-flush';
+          type = 'ul'
         }
 
         return (
@@ -404,7 +427,7 @@ export class Poll extends React.Component {
           <FlipMove 
             enterAnimation="accordionVertical" 
             leaveAnimation="accordionVertical"
-            typeName="ol" className={olClass}>
+            typeName={type} className={olClass}>
             {responses.map(response => (
                 <Response 
                   key={ response.response_id } 
@@ -424,15 +447,19 @@ export class Poll extends React.Component {
         );
       } else if (mode === 'results') {
         return (
-          <div className="" id="legend">
+          <div className="border" id="legend">
+          { showNav() }
+          <table className="table table-sm">
           <FlipMove
             enterAnimation="accordionVertical" 
             leaveAnimation="accordionVertical"
-            typeName="ol" > 
+            typeName="tbody" 
+            > 
             {responses.map(response => (
               <Response 
                 key={ response.response_id } 
-                id={ response.response_id } 
+                id={ response.response_id }
+                index={ responses.indexOf(response) }
                 mode={ mode }
                 pollId={ pollId }
                 text={ response.text }
@@ -440,6 +467,7 @@ export class Poll extends React.Component {
                 />         
             ))}
           </FlipMove>
+          </table>
           </div>
         );
       } // end if
@@ -450,7 +478,7 @@ export class Poll extends React.Component {
       if (mode === 'edit') {
         return(
           <div className="">
-            <button className="btn btn-lg btn-success btn-block" type="button" onClick={this.addInput}><i className="fas fa-plus"></i></button>
+            <button className="btn btn-lg btn-success btn-block" id="add-input" type="button" onClick={this.addInput}><i className="fas fa-plus"></i></button>
           </div>);
       }
     }; // end showAddInput
@@ -458,7 +486,7 @@ export class Poll extends React.Component {
     const showSave = () => {
       if (mode === 'edit') {
         return(
-          <div className="d-flex justify-content-start">
+          <div className="">
             <button className="btn btn-lg btn-success" type="button" id="save">Save</button>
             
           </div>);
@@ -468,9 +496,9 @@ export class Poll extends React.Component {
     const showCharts = () => {    
       if (mode === 'results') {
         if (chart === 'bar') {
-          return(<div id="chart"><BarChart data={responses} /></div>);
+          return(<div id="chart" className="ml-auto mr-auto"><BarChart data={responses} /></div>);
         } else if (chart === 'pie') {
-          return(<div id="chart"><PieChart data={responses} /></div>);
+          return(<div id="chart" className="ml-auto mr-auto"><PieChart data={responses} /></div>);
         }
       }
     } // end showCharts
@@ -483,17 +511,18 @@ export class Poll extends React.Component {
 
 
     return(
-      <div className="px-5 py-5" id="poll"> 
-        { showNav() }
+      <div className="px-5 py-3" id="poll"> 
+        
 
         { showPrompt() }
 
         { inputs.length > 0 && collectResponse === true ? showInputs() : <div/> }
         
-        <div className="d-flex flex-row justify-content-lg-between">    
-          { responses.length > 0 && collectTally === true ? showResponses() : <div/> }
-          
+        <div className="d-flex flex-row mt-3">    
           { responses.length > 0 ? showCharts() : <div/> }
+
+          { responses.length > 0 && collectTally === true ? showResponses() : <div/> }
+
         </div>
         
         { inputs.length > 0 && collectTally === true && mode === 'edit' ? showInputs() : <div/> }

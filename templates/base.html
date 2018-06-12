@@ -14,12 +14,12 @@
 <body>
 
     <div class="container">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar sticky-top navbar-expand-lg navbar-light">
           <div>
             <a id="brand" class="navbar-brand" href="/">Quippoll</a>
-            <span id="shortcode" class="navbar-brand mr-5"></span>
+            <span id="shortcode-url" class="navbar-brand mr-5"></span>
           </div>
-          <div class="mr-5">Text "<strong>{pollCode}</strong>" to <strong>(628) 800-0602</strong> to respond.</div>
+          <div id="sms" class="collapse mr-5">Text "<strong><span id="shortcode-text"></span></strong>" to <strong>(628) 800-0602</strong></div>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>

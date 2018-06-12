@@ -23,7 +23,7 @@ export class BarChart extends React.Component {
 
     return (
     <OrdinalFrame
-          size={[540,400]}
+          size={[540,540]}
           data={chartData}
           oAccessor={"text"}
           rAccessor={"value"}

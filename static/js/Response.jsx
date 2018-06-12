@@ -87,6 +87,7 @@ export class Response extends React.Component {
     let value = this.props.value;
     let isVisible = this.props.isVisible;
     let isSelected = this.props.isSelected;
+    const index = this.props.index;
 
     if (this.props.pollType === 'ranked questions') {
       return(<li className="list-group-item">
@@ -116,7 +117,13 @@ export class Response extends React.Component {
           </li>
         );
       } else if (mode === 'results') {
-        return(<li className="li-response">{text} : {value}</li>);
+        return(
+          <tr>
+            <td id={'td-' + index} width="30"></td>
+            <td>{text}</td>
+            <td>{value}</td>
+          </tr>)
+        // return(<li className="li-response">{text} : {value}</li>);
       } // end if
 
     } // end if

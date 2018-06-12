@@ -174,9 +174,8 @@ const Header = (props) => {
   if (props.isAdmin === true) {
     return(
       <header>
-        {showSMS()}
         <nav id="admin-nav">
-          <ul className="nav nav-tabs">
+          <ul className="nav nav-tabs pt-2">
             <li key="1" className="nav-item"><Link className={"nav-link " + respondActive } to={ match.url } >Respond</Link></li>
             <li key="3" className="nav-item"><Link className={"nav-link " + resultsActive } to={ match.url + '/results' }>Results</Link></li>
             <li key="2" className="nav-item"><Link className={"nav-link " + editActive } to={ match.url + '/edit' } >Edit</Link></li>

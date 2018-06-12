@@ -41,14 +41,14 @@ export class Input extends React.Component {
 
     if (this.props.mode === 'edit') {
         return(
-          <li className="li-response">
+          <li className="li-input">
           <div className="button-outline">
             <input type="text" 
                    className="response-input edit text-center" 
                    onChange={this.updateInput} 
                    onBlur={this.addResponse}
                    value={this.props.value} />
-            <button className="close" aria-label="Close" type="button" onClick={this.deleteInput}>&times;</button>
+            <button className="close light" aria-label="Close" type="button" onClick={this.deleteInput}>&times;</button>
           </div>
           </li>
         );

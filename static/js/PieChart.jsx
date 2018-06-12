@@ -22,7 +22,7 @@ export class PieChart extends React.Component {
 
     return (
     <OrdinalFrame
-          size={[540,400]}
+          size={[540,500]}
           data={chartData}
           oAccessor={"text"}
           rAccessor={() => 1}

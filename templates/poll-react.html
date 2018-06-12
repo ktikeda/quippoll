@@ -21,8 +21,11 @@
   const content = document.getElementById('root');
 
   $("#brand").append(".com");
-  $("#shortcode").html('/' + content.dataset.code);
+  $("#shortcode-url").html('/' + content.dataset.code);
   $("#add-poll").removeClass('show');
+
+  $("#shortcode-text").html(content.dataset.code);
+  $("#sms").addClass('show');
 
 </script>
 
