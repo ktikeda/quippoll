@@ -254,6 +254,15 @@ ul.inputs {
   font-size: 2rem;
 }
 
+.features {
+  margin: 0 4rem;
+}
+
+.card-header {
+  font-weight: bold !important;
+  font-size: 1.2rem !important;
+}
+
 /*https://codepen.io/fox_hover/pen/bqZxLa?editors=0100#0*/
 .effect {
     text-align: center;

@@ -8,31 +8,68 @@
   <div class="col-lg-3"></div>
 
   <div class="col-lg-6 col-xs-12 m-3">
-    <h1>About</h1>
     <h2>Technologies</h2>
-    <p><strong>Backend</strong>: Python, Flask, Flask-Login, Flask-Socketio, Jinja, Postgresql, SQLAlchemy</p>
-    <p><strong>Frontend</strong>: Javascript, React, React-Router, SocketIO, jQuery, Webpack, Semiotic, Bootstrap, CSS/HTML</p>
-    <h2>Features</h2>
-    <ul>
-      <li>Create poll via webform
-      <li>Handle open-ended, multiple choice, and multi-select response types
-      <li>Manage user permissions to enforce single response per poll and access to admin edit feature
-      <li>Respond to poll via webform
-      <li>Respond to poll via SMS (Twilio API)
-      <li>Generate unique link for poll
-      <li>Optionally hide poll results
-      <li>Visualize poll results via Semiotic
-      <li>Delete poll and response data
-      <li>Create account/login
-      <li>View user profile
-      <li>Auto-update poll results upon new input
-      <li>Find poll via geolocation API
-      <li>Reorder responses and edit poll prompt and response text
-    </ul>
-
+    <p><strong>Backend</strong>: Python, Flask, Flask-Login, Flask-Socketio, Jinja, Postgresql, SQLAlchemy<br>
+    <strong>Frontend</strong>: Javascript, React, React-Router, SocketIO, jQuery, Webpack, Semiotic, Bootstrap, CSS/HTML<br>
+    <strong>APIs</strong>: Twilio</p>
+    
   </div>
 
-  <div class="col-lg-3"></div>
+  <div class="col-lg-1"></div>
+</div>
+<div class="row d-flex justify-content-around features">
+
+    <div class="card text-white bg-info mb-3" style="max-width: 18rem;">
+      <div class="card-header">Multiple Poll Types</div>
+      <div class="card-body">
+        <p class="card-text">Create open-ended, multiple choice, and select all polls</p>
+      </div>
+    </div>
+    <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
+      <div class="card-header">User Accounts</div>
+      <div class="card-body">
+        <p class="card-text">Create, login to, view and manage user accounts</p>
+      </div>
+    </div>
+    <div class="card text-white bg-success mb-3" style="max-width: 18rem;">
+      <div class="card-header">User Permissions</div>
+      <div class="card-body">
+        <p class="card-text">Manage user permissions to enforce single response per poll and access to admin features</p>
+      </div>
+    </div>
+    <div class="card text-white bg-danger mb-3" style="max-width: 18rem;">
+      <div class="card-header">Manage Polls</div>
+      <div class="card-body">
+        <p class="card-text">Edit poll settings and responses as an admin. Optionally close poll to input and hide poll results</p>
+      </div>
+    </div>
+  </div>
+<div class="row d-flex justify-content-around features">
+  <div class="card text-white bg-danger mb-3" style="max-width: 18rem;">
+    <div class="card-header">Geolocate Poll</div>
+    <div class="card-body">
+      <p class="card-text">Lookup poll by your location using the geolocation API</p>
+    </div>
+  </div>
+  <div class="card text-white bg-success mb-3" style="max-width: 18rem;">
+    <div class="card-header">Auto-Generated Links</div>
+    <div class="card-body">
+      <p class="card-text">Generate unique link for poll upon creation and optionally customize link</p>
+    </div>
+  </div>
+  <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
+    <div class="card-header">Text to Respond</div>
+    <div class="card-body">
+      <p class="card-text">Record input to poll via webform and SMS (Twilio API)</p>
+    </div>
+  </div>
+  <div class="card text-white bg-info mb-3" style="max-width: 18rem;">
+    <div class="card-header">Update in Real-Time</div>
+    <div class="card-body">
+      <p class="card-text">Auto-update poll results vis WebSockets upon new input</p>
+    </div>
+  </div>
+
 </div>
 
 {% endblock %}
