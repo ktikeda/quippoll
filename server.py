@@ -59,7 +59,7 @@ def broadcast_response_update(message):
     response = Response.query.get(response_id)
 
     socketio.emit('response_update',
-         {'response_id' : response_id, 'value': response.value()},
+         {'response_id' : response_id, 'value': response.value(), 'text' : response.text},
          namespace='/poll',
          room=message['room'],
          include_self=False)
