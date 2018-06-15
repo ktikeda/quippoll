@@ -921,5 +921,6 @@ if __name__ == "__main__":
     # DebugToolbarExtension(app)
 
     # Run server
-    socketio.run(app, debug=False, host='0.0.0.0', port=5000)
+    # socketio.run(app, debug=False, host='0.0.0.0', port=5000)
+    socketio.run(app, debug=False, port=5000)
     # app.run(port=5000, host='0.0.0.0')
