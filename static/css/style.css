@@ -35,7 +35,6 @@ body {
   width: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
   width: fill-available;
   margin: 0;
-  padding: 0 10rem;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -46,7 +45,6 @@ body {
   color: #FFF;
   display: table;
   padding: 2rem;
-  margin-top: -7rem;
   backdrop-filter: -webkit-backdrop-filter: blur(10px);
 }
 
