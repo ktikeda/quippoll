@@ -8,7 +8,7 @@
   <div class="col-lg-3"></div>
 
   <div class="col-lg-6 col-xs-12 m-3">
-    <h1>Add Poll</h1>
+    <h1 class="text-center">Add Poll</h1>
 
     <form class="p-3" action="/add-poll" method="POST">
       <div class="input-group mb-3">
@@ -50,6 +50,7 @@
         </div>
         {% endif %}
         <!-- TODO: for multiple choice and select-all polls: Need js to add responses -->
+        <small id="response-help" class="form-text text-muted mb-3 collapse show">Line-seperate response options.</small>
         <div class="input-group collapse show" id="response_options">
           <div class="input-group-prepend">
             <span class="input-group-text">Response Options</span>
@@ -85,12 +86,16 @@
       pollHelp.html('Users may select one response option.');
     } else if (poll_type === 2) {
       pollHelp.html('Users may select any available response options.');
-    }
+    } else if (poll_type === 3) {
+      pollHelp.html('Users may type and submit a response.');
+    } 
 
     if (poll_type === 3 | poll_type === 4) {
       $('#response_options').removeClass('show');
+      $('#response-help').removeClass('show');
     } else {
       $('#response_options').addClass('show');
+      $('#response-help').addClass('show');
     }
   });
 

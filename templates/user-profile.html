@@ -9,7 +9,7 @@
 
   <div class="col-lg-6 col-xs-12 ml-3 mr-3">
 
-	<h1>{{ current_user.fname }} {{ current_user.lname }}</h1>
+	<h1 class="text-center">{{ current_user.fname }} {{ current_user.lname }}</h1>
 
 	Email: {{ current_user.email }}
 
@@ -18,8 +18,10 @@
 	  <ul>
 	  {% for poll in current_user.admin_polls %}
 	    <li><a href="/{{ poll.short_code }}">{{ poll.title }}</a> 
-	        <form action="/delete" method="POST"><button type="submit" value="{{ poll.short_code }}">Delete</button></form>
-	        <button type="submit" onclick="window.location.href='/poll/{{poll.poll_id}}/settings'" >Settings</button>
+	        <form action="/polls/{{poll.poll_id}}/delete" method="POST">
+          <button class="delete-button" type="submit">Delete</button>
+          </form>
+	        <button type="submit" onClick="window.location.href='/polls/{{poll.poll_id}}/settings'" >Settings</button>
 	    </li>
 	  {% endfor %}
 	  </ul>

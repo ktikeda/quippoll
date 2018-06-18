@@ -3,17 +3,44 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<h1>Register</h1>
+<div class="row">
+  <div class="col-lg-4"></div>
 
-<form action="/register" method="POST">
-    First Name: <input type="text" name="fname" required><br>
-    Last Name: <input type="text" name="lname" required><br>
-    Email: <input type="text" name="email" required><br>
-    Password: <input type="password" name="password" required><br>
-    <!-- Confirm Password: <input type="password" name="password2" required><br> -->
+  <div class="col-lg-4 col-xs-12 m-3">
+    <h1 class="text-center">Register</h1>
 
-    <input type="submit" value="Register">
-    
-</form>
+    <form class="p-3" action="/register" method="POST">
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">First Name</span>
+        </div>
+        <input class="form-control" type="text" name="fname" required>
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Last Name</span>
+        </div>
+        <input class="form-control" type="text" name="lname" required>
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Email</span>
+        </div>
+        <input class="form-control" type="text" name="email" required>
+      </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <span class="input-group-text">Password</span>
+        </div>
+        <input class="form-control" type="password" name="password" required>
+      </div>
+        <!-- Confirm Password: <input type="password" name="password2" required><br> -->
+        <input class="btn btn-success mt-3" type="submit" value="Register">
+        
+    </form>
+  </div>
+
+  <div class="col-lg-4"></div>
+</div>
 
 {% endblock %}

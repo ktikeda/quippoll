@@ -370,24 +370,6 @@ def show_profile():
         return redirect('/')
 
 
-@app.route('/delete', methods=['POST'])
-@login_required
-def delete_poll():
-    """Delete all data associated with a poll"""
-
-    short_code = request.form.get('p')
-
-    poll = Poll.get_from_code(short_code)
-
-    if current_user.is_admin(poll):
-        poll.delete()
-        flash('Your poll has been deleted.')
-    else:
-        flash('You do not have permission to delete this poll.')
-
-    return redirect('/profile')
-
-
 @app.route('/locate')
 def locate_user():
     return render_template('locate.html')
@@ -418,7 +400,23 @@ def locate_poll():
     return route
 
 
-@app.route('/poll/<int:poll_id>/settings')
+@app.route('/polls/<int:poll_id>/delete', methods=['POST'])
+@login_required
+def delete_redirect_poll(poll_id):
+    """Delete all data associated with a poll"""
+
+    poll = Poll.query.get(poll_id)
+
+    if current_user.is_admin(poll):
+        poll.delete()
+        flash('Your poll has been deleted.')
+    else:
+        flash('You do not have permission to delete this poll.')
+
+    return redirect('/profile')
+
+
+@app.route('/polls/<int:poll_id>/settings')
 def show_poll_settings(poll_id):
     poll = Poll.query.get(poll_id)
 
@@ -726,6 +724,22 @@ def update_poll(poll_id):
     return jsonify({'poll_id' : poll_id})
 
 
+@app.route(api + '/polls/<int:poll_id>', methods=['DELETE'])
+@login_required
+def delete_poll(poll_id):
+    """Delete all data associated with a poll"""
+
+    poll = Poll.query.get(poll_id)
+
+    if current_user.is_admin(poll):
+        poll.delete()
+        flash('Your poll has been deleted.')
+    else:
+        flash('You do not have permission to delete this poll.')
+
+    return redirect('/profile')
+
+
 @app.route(api + '/polls/<int:poll_id>/user', methods=["GET"])
 def get_user_data(poll_id):
     """Get user data for a poll id"""
@@ -920,7 +934,8 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     # DebugToolbarExtension(app)
 
-    # Run server
-    # socketio.run(app, debug=False, host='0.0.0.0', port=5000)
-    socketio.run(app, debug=False, port=5000)
-    # app.run(port=5000, host='0.0.0.0')
+    # Run server in developer mode
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+
+    # Run server in production
+    # socketio.run(app, debug=False, port=5000)
