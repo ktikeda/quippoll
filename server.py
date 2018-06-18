@@ -150,10 +150,10 @@ def add_poll_to_db():
     """Adds poll form data to database"""
 
     # get data from form
-    title = request.form.get('title')
     prompt = request.form.get('prompt')
     poll_type = int(request.form.get('poll_type'))
     is_results_visible = bool(request.form.get('is_results_visible'))
+    title = prompt
 
     # create and add objects to db
     if current_user.is_authenticated:

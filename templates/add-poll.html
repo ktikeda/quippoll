@@ -11,12 +11,6 @@
     <h1>Add Poll</h1>
 
     <form class="p-3" action="/add-poll" method="POST">
-      <div class="input-group mb-3 form-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text">Title</span>
-        </div>
-        <input class="form-control" type="text" name="title" required>
-      </div>
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <span class="input-group-text">Prompt</span>
@@ -32,7 +26,6 @@
           <option value="1">Multiple Choice</option>
           <option value="2">Select All</option>
           <option value="3">Open-Ended</option>
-          <option value="4">Open-Ended with Voting</option>
         </select>
       </div>
           <small id="poll-help" class="form-text text-muted">Users may select one response option.</small>
@@ -49,7 +42,12 @@
         </div>
       </div>
         {% if current_user.is_anonymous %}
-        Email: <input type="text" name="email" required><br>
+        <div class="input-group mb-3 form-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">Email</span>
+          </div>
+          <input class="form-control" type="email" name="title" required>
+        </div>
         {% endif %}
         <!-- TODO: for multiple choice and select-all polls: Need js to add responses -->
         <div class="input-group collapse show" id="response_options">
