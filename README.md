@@ -12,8 +12,8 @@ Quippoll was created by [Karynn Ikeda](https://www.linkedin.com/in/ktikeda/), a 
 Backend
 * Python
 * Flask
-* Flask-Login
-* Flask-Socketio
+* [Flask-Login](https://flask-login.readthedocs.io/en/latest/)
+* [Flask-Socketio](https://github.com/miguelgrinberg/Flask-SocketIO)
 * Jinja
 * Postgresql
 * SQLAlchemy
@@ -23,9 +23,11 @@ Frontend
 * jQuery
 * Webpack
 * React
-* React-Router
-* SocketIO
-* Semiotic
+* [React-Router](https://github.com/ReactTraining/react-router)
+* [React-Sortable-HOC](https://github.com/clauderic/react-sortable-hoc)
+* [React-Flip-Move](https://github.com/joshwcomeau/react-flip-move)
+* [SocketIO](https://socket.io/)
+* [Semiotic](https://github.com/emeeks/semiotic)
 * Bootstrap
 * CSS/HTML
 
@@ -33,18 +35,26 @@ APIs
 * Twilio API
 
 ## Features
+
+### Poll Creation & Management
 * Create poll via webform
 * Handle open-ended, multiple choice, and multi-select response types
-* Manage user permissions to enforce single response per poll and access to admin edit feature
+* Generate unique link for poll
+* Optionally close poll and hide poll results
+* Set poll geolocation and find poll via geolocation API
+* Reorder responses and edit poll prompt and response text
+* Delete poll and response data
+
+### Response Collection
 * Respond to poll via webform
 * Respond to poll via SMS (Twilio API)
-* Generate unique link for poll
-* Optionally hide poll results
-* Visualize poll results via Semiotic
-* Delete poll and response data
+
+### Results Visualization
+* Visualize poll results as bar chart or pie chart via Semiotic
+* Auto-update poll results upon new input
+
+### Accounts & User Permissions
 * Create account/login
 * View user profile
-* Auto-update poll results upon new input
-* Find poll via geolocation API
-* Reorder responses and edit poll prompt and response text
+* Manage user permissions to enforce single response per poll and access to admin edit feature
 
