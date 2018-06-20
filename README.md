@@ -1,5 +1,7 @@
 # Quippoll
 ## Summary
+[Live Deployment](http://quippoll.com/)
+
 Quippoll allows users to create, view, update, and delete their own polls to gather feedback from an audience. User input is collected via webform and SMS, using the Twilio API, and updated in realtime via WebSockets and React. User authentication is handled on the backend with Flask-Login while user permissions for each poll are managed on the frontend with React-Router.
 
 ## About the Developer
