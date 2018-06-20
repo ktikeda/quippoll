@@ -18,32 +18,32 @@ class GetRouteTests(TestCase):
     def test_index(self):
         result = self.client.get('/')
         self.assertEqual(result.status_code, 200)
-        self.assertIn('Gather input in a snap.', result.data)
+        self.assertIn('Create, View, Edit and Delete Live Polls.', result.data)
 
     def test_add_poll(self):
         result = self.client.get('/add-poll')
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<h1>Add Poll</h1>', result.data)
+        self.assertIn('<title>Add Poll</title>', result.data)
 
     def test_login(self):
         result = self.client.get('/login')
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<h1>Login</h1>', result.data)
+        self.assertIn('<title>Login</title>', result.data)
 
     def test_logout(self):
         result = self.client.get('/logout', follow_redirects=True)
         self.assertEqual(result.status_code, 200)
-        self.assertIn('Gather input in a snap.', result.data)
+        self.assertIn('Create, View, Edit and Delete Live Polls.', result.data)
 
     def test_register(self):
         result = self.client.get('/register')
         self.assertEqual(result.status_code, 200)
-        self.assertIn('<h1>Register</h1>', result.data)
+        self.assertIn('<title>Register</title>', result.data)
 
     def test_profile(self):
         result = self.client.get('/profile', follow_redirects=True)
         self.assertEqual(result.status_code, 200)
-        self.assertIn('Gather input in a snap.', result.data)
+        self.assertIn('Create, View, Edit and Delete Live Polls.', result.data)
 
     def test_locate(self):
         result = self.client.get('/locate')
@@ -203,17 +203,17 @@ class DBRouteTests(TestCase):
         pass
 
     def test_poll_settings_not_admin(self):
-        result = self.client.get('/poll/1/settings', follow_redirects=True)
+        result = self.client.get('/polls/1/settings', follow_redirects=True)
         self.assertEqual(result.status_code, 200)
-        self.assertIn('Gather input in a snap.', result.data)
+        self.assertIn('Create, View, Edit and Delete Live Polls.', result.data)
 
     def test_update_poll_settings(self):
-        result = self.client.post('/poll/1/settings',
+        result = self.client.post('/polls/1',
                                   data={'title': 'My Colors'})
-        self.assertIn('Saved', result.data)
+        self.assertIn('My Colors', result.data)
 
     def test_update_poll_settings_bad_short_code(self):
-        result = self.client.post('/poll/1/settings',
+        result = self.client.post('/polls/1',
                                   data={'short_code': 'open'})
         self.assertIn('This short code is already in use.', result.data)
 

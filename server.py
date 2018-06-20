@@ -593,37 +593,39 @@ def sms_add_input(short_code):
         try:
             index = int(sms)
             responses = poll.responses
-            response = responses[index-1]
+            
+            try:
+                response = responses[index-1]
 
-            # Check that response option exists
-            if response:
+                # Check that response option exists
+                if response:
 
-                # Check that user hasn't already responded
-                if Tally.query.filter(Tally.response_id == response.response_id,
-                                      Tally.user_id == user.user_id).first():
+                    # Check that user hasn't already responded
+                    if Tally.query.filter(Tally.response_id == response.response_id,
+                                          Tally.user_id == user.user_id).first():
 
-                    resp.message('You have already responsed for "{}".'.format(response.text))
+                        resp.message('You have already responsed for "{}".'.format(response.text))
 
-                # Add tally
-                else:
-                    tally = Tally(response_id=response.response_id,
-                                  user_id=user.user_id)
-                    db.session.add(tally)
-                    db.session.commit()
+                    # Add tally
+                    else:
+                        tally = Tally(response_id=response.response_id,
+                                      user_id=user.user_id)
+                        db.session.add(tally)
+                        db.session.commit()
 
-                    # emit_new_result(response)
-                    emit_response_update(response)
+                        # emit_new_result(response)
+                        emit_response_update(response)
 
-                    resp.message('Your response "{}" has been recorded.'.format(response.text))
+                        resp.message('Your response "{}" has been recorded.'.format(response.text))
 
-                if poll.poll_type.multi_select:
-                    resp.message('Continue responding? Y/N')
-                    return str(resp)
-                    # redirect for route for Y/N
+                    if poll.poll_type.multi_select:
+                        resp.message('Continue responding? Y/N')
+                        return str(resp)
+                        # redirect for route for Y/N
 
-                del session['short_code']
+                    del session['short_code']
 
-            else:
+            except:
                 resp.message('Sorry that response does not exist. Please enter another number.')
 
         except:
@@ -710,6 +712,7 @@ def update_poll(poll_id):
     """Update poll data for a poll id"""
     poll = Poll.query.get(poll_id)
     data = request.form.to_dict()
+    resp_data = {'poll_id' : poll_id}
 
     for attr, val in data.iteritems():
 
@@ -717,11 +720,12 @@ def update_poll(poll_id):
             return 'This short code is already in use.'
 
         setattr(poll, attr, val)
+        resp_data[attr] = val
         poll.updated_at = datetime.now()
         db.session.add(poll)
         db.session.commit()
 
-    return jsonify({'poll_id' : poll_id})
+    return jsonify(resp_data)
 
 
 @app.route(api + '/polls/<int:poll_id>', methods=['DELETE'])
@@ -935,7 +939,7 @@ if __name__ == "__main__":
     # DebugToolbarExtension(app)
 
     # Run server in developer mode
-    # socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
 
     # Run server in production
-    socketio.run(app, debug=False, port=5000)
+    # socketio.run(app, debug=False, port=5000)
