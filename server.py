@@ -189,101 +189,10 @@ def add_poll_to_db():
     return redirect(route)
 
 
-@app.route('/polls/<short_code>')
-def add_user_input(short_code):
-    """Poll response submission display"""
-
-    poll = Poll.get_from_code(short_code)
-    user = User.get_user()
-
-    if poll is not None:  # Ensure this is a valid poll route
-        if poll.poll_type.collect_response:
-            if not Response.query.filter(Response.user_id == user.user_id,
-                                         Response.poll_id == poll.poll_id).first():
-                return render_template('add-response.html', poll=poll)
-        elif user not in poll.get_users_from_tally():
-                return render_template('add-tally.html', poll=poll)
-            # TODO: make a direct query to db
-            # Tally.query.filter(Tally.user_id == user.user_id).first():
-
-        else:
-            route = '/' + short_code + '/r'
-
-    flash('Sorry, that page does not exist.')
-    route = '/'
-
-    return redirect(route)
-
-
 @app.route('/favicon.ico')
 def _():
     # print 'favicon'
     return ''
-
-
-@app.route('/polls/<short_code>/response', methods=["POST"])
-def add_response_to_db(short_code):
-    """Add response data to db"""
-
-    poll = Poll.get_from_code(short_code)
-    user = User.get_user()
-
-    # TODO: Write logic to query user and poll, and not add to db if already exists
-
-    text = request.form.get('response')
-
-    weight = Response.query.filter(Response.poll_id == poll.poll_id).count()
-
-    response = Response(poll_id=poll.poll_id,
-                        user_id=user.user_id,
-                        text=text,
-                        weight=weight)
-    db.session.add(response)
-    db.session.commit()
-
-    # emit_new_result(response)
-    emit_response_update(response)
-
-    # Specify route
-    if poll.is_results_visible:
-        flash('Your response has been recorded.')
-        route = '/' + poll.short_code
-    else:
-        route = '/' + poll.short_code + '/success'
-
-    return redirect(route)
-
-
-@app.route('/polls/<short_code>', methods=["POST"])
-def add_tally_to_db(short_code):
-    """Add tally data to db"""
-
-    poll = Poll.get_from_code(short_code)
-    user = User.get_user()
-
-    # TODO: Write logic to query user and poll, and not add to db if already exists
-
-    tallys = json.loads(request.form.get('tallys'))
-
-    for response_text in tallys:
-        response = Response.query.filter(Response.text == response_text,
-                                         Response.poll_id == poll.poll_id).one()
-
-        tally = Tally(response_id=response.response_id, user_id=user.user_id)
-        db.session.add(tally)
-        db.session.commit()
-
-        # emit_new_result(response)
-        emit_response_update(response)
-
-    # Specify route
-    if poll.is_results_visible:
-        flash('Your response has been recorded.')
-        route = '/' + poll.short_code
-    else:
-        route = '/' + poll.short_code + '/success'
-
-    return route
 
 
 @app.route('/<short_code>')
@@ -635,45 +544,6 @@ def sms_add_input(short_code):
 
 # End twilio routes
 
-
-# Start chart.js routes
-@app.route('/<short_code>/d')
-def show_doughnut_results(short_code):
-    poll = Poll.get_from_code(short_code)
-
-    return render_template('doughnut-chart.html', poll=poll)
-
-
-@app.route('/<short_code>/doughnut.json')
-def doughnut_results(short_code):
-    """Return data for results page."""
-    poll = Poll.get_from_code(short_code)
-
-    labels = []
-    data = []
-
-    for response in poll.responses:
-        labels.append(response.text)
-        data.append(response.value())
-
-    data_dict = {
-                "labels": labels,
-                "datasets": [
-                    {
-                        "data": data,
-                        "backgroundColor": [
-                            "#FF6384",
-                            "#36A2EB",
-                        ],
-                        "hoverBackgroundColor": [
-                            "#FF6384",
-                            "#36A2EB",
-                        ]
-                    }]
-                }
-
-    return jsonify(data_dict)
-# End chart.js routes
 
 # API routes for AJAX
 api = '/api'
