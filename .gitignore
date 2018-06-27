@@ -7,4 +7,5 @@ htmlcov/
 static/dist/
 static/node_modules/
 static/npm-debug.log
+npm-debug.log
 
