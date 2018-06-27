@@ -138,11 +138,11 @@ def add_poll():
     return render_template('add-poll.html')
 
 
-@app.route('/about')
-def about():
+@app.route('/features')
+def show_features():
     """Show about page."""
 
-    return render_template('about.html')
+    return render_template('features.html')
 
 
 @app.route('/add-poll', methods=["POST"])
