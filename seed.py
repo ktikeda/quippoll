@@ -84,6 +84,10 @@ def test_data():
                    prompt='What is your favorite color?',
                    short_code='open', admin_code='adminoe')
 
+    ro_poll = Poll(poll_type_id=3, title='Colors - Ranked Order',
+                   prompt='Rank the colors from most to lease favorite?',
+                   short_code='ranked', admin_code='adminro')
+
     q_poll = Poll(poll_type_id=4, title='Questions',
                    prompt='Ask me anything.',
                    short_code='questions', admin_code='adminq')
@@ -93,13 +97,14 @@ def test_data():
                    short_code='close', admin_code='adminclosed', 
                    is_open=False)
 
-    db.session.add_all([mc_poll, sa_poll, oe_poll, q_poll, closed_poll])
+    db.session.add_all([mc_poll, sa_poll, oe_poll, ro_poll, q_poll, closed_poll])
     db.session.commit()
 
     # Create PollAdmin
     mc_admin = PollAdmin(poll_id=mc_poll.poll_id, user_id=admin.user_id)
     sa_admin = PollAdmin(poll_id=sa_poll.poll_id, user_id=admin.user_id)
     oe_admin = PollAdmin(poll_id=oe_poll.poll_id, user_id=admin.user_id)
+    ro_admin = PollAdmin(poll_id=ro_poll.poll_id, user_id=admin.user_id)
     q_admin = PollAdmin(poll_id=q_poll.poll_id, user_id=admin.user_id)
     closed_admin = PollAdmin(poll_id=closed_poll.poll_id, user_id=admin.user_id)
 
@@ -122,11 +127,15 @@ def test_data():
     oe_r1 = Response(poll_id=oe_poll.poll_id, user_id=user_responded.user_id, text='Red', weight=1)
     oe_r2 = Response(poll_id=oe_poll.poll_id, user_id=anon_user_responded.user_id, text='Blue', weight=1)
 
+    ro_r1 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Purple', weight=1)
+    ro_r2 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Green', weight=2)
+    ro_r3 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Orange', weight=3)
+
     q_r1 = Response(poll_id=q_poll.poll_id, user_id=user_responded.user_id, text='What is your name?', weight=1)
     q_r2 = Response(poll_id=q_poll.poll_id, user_id=anon_user_responded.user_id, text='Where do you live?', weight=1)
     q_r3 = Response(poll_id=q_poll.poll_id, user_id=user_responded.user_id, text='How old are you?', weight=1)
 
-    db.session.add_all([mc_r1, mc_r2, mc_r3, sa_r1, sa_r2, sa_r3, oe_r1, oe_r2, q_r1, q_r2, q_r3])
+    db.session.add_all([mc_r1, mc_r2, mc_r3, sa_r1, sa_r2, sa_r3, ro_r1, ro_r2, ro_r3, oe_r1, oe_r2, q_r1, q_r2, q_r3])
     db.session.commit()
 
     # Create Tallys
