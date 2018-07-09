@@ -84,8 +84,8 @@ def test_data():
                    prompt='What is your favorite color?',
                    short_code='open', admin_code='adminoe')
 
-    ro_poll = Poll(poll_type_id=3, title='Colors - Ranked Order',
-                   prompt='Rank the colors from most to lease favorite?',
+    ro_poll = Poll(poll_type_id=5, title='Colors - Ranked Order',
+                   prompt='Rank the colors from most to lease favorite.',
                    short_code='ranked', admin_code='adminro')
 
     q_poll = Poll(poll_type_id=4, title='Questions',
@@ -127,9 +127,9 @@ def test_data():
     oe_r1 = Response(poll_id=oe_poll.poll_id, user_id=user_responded.user_id, text='Red', weight=1)
     oe_r2 = Response(poll_id=oe_poll.poll_id, user_id=anon_user_responded.user_id, text='Blue', weight=1)
 
-    ro_r1 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Purple', weight=1)
-    ro_r2 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Green', weight=2)
-    ro_r3 = Response(poll_id=sa_poll.poll_id, user_id=admin.user_id, text='Orange', weight=3)
+    ro_r1 = Response(poll_id=ro_poll.poll_id, user_id=admin.user_id, text='Purple', weight=1)
+    ro_r2 = Response(poll_id=ro_poll.poll_id, user_id=admin.user_id, text='Green', weight=2)
+    ro_r3 = Response(poll_id=ro_poll.poll_id, user_id=admin.user_id, text='Orange', weight=3)
 
     q_r1 = Response(poll_id=q_poll.poll_id, user_id=user_responded.user_id, text='What is your name?', weight=1)
     q_r2 = Response(poll_id=q_poll.poll_id, user_id=anon_user_responded.user_id, text='Where do you live?', weight=1)
