@@ -26,7 +26,12 @@ def create_poll_types():
                           collect_tally=True,
                           multi_select=True)
 
-    db.session.add_all([multi_choice, select_all, open_ended, ranked_questions])
+    ranked_order = PollType(name='ranked order',
+                          collect_response=False,
+                          collect_tally=True,
+                          multi_select=False)
+
+    db.session.add_all([multi_choice, select_all, open_ended, ranked_questions, ranked_order])
     db.session.commit()
 
 
