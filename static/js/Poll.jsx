@@ -176,22 +176,24 @@ export class Poll extends React.Component {
     if (this.props.pollType === 'ranked questions') {
       let data = {tallys : [tally]};
 
-      $.ajax({ 
-        url: '/api/polls/' + this.props.pollId + '/tallys',
-        dataType: 'json',
-        contentType : 'application/json',
-        type: 'post',
-        data: JSON.stringify(data),
-        success: (resp) => {
-          console.log('tally created on server', resp);
-          responses.get(id).tally = resp.tallys[0];
-          tally = responses.get(id).tally;
-          tallys.push(tally);
-          this.setState({ responseData : responses,
-                          tallys : tallys });
-
-        }
-      });
+      fetch(`/api/polls/${this.props.pollId}/tallys`, 
+          {
+            method:'post', 
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+          }
+        )
+        .then((resp) => resp.json())
+        .then((resp) => {
+            console.log('tally created on server via fetch', resp);
+            responses.get(id).tally = resp.tallys[0];
+            tally = responses.get(id).tally;
+            tallys.push(tally);
+            this.setState({ responseData : responses,
+                            tallys : tallys });
+          }
+        );
+      
     } else {
       
       tallys.push(tally);
