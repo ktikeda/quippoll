@@ -9,6 +9,7 @@ import Response from './Response.jsx';
 import Input from './Input.jsx';
 import BarChart from './BarChart.jsx';
 import PieChart from './PieChart.jsx';
+import * as socketFns from './websockets';
 
 export class Poll extends React.Component {
   constructor(props) {
@@ -564,7 +565,7 @@ export class Poll extends React.Component {
     const pollType = this.props.pollType;
 
   /* call socketio functions */
-    onResponseCreation (
+    socketFns.onResponseCreation (
       (err, data) => {
         responses.set(data.response_id, data);
         order.push(responses.get(data.response_id));
@@ -574,7 +575,7 @@ export class Poll extends React.Component {
       }
     ); // end onResponseCreation
     
-    onResponseUpdate (
+    socketFns.onResponseUpdate (
       (err, data) => {
         const id = data.response_id;
 
@@ -601,7 +602,7 @@ export class Poll extends React.Component {
     
     }); // end onResponseUpdate
 
-    onResponseDeletion ( 
+    socketFns.onResponseDeletion ( 
       (err, data) => {
         const id = data.response_id;
 
@@ -615,7 +616,7 @@ export class Poll extends React.Component {
 
     }); // end onResponseUpdate
 
-    onNewOrder( 
+    socketFns.onNewOrder( 
       (err, data) => {
         const oldIndex = data.order[0];
         const newIndex = data.order[1];

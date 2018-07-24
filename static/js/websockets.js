@@ -1,3 +1,7 @@
+    import client from "socket.io-client";
+    
+    const io = client();
+
     const namespace = '/poll';
 
     // Connect to the Socket.IO server.
@@ -35,35 +39,35 @@
 
     });
 
-    const onResponseCreation = (cb) => {
+    export const onResponseCreation = (cb) => {
       socket.on('response_creation', function(data) {
         console.log('create new response on client', data);
         cb(null, data);
       });
     }
 
-    const onResponseUpdate = (cb) => {
+    export const onResponseUpdate = (cb) => {
       socket.on('response_update', function(data) {
         console.log('update response on client', data);
         cb(null, data);
       });
     }
 
-    const onResponseDeletion = (cb) => {
+    export const onResponseDeletion = (cb) => {
       socket.on('response_deletion', function(data) {
         console.log('delete response on client', data);
         cb(null, data);
       });
     }
 
-    const onNewOrder = (cb) => {
+    export const onNewOrder = (cb) => {
       socket.on('new_response_order', function(data){ 
         console.log('reorder responses on client', data);
         cb(null, data);
       }); 
     }
 
-    const onPollUpdate = (cb) => {
+    export const onPollUpdate = (cb) => {
       socket.on('poll_update', function(data) {
         console.log('update poll on client', data);
         cb(null, data);
