@@ -3,6 +3,8 @@ from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import current_user, login_user, logout_user, login_required
 from datetime import datetime
 import json
+import sys
+import logging
 
 from twilio.twiml.messaging_response import Body, Message, Redirect, MessagingResponse
 
@@ -13,6 +15,21 @@ from app import socketio, thread, thread_lock
 from model import connect_to_db, db
 from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 
+# Setup logging:
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# handler = logging.FileHandler("log_" + datetime.now().strftime('%Y%m%d%H%M%S'))
+# handler.setLevel(logging.DEBUG)
+
+# formatter = logging.Formatter("%(asctime)s %(levelname)s: %(message)s")
+# handler.setFormatter(formatter)
+
+# logger.addHandler(handler)
+
+# Uncomment line below to also stream logging to STDOUT
+logger.addHandler(logging.StreamHandler(sys.stdout))
+
 # import pdb; pdb.set_trace()
 
 
@@ -20,7 +37,7 @@ from model import PollType, Poll, User, Response, Tally, AdminRole, PollAdmin
 def emit_response_update(response):
     """Send updated response data as server generated event to clients."""
 
-    print "Server emitted response update"
+    logger.info("Server emitted response update")
 
     poll = Poll.query.get(response.poll_id)
 
@@ -37,7 +54,7 @@ def emit_response_update(response):
 
 def emit_response_creation(response):
     """Send new response data as server generated event to clients."""
-    print "Server emitted response creation"
+    logger.info("Server emitted response creation")
 
     poll = Poll.query.get(response.poll_id)
 
@@ -54,7 +71,7 @@ def emit_response_creation(response):
 # TODO: Create rooms for each poll
 @socketio.on('response_update', namespace='/poll')
 def broadcast_response_update(message):
-    print 'broadcast response update', message
+    logger.info(f"broadcast response update {message}")
     response_id = message['data']['response_id']
     response = Response.query.get(response_id)
 
@@ -67,7 +84,7 @@ def broadcast_response_update(message):
 
 @socketio.on('response_order_change', namespace='/poll')
 def broadcast_response_order(message):
-    print message
+    logger.info(message)
     socketio.emit('new_response_order',
          {'order': message['data']},
          namespace='/poll',
@@ -77,7 +94,7 @@ def broadcast_response_order(message):
 
 @socketio.on('response_deletion', namespace='/poll')
 def broadcast_response_deletion(message):
-    print message
+    logger.info(message)
     socketio.emit('response_deletion',
          {'response_id': message['data']['response_id']},
          namespace='/poll',
@@ -87,7 +104,7 @@ def broadcast_response_deletion(message):
 
 @socketio.on('poll_update', namespace='/poll')
 def broadcast_poll_update(message):
-    print 'broadcast poll update', message
+    logger.info(f'broadcast poll update {message}')
     poll_id = message['data']['poll_id']
     poll = Poll.query.get(poll_id)
 
@@ -101,23 +118,23 @@ def broadcast_poll_update(message):
 @socketio.on('join', namespace='/poll')
 def join(message):
     join_room(message['room'])
-    print message['room'], 'joined'
+    logger.info(f"{message['room']} joined")
 
 
 @socketio.on('leave', namespace='/poll')
 def leave(message):
     leave_room(message['room'])
-    print message['room'], 'left'
+    logger.info(f"{message['room']} left")
 
 
 @socketio.on('connect', namespace='/poll')
 def test_connect():
-    print 'Server is connected.'
+    logger.info('Server is connected.')
 
 
 @socketio.on('client_connect', namespace='/poll')
 def test_client_connect(message):
-    print message['data']
+    logger.info(message['data'])
 
 # End socket.io routes
 
@@ -202,18 +219,18 @@ def render_poll(short_code):
     poll = Poll.get_from_code(short_code)
     user = User.get_user()
 
-    print session
-    print 'poll:', poll
+    logger.info(session)
+    logger.info(f'poll: {poll}')
 
     if poll is not None:  # Ensure this is a valid poll route
         if user.is_admin(poll):
-            print "Admin view"
+            logger.info("Admin view")
             return render_template('poll-react.html', poll=poll, async_mode=socketio.async_mode)
         elif not poll.is_open:
-            print "poll not open"
+            logger.info("Poll not open")
             return render_template('poll-closed.html', poll=poll)
         elif user.may_respond(poll):
-            print 'User may respond'
+            logger.info('User may respond')
             return render_template('poll-react.html', poll=poll, async_mode=socketio.async_mode)
         elif not poll.is_results_visible:
             "User has voted but results not visible"
@@ -273,7 +290,7 @@ def success(short_code):
 @app.route('/profile')
 def show_profile():
     if current_user.is_authenticated:
-        print session
+        logger.info(session)
         return render_template('user-profile.html')
     else:
         return redirect('/')
@@ -637,7 +654,7 @@ def get_responses(poll_id):
                   'value' : response.value(),
                   'is_visible': response.is_visible} for response in poll.responses]
 
-    print responses
+    logger.info(responses)
 
     return jsonify({"response_data" : responses})
 
@@ -706,7 +723,7 @@ def update_response(poll_id, response_id):
     for attr, val in data.iteritems():
         if attr == 'weight':
             index = int(val)
-            print index
+            logger.info(index)
             weight = 1
             if index != 0:
                 prev_response = Response.query.filter(Response.poll_id == poll_id).order_by(Response.weight.asc()).offset(index-1).first()
@@ -742,7 +759,7 @@ def update_response(poll_id, response_id):
 @app.route(api + '/polls/<int:poll_id>/responses/<int:response_id>', methods=['DELETE'])
 def delete_response(poll_id, response_id):
     """Delete response from poll"""
-    print response_id
+    logger.info(response_id)
     poll = Poll.query.get(int(poll_id))
     response = Response.query.get(int(response_id))
 
